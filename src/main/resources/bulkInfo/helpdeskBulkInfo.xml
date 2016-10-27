@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bulkInfo xmlns="http://www.cnr.it/schema/BulkInfo_v2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" longDescription="HelpDesk"
+          shortDescription="HelpDesk" xsi:schemaLocation="http://www.cnr.it/schema/BulkInfo_v2 BulkInfo_v2">
+
+    <fieldProperty inputType="TEXT" label="label.helpdesk.firstName" name="firstName" property="firstName">
+        <jsonvalidator maxlength="50" required="true"/>
+    </fieldProperty>
+
+    <fieldProperty inputType="TEXT" label="label.helpdesk.lastName" name="lastName" property="lastName">
+        <jsonvalidator maxlength="50" required="true"/>
+    </fieldProperty>
+
+    <fieldProperty inputType="TEXT" label="label.helpdesk.email" name="email" property="email"
+                   tooltip="tooltip.helpdesk.email">
+        <jsonvalidator email="true" maxlength="50" required="true"/>
+    </fieldProperty>
+
+    <fieldProperty inputType="TEXT" label="label.helpdesk.confirmEmail" name="confirmEmail" property="confirmEmail">
+        <jsonvalidator email="true" equalTo="#email" maxlength="50" required="true"/>
+    </fieldProperty>
+
+    <fieldProperty inputType="TEXT" label="label.helpdesk.phoneNumber" name="phoneNumber" property="phoneNumber"
+                   validator="number: true">
+    </fieldProperty>
+
+    <fieldProperty inputType="TEXT" label="label.helpdesk.subject" name="subject" property="subject">
+        <jsonvalidator maxlength="900" required="true"/>
+    </fieldProperty>
+
+    <fieldProperty i18n="true" inputType="TEXTAREA" label="label.helpdesk.message" name="message" property="message">
+        <jsonvalidator maxlength="3070" required="true"/>
+    </fieldProperty>
+
+    <fieldProperty class="criteria-equals input-large" default="attivi" label="label.column.jconon_call_type" name="call-type" property="cmis:objectTypeId" widget="ui.select">
+       <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+
+    <fieldProperty class="check" inputType="RADIOGROUP"
+                   name="problemType" property="problemType"
+                   label="" type="buttonset" widget="ui.radio">
+        <jsonlabel default="Problema" key="Tipologia Problema" />
+        <jsonlist>
+            <listElement defaultLabel="Problema Tecnico" key="Problema Tecnico"
+                         label="Problema Tecnico" />
+            <listElement defaultLabel="Problema Normativo" key="Problema Normativo"
+                         label="Problema Normativo" />
+        </jsonlist>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+
+    <!--Controllo che sia valorizzato direttamente nel file js-->
+    <fieldProperty inputType="SELECT" labelClass="control-label"
+                   name="call" property="call" visible="true"
+                   widget="ui.select">
+
+        <jsonlabel default="label.helpdesk.cmisCallId" key="label.helpdesk.cmisCallId" />
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+
+
+    <form name="helpDesk">
+        <formFieldProperty class="medium-field" name="firstName"/>
+        <formFieldProperty class="medium-field" name="lastName" same-line="true"/>
+        <formFieldProperty class="medium-field" name="email"/>
+        <formFieldProperty class="medium-field" name="confirmEmail" same-line="true"/>
+        <formFieldProperty class="medium-field" name="phoneNumber"/>
+        <formFieldProperty class="large-field" name="subject"/>
+        <formFieldProperty class="input-xxlarge" name="message" rows="5"/>
+        <formFieldProperty class="input-large" name="problemType" />
+        <formFieldProperty class="criteria-equals input-xxlarge" name="call-type"/>
+        <formFieldProperty class="search-query input-xxlarge" name="call"/>
+    </form>
+
+
+    <form name="user_HelpDesk">
+        <formFieldProperty class="medium-field" name="firstName"/>
+        <formFieldProperty class="medium-field" name="lastName" same-line="true"/>
+        <formFieldProperty class="medium-field" name="email"/>
+        <formFieldProperty class="large-field" name="subject"/>
+        <formFieldProperty class="input-xxlarge" name="message" rows="5"/>
+        <formFieldProperty class="input-large" name="problemType" />
+        <formFieldProperty class="criteria-equals input-xxlarge" name="call-type"/>
+        <formFieldProperty class="isearch-query input-xxlarge" name="call"/>
+    </form>
+
+    <form name="reopen_HelpDesk">
+        <formFieldProperty class="input-xxlarge" name="message" rows="8" style="width:910px">
+            <jsonvalidator required="true"/>
+        </formFieldProperty>
+    </form>
+</bulkInfo>
