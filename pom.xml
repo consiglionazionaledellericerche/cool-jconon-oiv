@@ -11,8 +11,8 @@
 
   <packaging>war</packaging>
 
-  <artifactId>cool-jconon</artifactId>
-  <name>Concorsi On-Line</name>
+  <artifactId>cool-jconon-funzione-pubblica</artifactId>
+  <name>Concorsi On-Line Funzione Pubblica</name>
 
   <dependencies>
     <dependency>
