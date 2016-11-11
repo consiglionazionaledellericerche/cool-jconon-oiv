@@ -7,14 +7,14 @@ var path = require('path');
 
 gulp.task('less', function () {
 
-  var source = '../less/style.less';
+  var source = './src/main/less/funzione-pubblica.less';
 
   return gulp.src(source)
     .pipe(watch(source, {base: source}))
     .pipe(less({
       paths: [ path.join(__dirname, 'less', 'includes') ]
     }))
-    .pipe(gulp.dest('../../../target/classes/META-INF/css/css/'))
+    .pipe(gulp.dest('./target/classes/META-INF/css/css/'))
     .pipe(livereload());
 
 
@@ -23,21 +23,21 @@ gulp.task('less', function () {
 
 gulp.task('watch-js', ['livereload'], function() {
 
-  var source = './META-INF/js';
+  var source = './src/main/resources/META-INF/js';
 
   gulp.src(source + '/**/*', {base: source})
     .pipe(watch(source, {base: source}))
-    .pipe(gulp.dest('../../../target/classes/META-INF/js'))
+    .pipe(gulp.dest('./target/classes/META-INF/js'))
     .pipe(livereload());
 });
 
 gulp.task('watch-pages', ['livereload'], function() {
 
-  var source = './pages';
+  var source = './src/main/resources/pages';
 
   gulp.src(source + '/**/*', {base: source})
     .pipe(watch(source, {base: source}))
-    .pipe(gulp.dest('../../../target/classes/pages'))
+    .pipe(gulp.dest('./target/classes/pages'))
     .pipe(livereload());
 });
 
