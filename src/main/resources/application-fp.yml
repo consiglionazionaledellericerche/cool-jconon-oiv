@@ -1,0 +1,3 @@
+repository.base.url: http://alf4fp.cedrc.cnr.it:8080/alfresco/
+user.admin.password: Alf4FpPw
+rrd.path: remote-shared,remote-fp
