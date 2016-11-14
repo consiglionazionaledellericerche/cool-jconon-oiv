@@ -11,19 +11,7 @@
 <div class="container">
   <div class="container-fluid">
     <div class="row-fluid">
-      <div class="span3">
-        <div class="cnr-sidenav">
-          <ul class="nav nav-list cnraffix" ></ul>
-        </div>
-        <br/>
-        <div>
-          <div id="criteria" class="simple">
-            <div class="control-group form-horizontal">
-            </div>
-          </div>
-        </div>
-      </div><!--/span-->
-      <div class="list-main-call span9">
+      <div class="list-main-call span12">
         <table class="table" id="items">
           <thead><tr>
             <th>
