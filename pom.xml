@@ -97,7 +97,29 @@
           </archive>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.lesscss</groupId>
+        <artifactId>lesscss-maven-plugin</artifactId>
+        <version>1.7.0.1.1</version>
+        <configuration>
+          <includes>
+            <include>funzione-pubblica.less</include>
+          </includes>
+          <outputDirectory>${project.build.directory}/classes/META-INF/css</outputDirectory>
+          <nodeExecutable>${node.path}</nodeExecutable>
+        </configuration>
+        <executions>
+          <execution>
+            <id>less-compile</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
 
 </project>
