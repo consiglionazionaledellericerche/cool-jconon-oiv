@@ -111,7 +111,6 @@
         <executions>
           <execution>
             <id>less-compile</id>
-            <phase>prepare-package</phase>
             <goals>
               <goal>compile</goal>
             </goals>
