@@ -120,5 +120,11 @@
     </plugins>
   </build>
 
+  <scm>
+    <connection>scm:git:ssh://git@git.si.cnr.it/documentale/cool-jconon-funzione-pubblica.git</connection>
+    <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/cool-jconon-funzione-pubblica.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
 
 </project>
