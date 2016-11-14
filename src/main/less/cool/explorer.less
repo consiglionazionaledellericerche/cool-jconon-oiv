@@ -1,0 +1,36 @@
+/*-- cool Explorer --*/
+#items,#itemsPagination, #orderBy, #emptyResultset, .empty {
+  display: none
+}
+
+.documentRow {
+  margin-top: 15px
+}
+
+tr .btn-actions, tr .btn-actions-folder {
+  opacity: 0.6;
+  -webkit-transition-duration: 0,1s, 0.2s;
+}
+
+tr:hover .btn-actions, tr:hover .btn-actions-folder {
+  opacity: 1;
+}
+
+/* override opacity of blurred .btn-actions */
+tr .btn-prevent-fade.open {
+  opacity: 1
+}
+
+#collection-tree{
+  overflow: auto;
+  padding: 15px;
+}
+
+.breadcrumb-white {
+  background-color: transparent;
+}
+
+.annotation {
+  display: block;
+  font-size: .8em
+}

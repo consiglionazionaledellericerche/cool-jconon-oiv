@@ -1,0 +1,98 @@
+/*
+
+	http://csswizardry.com/2013/04/shame-css/
+
+	If it’s a hack, it goes <HERE>.
+
+	Document all hacks fully:
+		What part of the codebase does it relate to?
+		Why was this needed?
+		How does this fix it?
+		How might you fix it properly, given more time?
+
+	Do not blame the developer; if they explained why they had to do it then their reasons are probably (hopefully) valid.
+
+	Try and clean shame.css up when you have some down time.
+		Even better, get a tech-debt story in which you can dedicate actual sprint time to it.
+
+*/
+
+// hack to display typeahead inside modal windows
+.typeahead{
+  z-index: @zindexModal + 1
+}
+
+// fix multiple modals (c.f. https://github.com/twitter/bootstrap/issues/6344#issuecomment-12346306)
+.modal-body{
+  overflow: visible;
+}
+
+// fix to allow the scrolling of long content inside modal
+.modal-inner-fix{
+  overflow-y: auto;
+  max-height: inherit;
+}
+
+// fix to proper display of tooltips while hover btn-groups (e.g. ACE panels)
+.tooltip {
+  white-space: normal;
+}
+
+// navbar hack to hide the items before the resizeNavbar (prevent ugly navbar refresh caused by buttons re-arrangement)
+.hidden-important {
+  height: 0;
+  visibility: hidden
+}
+
+// allows multiple modals backdrop
+.modal-backdrop {
+	z-index: 1050;
+}
+
+#error {
+	margin-top: 40px;
+}
+
+// fix tooltip inside scrollable modals
+.modal .tooltip.relative {
+    position: relative;
+    top: 0 !important;
+    left: 0 !important;
+    display: inline-block !important;
+}
+
+// fix problem on low resolution causing ok/cancel modal buttons to be invisible.
+@media (min-height: 641px) and (max-height: 768px) {
+	.modal-body {
+		max-height: 300px
+	}
+}
+@media (max-height: 640px) {
+	.modal-body {
+		max-height: 200px
+	}
+}
+@media (max-height: 600px) {
+	.modal-body {
+		max-height: 140px
+	}
+}
+
+
+@leftSubmenuWidth: 600px;
+
+.dropdown-submenu.cool-pull-left {
+
+  > .dropdown-menu {
+    width: @leftSubmenuWidth;
+    left: -@leftSubmenuWidth;
+		top: -50px;
+
+    > li > a {
+	    width: @leftSubmenuWidth - 50;
+	    white-space: nowrap;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+    }
+  }
+}

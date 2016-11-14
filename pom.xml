@@ -104,6 +104,7 @@
         <version>1.7.0.1.1</version>
         <configuration>
           <includes>
+            <include>cool/cool.less</include>
             <include>style.less</include>
           </includes>
           <outputDirectory>${project.build.directory}/classes/META-INF/css</outputDirectory>
