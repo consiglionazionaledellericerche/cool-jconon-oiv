@@ -11,28 +11,15 @@
 <div class="container">
   <div class="container-fluid">
     <div class="row-fluid">
-      <div class="list-main-call span12">
-        <table class="table" id="items">
-          <thead><tr>
-            <th>
-              <h3>${message('label.h3.call')}</h3>
-            </th>
-            <th>
-              <div id="orderBy" class="btn-group">
-                <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-                  ${message('button.order.by')}
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu"></ul>
-              </div>
-            </th></tr>
-          </thead>
-        </table>
-        <div id="itemsPagination" class="pagination pagination-centered">
-          <ul></ul>
-        </div>
-        <div id="emptyResultset" class="alert" style="display:none">${message('message.no.call')}</div>
-      </div><!--/span-->
+      <h2>Come iscriversi</h2>
+      <p>
+      Per inserire la domanda di iscrizione all’Elenco nazionale dei componenti degli organismi indipendenti di valutazione occorre accedere all'area utenti inserendo Nome utente e password scelti in fase di registrazione al sito. In fase di completamento della procedura di iscrizione sarà richiesto il caricamento del curriculum vitae in formato europeo, datato e firmato e di copia del documento di identità.
+      </p>
+      <h5>
+Per registrarsi utilizzare il link <a href="/create-account?guest=true">Nuova registrazione</a>. Si ricorda che in fase di registrazione sarà richiesta l’indicazione di un indirizzo di Posta Elettronica.
+Per maggiori informazioni consultare il capitolo "Accesso / registrazione in procedura" del Manuale Utente. 
+Per ricevere assistenza utilizzare il servizio di <a href="/helpdesk">Helpdesk</a>
+    </h5>
     </div><!--/row-->
   </div>
 </div> <!-- /container -->
