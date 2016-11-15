@@ -13,7 +13,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </a>
-      <a class="logo href="${url.context}/home"></a>
+      <a class="logo" href="${url.context}/home"></a>
       <div class="nav-collapse collapse">
         <div id="userInfo" class="navbar-form pull-right">
           <#if !context.user.guest>
