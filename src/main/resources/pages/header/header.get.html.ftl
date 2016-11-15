@@ -13,7 +13,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </a>
-      <a class="logo navbar-logo-fp" href="${url.context}"></a>
+      <a class="logo logo-${locale_suffix}" href="${url.context}"></a>
       <div class="nav-collapse collapse">
         <div id="userInfo" class="navbar-form pull-right">
           <#if !context.user.guest>

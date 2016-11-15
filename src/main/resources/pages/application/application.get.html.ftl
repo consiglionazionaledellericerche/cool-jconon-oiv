@@ -1,10 +1,5 @@
 <div class="header container">
   <div class="jumbotron">
-    <h5>
-      <div id="call-codice" class="text-right">
-        <button class="btn btn-mini"><i class="icon-download-alt"></i> ${message('actions.attachments')}</button>
-      </div>
-    </h5>
     <h4><div id="application-title"></div></h4>
     <h4><div id="call-desc"></div></h4>
     <h5><div id="appl-rich"></div></h5>
