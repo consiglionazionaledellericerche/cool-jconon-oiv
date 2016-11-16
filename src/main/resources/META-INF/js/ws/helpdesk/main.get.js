@@ -64,12 +64,12 @@ define(['jquery', 'header', 'cnr/cnr.bulkinfo', 'cnr/cnr', 'cnr/cnr.url', 'cnr/c
               });
               formData.data.append('allegato', $('input[type=file]')[0].files[0]);
 
-              call = i18n.prop('app.name');
+              formData.data.set('call', i18n.prop('app.name'));
 
               if (problemType === 'Problema Tecnico') {
-                idCategory = 1;
+                idCategory = 13;
               } else if (problemType === 'Problema Normativo') {
-                idCategory = 1;
+                idCategory = 14;
               } else {
                 UI.info('Occorre selezionare almeno un "Problema"');
                 return false;
