@@ -612,7 +612,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
       if (bulkinfo.validate()) {
         calcolaPunteggio();
         Application.send(bulkinfo.getData(), function () {
-          window.location.href = cache.redirectUrl;
+          window.location.href = cache.redirectUrl + "/my-applications";
         });
       } else {
         UI.alert(i18n['message.improve.required.fields']);
