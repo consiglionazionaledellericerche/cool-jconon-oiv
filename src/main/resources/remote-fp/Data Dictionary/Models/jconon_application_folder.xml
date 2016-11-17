@@ -63,8 +63,11 @@
 		<constraint name="jconon_application:elenco_area_specializzazione_values" type="LIST">
 			<parameter name="allowedValues">
 				<list>
-					<value>Risk managment</value>
 					<value>Misurazione e valutazione della performance organizzativa e individuale</value>
+					<value>Pianificazione</value>
+					<value>Controllo di gestione</value>
+					<value>Programmazione finanziaria e di bilancio</value>
+					<value>Risk managment</value>
 				</list>
 			</parameter>
 		</constraint>

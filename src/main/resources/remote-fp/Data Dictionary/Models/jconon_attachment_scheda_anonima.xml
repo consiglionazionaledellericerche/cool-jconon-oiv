@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Custom Model -->
+
+<!-- Note: This model is pre-configured to load at startup of the Repository.  So, all custom -->
+<!--       types and aspects added here will automatically be registered -->
+
+<model name="jconon_scheda_anonima:model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+	<!-- Optional meta-data about the model -->   
+	<description>CNR CV Element Model</description>
+	<author>Marco Spasiano</author>
+	<version>1.0</version>
+
+	<imports>
+		<!-- Import Alfresco Dictionary Definitions -->
+		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+		<!-- Import Alfresco Content Domain Model Definitions -->
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+		<import uri="http://www.cnr.it/model/jconon_attachment/cmis"
+			prefix="jconon_attachment" />		
+	</imports>
+
+	<!-- Introduction of new namespaces defined by this model -->
+	<!-- NOTE: The following namespace custom.model should be changed to reflect your own namespace -->
+	<namespaces>
+		<namespace uri="http://www.cnr.it/model/jconon_scheda_anonima/1.0" prefix="jconon_scheda_anonima"/>
+	</namespaces>
+
+	<!-- CONSTRAINS -->        
+	<constraints>
+		<constraint name="jconon_scheda_anonima:medioLenght" type="LENGTH">
+			<parameter name="minLength">
+				<value>0</value>
+			</parameter>
+			<parameter name="maxLength">
+				<value>1000</value>
+			</parameter>
+		</constraint>
+		<constraint name="jconon_scheda_anonima:elenco_oiv_numero_dipendenti_values" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>&lt;250</value>
+					<value>&gt;250</value>
+				</list>
+			</parameter>
+		</constraint>
+		<constraint name="jconon_scheda_anonima:elenco_oiv_ruolo_values" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>Componente</value>
+					<value>Monocratico/Presidente</value>
+				</list>
+			</parameter>
+		</constraint>		
+	</constraints>
+	<!-- TYPES -->      
+	<types>
+	<!-- NEW TYPES -->
+		<type name="jconon_scheda_anonima:document">
+			<title>Scheda anonima</title>
+			<parent>jconon_attachment:document</parent>
+		</type>
+		<type name="jconon_scheda_anonima:esperienza_professionale">
+			<title>Esperienza professionale</title>
+			<description>Esperienza Professionale</description>
+			<parent>jconon_scheda_anonima:document</parent>
+			<properties>
+				<property name="jconon_attachment:esperienza_professionale_da">
+					<title>Da</title>
+					<description>2]</description>
+					<type>d:datetime</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esperienza_professionale_a">
+					<title>A</title>
+					<description>3]</description>
+					<type>d:datetime</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esperienza_professionale_area_specializzazione">
+					<title>Indicare l'area di specializzazione</title>
+					<description>4]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_attachment:elenco_area_specializzazione_values" />
+					</constraints>
+				</property>
+				<property name="jconon_attachment:esperienza_professionale_datore_lavoro">
+					<title>Datore di Lavoro/Committente</title>
+					<description>5]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esperienza_professionale_ruolo">
+					<title>Ruolo ricoperto</title>
+					<description>6]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esperienza_professionale_nome">
+					<title>Nome</title>
+					<description>7]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esperienza_professionale_citta">
+					<title>Città</title>
+					<description>8]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esperienza_professionale_stato_estero">
+					<title>Nazione</title>
+					<description>9]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+			</properties>	
+		</type>
+		<type name="jconon_scheda_anonima:precedente_incarico_oiv">
+			<title>Precedente incarico OIV</title>
+			<parent>jconon_scheda_anonima:document</parent>
+			<properties>
+				<property name="jconon_attachment:precedente_incarico_oiv_da">
+					<title>Da</title>
+					<description>2]</description>
+					<type>d:datetime</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_a">
+					<title>A</title>
+					<description>3]</description>
+					<type>d:datetime</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_amministrazione">
+					<title>Amministrazione</title>
+					<description>4]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_numero_dipendenti">
+					<title>N. dipendenti</title>
+					<description>5]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_scheda_anonima:elenco_oiv_numero_dipendenti_values" />
+					</constraints>
+				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_ruolo">
+					<title>Ruolo</title>
+					<description>5]</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_scheda_anonima:elenco_oiv_ruolo_values" />
+					</constraints>
+				</property>
+			</properties>
+		</type>
+
+	</types>
+</model>

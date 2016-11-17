@@ -238,7 +238,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
       cmisObjectId: cmisObjectId,
       search: {
         type: 'jconon_scheda_anonima:document',
-        displayRow: Application.displaySchedaAnonima,
+        displayRow: Application.displayCurriculum,
         displayAfter: function (documents, refreshFn, resultSet, isFilter) {
           if (!isFilter) {
             affix.find('sub.total').remove();
@@ -455,7 +455,8 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
               widget.rules('remove', 'requiredWidget');
             }
           });
-
+          form.find('input.datepicker.input-small').addClass('input-medium').removeClass('inpt-small');
+          form.find('#fascia_professionale_attribuita').parents('.control-group').after('<div class="alert alert-warning">Il calcolo della fascia verrà eseguito dopo il salvataggio.</div>');
           tabAnagraficaFunction();
           tabResidenzaFunction();
           tabReperibilitaFunction();
@@ -629,7 +630,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
   });
   $('#delete').click(function () {
     Application.remove(cmisObjectId, function () {
-      window.location.href = cache.redirectUrl;
+      window.location.href = cache.redirectUrl + "/home";
     });
   });
   function main() {
