@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <include resource="logging/properties/prod.xml" />
+    <property name="gelf.port" value="${gelf.port:-3515}" />
+    <property name="gelf.facility" value="springboot-selezioni-fp" />
+
+    <include resource="logging/base.xml" />
+</configuration>
