@@ -574,7 +574,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         } else {
           UI.success(i18n['message.aggiornamento.application']);
         }
-        $('#fascia_professionale_attribuita').val(data['jconon_application:fascia_professionale_attribuita']);
+        $('#fascia_professionale_attribuita').val(data['jconon_application:fascia_professionale_attribuita'] || '');
         saved = true;
       },
       complete: close,
