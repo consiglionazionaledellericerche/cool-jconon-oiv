@@ -24,6 +24,16 @@ import org.springframework.stereotype.Component;
 @Component("applicationService")
 @Primary
 public class ApplicationOIVService extends ApplicationService{
+	private static final String JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA = "jconon_application:fascia_professionale_attribuita";
+
+	private static final String JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_A = "jconon_application:esperienza_professionale_a";
+
+	private static final String JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_DA = "jconon_application:esperienza_professionale_da";
+
+	private static final String JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_A = "jconon_application:precedente_incarico_oiv_a";
+
+	private static final String JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_DA = "jconon_application:precedente_incarico_oiv_da";
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationOIVService.class);
 
 	private static final String JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A = "jconon_attachment:precedente_incarico_oiv_a";
@@ -72,26 +82,26 @@ public class ApplicationOIVService extends ApplicationService{
 				a = oiv.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A);
 			days = days + Duration.between(da.toInstant(), a.toInstant()).toDays();
 		}
-		Calendar daOIV = (Calendar) aspectProperties.get("jconon_application:precedente_incarico_oiv_da"),
-				aOIV = (Calendar) aspectProperties.get("jconon_application:precedente_incarico_oiv_a"),
-				daEsperienza = (Calendar) aspectProperties.get("jconon_application:esperienza_professionale_da"),
-				aEsperienza = (Calendar) aspectProperties.get("jconon_application:esperienza_professionale_a");
+		Calendar daOIV = (Calendar) aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_DA),
+				aOIV = (Calendar) aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_A),
+				daEsperienza = (Calendar) aspectProperties.get(JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_DA),
+				aEsperienza = (Calendar) aspectProperties.get(JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_A);
 		if (daOIV != null && aOIV != null) {
 			days = days + Duration.between(daOIV.toInstant(), aOIV.toInstant()).toDays();
 		}
 		if (daEsperienza != null && aEsperienza != null) {
 			days = days + Duration.between(daEsperienza.toInstant(), aEsperienza.toInstant()).toDays();
 		}
-		LOGGER.info("DAYS", days);
+		LOGGER.info("DAYS: {}", days);
 		if (!days.equals(Long.valueOf(0)) ) {
 			Long years = days/new Long(365);
-			LOGGER.info("YEARS", years);
+			LOGGER.info("YEARS: {}", years);
 			if (years.intValue() > 12) {
-				aspectProperties.put("jconon_application:fascia_professionale_attribuita", "1");
+				aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, "1");
 			} else if (years.intValue() > 8) {
-				aspectProperties.put("jconon_application:fascia_professionale_attribuita", "2");				
+				aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, "2");				
 			} else {
-				aspectProperties.put("jconon_application:fascia_professionale_attribuita", "3");
+				aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, "3");
 			}
 		}
 	}
