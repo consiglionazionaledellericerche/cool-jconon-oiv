@@ -27,6 +27,21 @@
       <artifactId>cool-jconon-webapp-resources</artifactId>
       <version>${cool-jconon.version}</version>
     </dependency>
+    <dependency>
+      <groupId>it.cnr.si.sprint</groupId>
+      <artifactId>sprint-logging</artifactId>
+      <version>2.0.12</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-boot-starter</artifactId>
+          <groupId>org.springframework.boot</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-boot-starter-logging</artifactId>
+          <groupId>org.springframework.boot</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <profiles>
