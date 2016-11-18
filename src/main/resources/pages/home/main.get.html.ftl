@@ -20,18 +20,20 @@ L’iscrizione diverrà efficace a decorrere dalla comunicazione da parte del Di
       </p>
       <h2>Come iscriversi</h2>
         <p>
-          Per inserire la domanda di iscrizione all’Elenco nazionale dei componenti degli organismi indipendenti di valutazione occorre accedere all'area utenti inserendo Nome utente e password scelti in fase di registrazione al sito. In fase di completamento della procedura di iscrizione sarà richiesta l’indicazione di un indirizzo di Posta Elettronica Certificata, il caricamento di copia del documento di identità e del curriculum vitae in formato europeo, datato e firmato.
+        Per inserire la domanda di iscrizione all’Elenco nazionale dei componenti degli organismi indipendenti di valutazione occorre accedere all'area utenti inserendo Nome utente e password scelti in fase di registrazione al sito. In fase di completamento della procedura di iscrizione sarà richiesta l’indicazione di un indirizzo di Posta Elettronica Certificata, il caricamento di copia del documento di identità e del curriculum vitae in formato europeo, datato e firmato.
         </p>
-        <h5>
-          Per registrarsi utilizzare il link <a href="/create-account?guest=true">Nuova registrazione</a>. 
-          Per maggiori informazioni consultare il capitolo "Accesso / registrazione in procedura" del Manuale Utente. 
+      <h5>
+        <p>
+          Per registrarsi utilizzare il link <a href="/create-account?guest=true">Nuova registrazione</a>.<br>
+          Per maggiori informazioni consultare il capitolo "Accesso / registrazione in procedura" del Manuale Utente.<br> 
           Per ricevere assistenza utilizzare il servizio di <a href="/helpdesk">Helpdesk</a>
-          <#if !context.user.guest>
-            <p>
-              Per presentare la propria candidatura utilizzare i seguente <a href="/manage-application?callCodice=OIV">link</a>
-            </p>
-          </#if>
-        </h5>
+        </p>
+        <#if !context.user.guest>
+        <p>
+          Per presentare la propria candidatura utilizzare i seguente <a href="/manage-application?callCodice=OIV">link</a>
+        </p>
+        </#if>
+    </h5>
     </div><!--/row-->
   </div>
 </div> <!-- /container -->

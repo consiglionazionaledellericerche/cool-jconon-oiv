@@ -558,33 +558,10 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     bulkInfoRender(call);
   }
 
-  function calcolaPunteggio () {
-    var fieldPunteggio = $('#fascia_professionale_attribuita'),
-      dataDa = bulkinfo.getDataValueById('esperienza_professionale_da'), 
-      dataA = bulkinfo.getDataValueById('esperienza_professionale_a'),
-      precedenteOIV = bulkinfo.getDataValueById('fl_precedente_incarico_oiv'),
-      precedenteOIVNumDip =  bulkinfo.getDataValueById('precedente_incarico_oiv_numero_dipendenti'),
-      diff;
-    if (bulkinfo.getDataValueById('fl_esperienza_professionale')) {
-      fieldPunteggio.val('3');
-      if (dataDa && dataA && (String(precedenteOIV) === 'true')) {
-        diff = moment.duration(moment(dataA).diff(moment(dataDa)));
-        if (diff.get('years') >= 12 && precedenteOIVNumDip === '>250') {
-          fieldPunteggio.val('1');
-        } else if (diff.get('years') >= 8) {
-          fieldPunteggio.val('2');
-        }
-      }
-    } else {
-      fieldPunteggio.val('');
-    }
-  }
 
   $('#save').click(function () {
     bulkinfo.resetForm();
-
     var close = UI.progress();
-    calcolaPunteggio();
     jconon.Data.application.main({
       type: 'POST',
       data: bulkinfo.getData(),
@@ -596,6 +573,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         } else {
           UI.success(i18n['message.aggiornamento.application']);
         }
+        $('#fascia_professionale_attribuita').val(data['jconon_application:fascia_professionale_attribuita']);
         saved = true;
       },
       complete: close,
@@ -611,7 +589,6 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     }
     UI.confirm(i18n.prop(message, placeholder), function () {
       if (bulkinfo.validate()) {
-        calcolaPunteggio();
         Application.send(bulkinfo.getData(), function () {
           window.location.href = cache.redirectUrl + "/my-applications";
         });
