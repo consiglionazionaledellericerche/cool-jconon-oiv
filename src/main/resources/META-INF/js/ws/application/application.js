@@ -457,6 +457,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           });
           form.find('input.datepicker.input-small').addClass('input-medium').removeClass('inpt-small');
           form.find('#fascia_professionale_attribuita').parents('.control-group').after('<div class="alert alert-warning">Il calcolo della fascia verrà eseguito dopo il salvataggio.</div>');
+          form.find("label[for='fascia_professionale_attribuita']").addClass('span8').append("&nbsp;&nbsp;");
           tabAnagraficaFunction();
           tabResidenzaFunction();
           tabReperibilitaFunction();
