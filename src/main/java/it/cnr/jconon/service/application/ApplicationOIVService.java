@@ -117,19 +117,23 @@ public class ApplicationOIVService extends ApplicationService{
 					yearsOIVINF250 = daysOIVInf250/new Long(365),
 					yearsOIVSUP250 = daysOIVSup250/new Long(365);
 			LOGGER.info("YEARS: {}", years);
-			if (years > 12) {
-				if (yearsOIVSUP250 > 3) {
+			if (years >= 12) {
+				if (yearsOIVSUP250 >= 3) {
 					aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, FASCIA3);
 					return;
 				}
 			} 
-			if (years.intValue() > 8) {
-				if (yearsOIVINF250 + yearsOIVSUP250 > 3) {
+			if (years.intValue() >= 8) {
+				if (yearsOIVINF250 + yearsOIVSUP250 >= 3) {
 					aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, FASCIA2);
 					return;
 				}
 			}
-			aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, FASCIA1);
+			if (years.intValue() >= 5) {
+				aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, FASCIA1);
+				return;
+			}
+			aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, "");
 		}
 	}
 }
