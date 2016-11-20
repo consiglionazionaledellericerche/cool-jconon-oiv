@@ -1,6 +1,8 @@
 package it.cnr.jconon.service.application;
 
 import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.cool.service.I18nService;
+import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
@@ -55,6 +57,8 @@ public class ApplicationOIVService extends ApplicationService{
 	private static final String FASCIA1 = "1", FASCIA2 = "2", FASCIA3 = "3";
 	@Autowired
 	private CMISService cmisService;
+	@Autowired
+	private I18nService i18nService;
 	
 
 	@Override
@@ -70,6 +74,9 @@ public class ApplicationOIVService extends ApplicationService{
 	public Map<String, String> sendApplication(Session currentCMISSession, final String applicationSourceId, final String contextURL, 
 			final Locale locale, String userId, Map<String, Object> properties, Map<String, Object> aspectProperties) {
 		eseguiCalcolo(properties, aspectProperties);
+		if (aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA) == null)
+			throw new ClientMessageException(
+					i18nService.getLabel("message.error.domanda.fascia", Locale.ITALIAN));			
 		return super.sendApplication(currentCMISSession, applicationSourceId, contextURL, locale, userId, properties, aspectProperties);
 	}
 	
@@ -155,7 +162,7 @@ public class ApplicationOIVService extends ApplicationService{
 				aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, FASCIA1);
 				return;
 			}
-			aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, "");
+			aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, null);
 		}
 	}
 
