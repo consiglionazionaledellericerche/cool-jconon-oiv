@@ -52,7 +52,8 @@ public class ApplicationOIVService extends ApplicationService{
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationOIVService.class);
 
 	
-	private static final String FASCIA1 = "1", FASCIA2 = "2", FASCIA3 = "3";
+	public static final String FASCIA1 = "1", FASCIA2 = "2", FASCIA3 = "3";
+	
 	@Autowired
 	private CMISService cmisService;
 	@Autowired

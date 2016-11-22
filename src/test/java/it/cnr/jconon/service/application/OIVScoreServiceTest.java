@@ -1,6 +1,7 @@
 package it.cnr.jconon.service.application;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import it.cnr.si.cool.jconon.CoolJcononApplication;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class OIVScoreServiceTest {
 
     @Autowired
-    private ApplicationOIVService oivScoreService;
+    private ApplicationOIVService applicationOIVService;
 
     @Test
     public void eseguiCalcolo()  {
@@ -38,7 +39,25 @@ public class OIVScoreServiceTest {
     	oivPeriodInf250.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)));
     	oivPeriodInf250.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2007,1,1)));
 
-    	assertEquals("1", oivScoreService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250));
+    	assertEquals(ApplicationOIVService.FASCIA1, applicationOIVService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250));
 
+    	esperienzePeriod.clear();
+    	esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)));
+    	esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2004,1,1)));
+    	
+    	assertNull(applicationOIVService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250));
+
+    	esperienzePeriod.clear();
+    	esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)));
+    	esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2008,1,1)));
+    	
+    	assertEquals(ApplicationOIVService.FASCIA2, applicationOIVService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250));
+
+    	esperienzePeriod.clear();
+    	esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)));
+    	esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2012,1,1)));
+    	
+    	assertEquals(ApplicationOIVService.FASCIA3, applicationOIVService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250));
+    	
     }
 }
