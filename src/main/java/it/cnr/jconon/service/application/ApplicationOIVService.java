@@ -9,6 +9,9 @@ import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -92,7 +95,7 @@ public class ApplicationOIVService extends ApplicationService{
 		for (QueryResult esperienza : iterable.getPage(Integer.MAX_VALUE)) {
 			Calendar da = esperienza.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA),
 				a = esperienza.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A);
-			esperienzePeriod.add(INTERVAL(da, a));
+			esperienzePeriod.add(new Interval().startDate(da).endDate(a));
 		}		
 
 		Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_PRECEDENTE_INCARICO_OIV);
@@ -102,9 +105,9 @@ public class ApplicationOIVService extends ApplicationService{
 			Calendar da = oiv.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA),
 				a = oiv.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A);
 			if (oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(INF250)) {
-				oivPeriodInf250.add(INTERVAL(da, a));
+				oivPeriodInf250.add(new Interval().startDate(da).endDate(a));
 			} else if (oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(SUP250)) {
-				oivPeriodSup250.add(INTERVAL(da, a));
+				oivPeriodSup250.add(new Interval().startDate(da).endDate(a));
 			}
 		}
 		Calendar daOIV = (Calendar) aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_DA),
@@ -113,13 +116,13 @@ public class ApplicationOIVService extends ApplicationService{
 				aEsperienza = (Calendar) aspectProperties.get(JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_A);				
 		if (daOIV != null && aOIV != null) {
 			if (aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(INF250)) {
-				oivPeriodInf250.add(INTERVAL(daOIV, aOIV));
+				oivPeriodInf250.add(new Interval().startDate(daOIV).endDate(aOIV));
 			} else if (aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(SUP250)) {
-				oivPeriodSup250.add(INTERVAL(daOIV, aOIV));
+				oivPeriodSup250.add(new Interval().startDate(daOIV).endDate(aOIV));
 			}
 		}
 		if (daEsperienza != null && aEsperienza != null) {
-			esperienzePeriod.add(INTERVAL(daEsperienza, aEsperienza));
+			esperienzePeriod.add(new Interval().startDate(daEsperienza).endDate(aEsperienza));
 		}
 		esperienzePeriod = overlapping(esperienzePeriod);
 		oivPeriodSup250 = overlapping(oivPeriodSup250);
@@ -166,18 +169,28 @@ public class ApplicationOIVService extends ApplicationService{
 		}
 	}
 
-	public static Interval INTERVAL(Calendar startDate, Calendar endDate){
-		return new Interval(startDate.toInstant(), endDate.toInstant());
-	}
-	
-	private static class Interval implements Comparable<Interval>{
-		private final Instant startDate;
-		private final Instant endDate;
+	private class Interval implements Comparable<Interval>{
+		private Instant startDate;
+		private Instant endDate;
 				
+		public Interval() {
+			super();
+		}
+
 		public Interval(Instant startDate, Instant endDate) {
 			super();
 			this.startDate = startDate;
 			this.endDate = endDate;
+		}
+
+		public Interval startDate(Calendar startDate) {
+			this.startDate = startDate.toInstant();
+			return this;
+		}
+
+		public Interval endDate(Calendar endDate) {
+			this.endDate = endDate.toInstant();
+			return this;
 		}
 
 		@Override
@@ -195,6 +208,14 @@ public class ApplicationOIVService extends ApplicationService{
 	}
 	
 	private List<Interval> overlapping(List<Interval> source) {
+		source.stream().forEach(interval ->  {
+			if (interval.startDate.isAfter(interval.endDate)) {
+				throw new ClientMessageException(
+						i18nService.getLabel("message.error.date.inconsistent", Locale.ITALIAN,  
+								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.startDate, ZoneId.systemDefault())), 
+								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.endDate, ZoneId.systemDefault()))));				
+			}
+		});
 		Collections.sort(source);
 		List<Interval> result = new ArrayList<Interval>();
 		for (Interval interval : source) {
@@ -202,15 +223,14 @@ public class ApplicationOIVService extends ApplicationService{
 				result.add(interval);
 			} else {
 				Interval lastInsert = result.get(result.size() - 1);
-				if (interval.startDate.isAfter(lastInsert.startDate) && interval.endDate.isBefore(lastInsert.endDate))
+				if (!interval.endDate.isAfter(lastInsert.endDate))
 					continue;
-				if (interval.startDate.isAfter(lastInsert.startDate) && interval.startDate.isBefore(lastInsert.endDate) && interval.endDate.isAfter(lastInsert.endDate)) {
-					result.add(new Interval(lastInsert.startDate, interval.endDate));					
+				if (!interval.startDate.isAfter(lastInsert.endDate) && !interval.endDate.isBefore(lastInsert.endDate)) {
+					result.add(new Interval(lastInsert.startDate, interval.endDate));
 					result.remove(lastInsert);
 				} else {
 					result.add(interval);
-				}
-				
+				}				
 			}
 		}
 		Collections.sort(result);
