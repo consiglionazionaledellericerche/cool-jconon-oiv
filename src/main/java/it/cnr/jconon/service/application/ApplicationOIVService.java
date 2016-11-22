@@ -8,7 +8,6 @@ import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,27 +34,23 @@ import org.springframework.stereotype.Component;
 public class ApplicationOIVService extends ApplicationService{
 	private static final String INF250 = "<250", SUP250=">250";
 
-	private static final String JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI = "jconon_attachment:precedente_incarico_oiv_numero_dipendenti";
-	private static final String JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI = "jconon_application:precedente_incarico_oiv_numero_dipendenti";
-
-	private static final String JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA = "jconon_application:fascia_professionale_attribuita";
-
-	private static final String JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_A = "jconon_application:esperienza_professionale_a";
-
-	private static final String JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_DA = "jconon_application:esperienza_professionale_da";
-
-	private static final String JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_A = "jconon_application:precedente_incarico_oiv_a";
-
-	private static final String JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_DA = "jconon_application:precedente_incarico_oiv_da";
+	public static final String 
+		JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI = "jconon_attachment:precedente_incarico_oiv_numero_dipendenti",
+		JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI = "jconon_application:precedente_incarico_oiv_numero_dipendenti",
+		JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA = "jconon_application:fascia_professionale_attribuita",
+		JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_A = "jconon_application:esperienza_professionale_a",
+		JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_DA = "jconon_application:esperienza_professionale_da",
+		JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_A = "jconon_application:precedente_incarico_oiv_a",
+		JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_DA = "jconon_application:precedente_incarico_oiv_da",
+		JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A = "jconon_attachment:precedente_incarico_oiv_a",
+		JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA = "jconon_attachment:precedente_incarico_oiv_da",
+		JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA = "jconon_attachment:esperienza_professionale_da", 
+		JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A = "jconon_attachment:esperienza_professionale_a",
+		JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE = "jconon_scheda_anonima:esperienza_professionale",
+		JCONON_SCHEDA_ANONIMA_PRECEDENTE_INCARICO_OIV = "jconon_scheda_anonima:precedente_incarico_oiv";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationOIVService.class);
 
-	private static final String JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A = "jconon_attachment:precedente_incarico_oiv_a";
-	private static final String JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA = "jconon_attachment:precedente_incarico_oiv_da";
-	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA = "jconon_attachment:esperienza_professionale_da", 
-			JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A = "jconon_attachment:esperienza_professionale_a";
-	private static final String JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE = "jconon_scheda_anonima:esperienza_professionale",
-			JCONON_SCHEDA_ANONIMA_PRECEDENTE_INCARICO_OIV = "jconon_scheda_anonima:precedente_incarico_oiv";
 	
 	private static final String FASCIA1 = "1", FASCIA2 = "2", FASCIA3 = "3";
 	@Autowired
@@ -83,12 +78,10 @@ public class ApplicationOIVService extends ApplicationService{
 		return super.sendApplication(currentCMISSession, applicationSourceId, contextURL, locale, userId, properties, aspectProperties);
 	}
 	
-	private void eseguiCalcolo(Map<String, Object> properties, Map<String, Object> aspectProperties) {
+	public void eseguiCalcolo(Map<String, Object> properties, Map<String, Object> aspectProperties) {
 		Session adminSession = cmisService.createAdminSession();
 		Folder application = (Folder) adminSession.getObject((String) properties.get(PropertyIds.OBJECT_ID));
 		List<Interval> esperienzePeriod = new ArrayList<Interval>(), oivPeriodSup250 = new ArrayList<Interval>(), oivPeriodInf250 = new ArrayList<Interval>();
-		
-		Long daysEsperienza = Long.valueOf(0), daysOIVInf250 = Long.valueOf(0), daysOIVSup250 = Long.valueOf(0);
 		Criteria criteria = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE);
 		criteria.add(Restrictions.inFolder(application.getId()));
 		ItemIterable<QueryResult> iterable = criteria.executeQuery(adminSession, false, adminSession.getDefaultContext());
@@ -124,6 +117,11 @@ public class ApplicationOIVService extends ApplicationService{
 		if (daEsperienza != null && aEsperienza != null) {
 			esperienzePeriod.add(new Interval().startDate(daEsperienza).endDate(aEsperienza));
 		}
+		aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250));		
+	}
+
+	public String assegnaFascia(List<Interval> esperienzePeriod, List<Interval> oivPeriodSup250, List<Interval> oivPeriodInf250) {
+		Long daysEsperienza = Long.valueOf(0), daysOIVInf250 = Long.valueOf(0), daysOIVSup250 = Long.valueOf(0);		
 		esperienzePeriod = overlapping(esperienzePeriod);
 		oivPeriodSup250 = overlapping(oivPeriodSup250);
 		oivPeriodInf250 = overlapping(oivPeriodInf250);
@@ -131,13 +129,13 @@ public class ApplicationOIVService extends ApplicationService{
 		LOGGER.info("oivPeriodSup250: {}", oivPeriodSup250);
 		LOGGER.info("oivPeriodInf250: {}", oivPeriodInf250);
 		for (Interval interval : esperienzePeriod) {
-			daysEsperienza = daysEsperienza + Duration.between(interval.startDate, interval.endDate).toDays();
+			daysEsperienza = daysEsperienza + Duration.between(interval.getStartDate(), interval.getEndDate()).toDays();
 		}
 		for (Interval interval : oivPeriodInf250) {
-			daysOIVInf250 = daysOIVInf250 + Duration.between(interval.startDate, interval.endDate).toDays();
+			daysOIVInf250 = daysOIVInf250 + Duration.between(interval.getStartDate(), interval.getEndDate()).toDays();
 		}
 		for (Interval interval : oivPeriodSup250) {
-			daysOIVSup250 = daysOIVSup250 + Duration.between(interval.startDate, interval.endDate).toDays();
+			daysOIVSup250 = daysOIVSup250 + Duration.between(interval.getStartDate(), interval.getEndDate()).toDays();
 		}
 
 		LOGGER.info("Days Esperienza: {}", daysEsperienza);
@@ -151,69 +149,28 @@ public class ApplicationOIVService extends ApplicationService{
 			LOGGER.info("YEARS: {}", years);
 			if (years >= 12) {
 				if (yearsOIVSUP250 >= 3) {
-					aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, FASCIA3);
-					return;
+					return FASCIA3;
 				}
 			} 
 			if (years.intValue() >= 8) {
 				if (yearsOIVINF250 + yearsOIVSUP250 >= 3) {
-					aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, FASCIA2);
-					return;
+					return FASCIA2;
 				}
 			}
 			if (years.intValue() >= 5) {
-				aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, FASCIA1);
-				return;
+				return FASCIA1;
 			}
-			aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, null);
 		}
-	}
-
-	private class Interval implements Comparable<Interval>{
-		private Instant startDate;
-		private Instant endDate;
-				
-		public Interval() {
-			super();
-		}
-
-		public Interval(Instant startDate, Instant endDate) {
-			super();
-			this.startDate = startDate;
-			this.endDate = endDate;
-		}
-
-		public Interval startDate(Calendar startDate) {
-			this.startDate = startDate.toInstant();
-			return this;
-		}
-
-		public Interval endDate(Calendar endDate) {
-			this.endDate = endDate.toInstant();
-			return this;
-		}
-
-		@Override
-		public int compareTo(Interval o) {
-			if (o.startDate.isAfter(startDate))
-				return -1;
-			if (o.startDate.isBefore(startDate))
-				return 1;			
-			return 0;
-		}
-		@Override
-	    public String toString() {
-	        return startDate + ".." + endDate;
-	    }		
+		return null;		
 	}
 	
 	private List<Interval> overlapping(List<Interval> source) {
 		source.stream().forEach(interval ->  {
-			if (interval.startDate.isAfter(interval.endDate)) {
+			if (interval.getStartDate().isAfter(interval.getEndDate())) {
 				throw new ClientMessageException(
 						i18nService.getLabel("message.error.date.inconsistent", Locale.ITALIAN,  
-								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.startDate, ZoneId.systemDefault())), 
-								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.endDate, ZoneId.systemDefault()))));				
+								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.getStartDate(), ZoneId.systemDefault())), 
+								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.getEndDate(), ZoneId.systemDefault()))));				
 			}
 		});
 		Collections.sort(source);
@@ -223,10 +180,10 @@ public class ApplicationOIVService extends ApplicationService{
 				result.add(interval);
 			} else {
 				Interval lastInsert = result.get(result.size() - 1);
-				if (!interval.endDate.isAfter(lastInsert.endDate))
+				if (!interval.getEndDate().isAfter(lastInsert.getEndDate()))
 					continue;
-				if (!interval.startDate.isAfter(lastInsert.endDate) && !interval.endDate.isBefore(lastInsert.endDate)) {
-					result.add(new Interval(lastInsert.startDate, interval.endDate));
+				if (!interval.getStartDate().isAfter(lastInsert.getEndDate()) && !interval.getEndDate().isBefore(lastInsert.getEndDate())) {
+					result.add(new Interval(lastInsert.getStartDate(), interval.getEndDate()));
 					result.remove(lastInsert);
 				} else {
 					result.add(interval);

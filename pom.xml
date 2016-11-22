@@ -13,6 +13,8 @@
     <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
     <cool.mode>development</cool.mode>
     <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
+    <junit.version>4.12</junit.version>    
+	<spring.version>4.3.3.RELEASE</spring.version>
   </properties>
 
   <packaging>war</packaging>
@@ -42,6 +44,24 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring.version}</version>
+      <scope>test</scope>
+    </dependency>  
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <version>${spring-boot.version}</version>
+      <scope>test</scope>
+    </dependency>      
   </dependencies>
 
   <profiles>
