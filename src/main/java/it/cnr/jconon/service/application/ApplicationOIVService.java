@@ -6,18 +6,6 @@ import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
-
-import java.time.Duration;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
@@ -28,6 +16,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Component
 @Primary
@@ -81,7 +75,8 @@ public class ApplicationOIVService extends ApplicationService{
 	
 	public void eseguiCalcolo(Map<String, Object> properties, Map<String, Object> aspectProperties) {
 		Session adminSession = cmisService.createAdminSession();
-		Folder application = (Folder) adminSession.getObject((String) properties.get(PropertyIds.OBJECT_ID));
+		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
+		Folder application = (Folder) adminSession.getObject(objectId);
 		List<Interval> esperienzePeriod = new ArrayList<Interval>(), oivPeriodSup250 = new ArrayList<Interval>(), oivPeriodInf250 = new ArrayList<Interval>();
 		Criteria criteria = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE);
 		criteria.add(Restrictions.inFolder(application.getId()));
@@ -118,14 +113,18 @@ public class ApplicationOIVService extends ApplicationService{
 		if (daEsperienza != null && aEsperienza != null) {
 			esperienzePeriod.add(new Interval().startDate(daEsperienza).endDate(aEsperienza));
 		}
-		aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250));		
+
+		String fascia = assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);
+		LOGGER.info("fascia attribuita a {}: {}", objectId, fascia);
+		aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, fascia);
+
 	}
 
-	public String assegnaFascia(List<Interval> esperienzePeriod, List<Interval> oivPeriodSup250, List<Interval> oivPeriodInf250) {
-		Long daysEsperienza = Long.valueOf(0), daysOIVInf250 = Long.valueOf(0), daysOIVSup250 = Long.valueOf(0);		
-		esperienzePeriod = overlapping(esperienzePeriod);
-		oivPeriodSup250 = overlapping(oivPeriodSup250);
-		oivPeriodInf250 = overlapping(oivPeriodInf250);
+	public String assegnaFascia(List<Interval> esperienzePeriodz, List<Interval> oivPeriodSup250z, List<Interval> oivPeriodInf250z) {
+		Long daysEsperienza = Long.valueOf(0), daysOIVInf250 = Long.valueOf(0), daysOIVSup250 = Long.valueOf(0);
+		List<Interval> esperienzePeriod = overlapping(esperienzePeriodz);
+		List<Interval> oivPeriodSup250 = overlapping(oivPeriodSup250z);
+		List<Interval> oivPeriodInf250 = overlapping(oivPeriodInf250z);
 		LOGGER.info("esperienzePeriod: {}", esperienzePeriod);
 		LOGGER.info("oivPeriodSup250: {}", oivPeriodSup250);
 		LOGGER.info("oivPeriodInf250: {}", oivPeriodInf250);
@@ -143,7 +142,7 @@ public class ApplicationOIVService extends ApplicationService{
 		LOGGER.info("Days OIV Inf 250: {}", daysOIVInf250);
 		LOGGER.info("Days OIV Sup 250: {}", daysOIVSup250);
 
-		if (!daysEsperienza.equals(Long.valueOf(0)) ) {
+		if (!Long.valueOf(0).equals(daysEsperienza) ) {
 			Long years = daysEsperienza/new Long(365),
 					yearsOIVINF250 = daysOIVInf250/new Long(365),
 					yearsOIVSUP250 = daysOIVSup250/new Long(365);
@@ -162,7 +161,7 @@ public class ApplicationOIVService extends ApplicationService{
 				return FASCIA1;
 			}
 		}
-		return null;		
+		return null;
 	}
 	
 	private List<Interval> overlapping(List<Interval> source) {
