@@ -59,23 +59,24 @@ public class ApplicationOIVService extends ApplicationService{
 			String contextURL, Locale locale,
 			String userId, Map<String, Object> properties,
 			Map<String, Object> aspectProperties) {
-		eseguiCalcolo(properties, aspectProperties);
+		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
+		eseguiCalcolo(objectId, aspectProperties);
 		return super.save(currentCMISSession, contextURL, locale, userId, properties, aspectProperties);
 	}
 	
 	@Override
 	public Map<String, String> sendApplication(Session currentCMISSession, final String applicationSourceId, final String contextURL, 
 			final Locale locale, String userId, Map<String, Object> properties, Map<String, Object> aspectProperties) {
-		eseguiCalcolo(properties, aspectProperties);
+		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
+		eseguiCalcolo(objectId, aspectProperties);
 		if (aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA) == null)
 			throw new ClientMessageException(
 					i18nService.getLabel("message.error.domanda.fascia", Locale.ITALIAN));			
 		return super.sendApplication(currentCMISSession, applicationSourceId, contextURL, locale, userId, properties, aspectProperties);
 	}
 	
-	public void eseguiCalcolo(Map<String, Object> properties, Map<String, Object> aspectProperties) {
+	public void eseguiCalcolo(String objectId, Map<String, Object> aspectProperties) {
 		Session adminSession = cmisService.createAdminSession();
-		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
 		Folder application = (Folder) adminSession.getObject(objectId);
 
 		List<Interval> oivPeriodSup250 = new ArrayList<>(), oivPeriodInf250 = new ArrayList<>();
