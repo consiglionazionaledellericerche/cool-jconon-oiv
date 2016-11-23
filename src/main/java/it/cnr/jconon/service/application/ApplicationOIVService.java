@@ -84,7 +84,7 @@ public class ApplicationOIVService extends ApplicationService{
 		for (QueryResult esperienza : queryResultEsperienza) {
 			Calendar da = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA),
 				a = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A);
-			esperienzePeriod.add(new Interval().startDate(da).endDate(a));
+			esperienzePeriod.add(new Interval(da, a));
 		}
 
 		ItemIterable<QueryResult> queryResultsOiv = getQueryResultsOiv(adminSession, application);
@@ -92,9 +92,9 @@ public class ApplicationOIVService extends ApplicationService{
 			Calendar da = oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA),
 				a = oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A);
 			if (oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(INF250)) {
-				oivPeriodInf250.add(new Interval().startDate(da).endDate(a));
+				oivPeriodInf250.add(new Interval(da, a));
 			} else if (oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(SUP250)) {
-				oivPeriodSup250.add(new Interval().startDate(da).endDate(a));
+				oivPeriodSup250.add(new Interval(da, a));
 			}
 		}
 		Calendar daOIV = (Calendar) aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_DA),
@@ -103,13 +103,13 @@ public class ApplicationOIVService extends ApplicationService{
 				aEsperienza = (Calendar) aspectProperties.get(JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_A);				
 		if (daOIV != null && aOIV != null) {
 			if (aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(INF250)) {
-				oivPeriodInf250.add(new Interval().startDate(daOIV).endDate(aOIV));
+				oivPeriodInf250.add(new Interval(daOIV, aOIV));
 			} else if (aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(SUP250)) {
-				oivPeriodSup250.add(new Interval().startDate(daOIV).endDate(aOIV));
+				oivPeriodSup250.add(new Interval(daOIV, aOIV));
 			}
 		}
 		if (daEsperienza != null && aEsperienza != null) {
-			esperienzePeriod.add(new Interval().startDate(daEsperienza).endDate(aEsperienza));
+			esperienzePeriod.add(new Interval(daEsperienza, aEsperienza));
 		}
 
 		String fascia = assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);

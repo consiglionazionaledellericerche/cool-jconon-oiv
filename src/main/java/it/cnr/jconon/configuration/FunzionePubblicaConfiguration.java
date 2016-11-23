@@ -25,13 +25,16 @@ public class FunzionePubblicaConfiguration {
 
     private PageService pageService;
 
+    private String LANGUAGE = Locale.ITALIAN.getLanguage();
+
     public FunzionePubblicaConfiguration (PageService pageService) {
         this.pageService = pageService;
     }
 
     @PostConstruct
     public void overrideLang() {
-        pageService.setOverrideLang(Locale.ITALIAN.getLanguage());
+        LOGGER.warn("overriding language: {}", LANGUAGE);
+        pageService.setOverrideLang(LANGUAGE);
     }
 
 

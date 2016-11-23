@@ -14,9 +14,6 @@ public class Interval implements Comparable<Interval>{
 	private Instant startDate;
 
 	private Instant endDate;
-	public Interval() {
-		super();
-	}
 
 	public Interval(Instant startDate, Instant endDate) {
 		super();
@@ -24,15 +21,12 @@ public class Interval implements Comparable<Interval>{
 		this.endDate = endDate;
 	}
 
-	public Interval startDate(Calendar startDate) {
+	public Interval(Calendar startDate, Calendar endDate) {
+		super();
 		this.startDate = startDate.toInstant();
-		return this;
+		this.endDate = endDate.toInstant();
 	}
 
-	public Interval endDate(Calendar endDate) {
-		this.endDate = endDate.toInstant();
-		return this;
-	}
 
 	@Override
 	public int compareTo(Interval o) {
