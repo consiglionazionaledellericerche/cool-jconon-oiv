@@ -36,14 +36,14 @@ public class OIVScoreServiceTest {
 	public static void before() {
 
 		oivPeriodSup250 = Arrays.asList(
-				new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)),
-				new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2007,1,1))
+				new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2003,1,1)),
+				new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2007,1,1))
 		);
 
 
 		oivPeriodInf250 = Arrays.asList(
-				new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)),
-				new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2007,1,1))
+				new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2003,1,1)),
+				new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2007,1,1))
 
 		);
 	}
@@ -51,9 +51,9 @@ public class OIVScoreServiceTest {
 	@Test
 	public void testAssegnaFasciaNull()  {
 
-		List<Interval> esperienzePeriod = new ArrayList<Interval>();
-		esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)));
-		esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2004,1,1)));
+		List<Interval> esperienzePeriod = new ArrayList<>();
+		esperienzePeriod.add(new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2003,1,1)));
+		esperienzePeriod.add(new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2004,1,1)));
 
 		String fascia = applicationOIVService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);
 		assertNull(fascia);
@@ -63,9 +63,9 @@ public class OIVScoreServiceTest {
 	@Test
 	public void testAssegnaFascia1(){
 
-		List<Interval> esperienzePeriod = new ArrayList<Interval>();
-		esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)));
-		esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2007,1,1)));
+		List<Interval> esperienzePeriod = new ArrayList<>();
+		esperienzePeriod.add(new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2003,1,1)));
+		esperienzePeriod.add(new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2007,1,1)));
 
 		String fascia = applicationOIVService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);
 		assertEquals(ApplicationOIVService.FASCIA1, fascia);
@@ -76,8 +76,8 @@ public class OIVScoreServiceTest {
 	public void testAssegnaFascia2() {
 
 		List<Interval> esperienzePeriod = new ArrayList<>();
-		esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)));
-		esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2008,1,1)));
+		esperienzePeriod.add(new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2003,1,1)));
+		esperienzePeriod.add(new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2008,1,1)));
 
 		String fascia = applicationOIVService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);
 		assertEquals(ApplicationOIVService.FASCIA2, fascia);
@@ -87,8 +87,8 @@ public class OIVScoreServiceTest {
 	public void testAssegnaFascia3(){
 
 		List<Interval> esperienzePeriod = new ArrayList<>();
-		esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2003,1,1)));
-		esperienzePeriod.add(new Interval().startDate(new GregorianCalendar(2000,1,1)).endDate(new GregorianCalendar(2012,1,1)));
+		esperienzePeriod.add(new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2003,1,1)));
+		esperienzePeriod.add(new Interval(new GregorianCalendar(2000,1,1), new GregorianCalendar(2012,1,1)));
 
 		String fascia = applicationOIVService.assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);
 		assertEquals(ApplicationOIVService.FASCIA3, fascia);
