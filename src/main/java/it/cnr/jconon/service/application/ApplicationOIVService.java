@@ -77,22 +77,20 @@ public class ApplicationOIVService extends ApplicationService{
 		Session adminSession = cmisService.createAdminSession();
 		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
 		Folder application = (Folder) adminSession.getObject(objectId);
-		List<Interval> esperienzePeriod = new ArrayList<Interval>(), oivPeriodSup250 = new ArrayList<Interval>(), oivPeriodInf250 = new ArrayList<Interval>();
-		Criteria criteria = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE);
-		criteria.add(Restrictions.inFolder(application.getId()));
-		ItemIterable<QueryResult> iterable = criteria.executeQuery(adminSession, false, adminSession.getDefaultContext());
-		for (QueryResult esperienza : iterable.getPage(Integer.MAX_VALUE)) {
-			Calendar da = esperienza.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA),
-				a = esperienza.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A);
-			esperienzePeriod.add(new Interval().startDate(da).endDate(a));
-		}		
 
-		Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_PRECEDENTE_INCARICO_OIV);
-		criteriaOIV.add(Restrictions.inFolder(application.getId()));
-		ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(adminSession, false, adminSession.getDefaultContext());
-		for (QueryResult oiv : iterableOIV.getPage(Integer.MAX_VALUE)) {
-			Calendar da = oiv.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA),
-				a = oiv.<Calendar>getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A);
+		List<Interval> esperienzePeriod = new ArrayList<>(), oivPeriodSup250 = new ArrayList<>(), oivPeriodInf250 = new ArrayList<>();
+
+		ItemIterable<QueryResult> queryResultEsperienza = getQueryResultEsperienza(adminSession, application);
+		for (QueryResult esperienza : queryResultEsperienza) {
+			Calendar da = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA),
+				a = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A);
+			esperienzePeriod.add(new Interval().startDate(da).endDate(a));
+		}
+
+		ItemIterable<QueryResult> queryResultsOiv = getQueryResultsOiv(adminSession, application);
+		for (QueryResult oiv : queryResultsOiv) {
+			Calendar da = oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA),
+				a = oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A);
 			if (oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(INF250)) {
 				oivPeriodInf250.add(new Interval().startDate(da).endDate(a));
 			} else if (oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(SUP250)) {
@@ -120,11 +118,25 @@ public class ApplicationOIVService extends ApplicationService{
 
 	}
 
-	public String assegnaFascia(List<Interval> esperienzePeriodz, List<Interval> oivPeriodSup250z, List<Interval> oivPeriodInf250z) {
+	private ItemIterable<QueryResult> getQueryResultsOiv(Session adminSession, Folder application) {
+		Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_PRECEDENTE_INCARICO_OIV);
+		criteriaOIV.add(Restrictions.inFolder(application.getId()));
+		ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(adminSession, false, adminSession.getDefaultContext());
+		return iterableOIV.getPage(Integer.MAX_VALUE);
+	}
+
+	private ItemIterable<QueryResult> getQueryResultEsperienza(Session adminSession, Folder application) {
+		Criteria criteria = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE);
+		criteria.add(Restrictions.inFolder(application.getId()));
+		ItemIterable<QueryResult> iterable = criteria.executeQuery(adminSession, false, adminSession.getDefaultContext());
+		return iterable.getPage(Integer.MAX_VALUE);
+	}
+
+	public String assegnaFascia(final List<Interval> esperienzePeriodList, final List<Interval> oivPeriodSup250List, final List<Interval> oivPeriodInf250List) {
 		Long daysEsperienza = Long.valueOf(0), daysOIVInf250 = Long.valueOf(0), daysOIVSup250 = Long.valueOf(0);
-		List<Interval> esperienzePeriod = overlapping(esperienzePeriodz);
-		List<Interval> oivPeriodSup250 = overlapping(oivPeriodSup250z);
-		List<Interval> oivPeriodInf250 = overlapping(oivPeriodInf250z);
+		List<Interval> esperienzePeriod = overlapping(esperienzePeriodList);
+		List<Interval> oivPeriodSup250 = overlapping(oivPeriodSup250List);
+		List<Interval> oivPeriodInf250 = overlapping(oivPeriodInf250List);
 		LOGGER.info("esperienzePeriod: {}", esperienzePeriod);
 		LOGGER.info("oivPeriodSup250: {}", oivPeriodSup250);
 		LOGGER.info("oivPeriodInf250: {}", oivPeriodInf250);
@@ -138,6 +150,10 @@ public class ApplicationOIVService extends ApplicationService{
 			daysOIVSup250 = daysOIVSup250 + Duration.between(interval.getStartDate(), interval.getEndDate()).toDays();
 		}
 
+		return getFascia(daysEsperienza, daysOIVInf250, daysOIVSup250);
+	}
+
+	private String getFascia(final Long daysEsperienza, final Long daysOIVInf250, final Long daysOIVSup250) {
 		LOGGER.info("Days Esperienza: {}", daysEsperienza);
 		LOGGER.info("Days OIV Inf 250: {}", daysOIVInf250);
 		LOGGER.info("Days OIV Sup 250: {}", daysOIVSup250);
@@ -147,15 +163,11 @@ public class ApplicationOIVService extends ApplicationService{
 					yearsOIVINF250 = daysOIVInf250/new Long(365),
 					yearsOIVSUP250 = daysOIVSup250/new Long(365);
 			LOGGER.info("YEARS: {}", years);
-			if (years >= 12) {
-				if (yearsOIVSUP250 >= 3) {
-					return FASCIA3;
-				}
-			} 
-			if (years.intValue() >= 8) {
-				if (yearsOIVINF250 + yearsOIVSUP250 >= 3) {
-					return FASCIA2;
-				}
+			if (years >= 12 && yearsOIVSUP250 >= 3) {
+				return FASCIA3;
+			}
+			if (years.intValue() >= 8 && yearsOIVINF250 + yearsOIVSUP250 >= 3) {
+				return FASCIA2;
 			}
 			if (years.intValue() >= 5) {
 				return FASCIA1;
@@ -163,7 +175,8 @@ public class ApplicationOIVService extends ApplicationService{
 		}
 		return null;
 	}
-	
+
+
 	private List<Interval> overlapping(List<Interval> source) {
 		source.stream().forEach(interval ->  {
 			if (interval.getStartDate().isAfter(interval.getEndDate())) {
