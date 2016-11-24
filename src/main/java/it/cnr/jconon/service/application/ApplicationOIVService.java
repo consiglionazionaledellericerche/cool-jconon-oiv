@@ -6,6 +6,7 @@ import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
+
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
@@ -26,7 +27,7 @@ import java.util.*;
 @Component
 @Primary
 public class ApplicationOIVService extends ApplicationService{
-	private static final String INF250 = "<250", SUP250=">250";
+	private static final String INF250 = "<250", SUP250=">=250";
 
 	public static final String 
 		JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI = "jconon_attachment:precedente_incarico_oiv_numero_dipendenti",
@@ -145,7 +146,15 @@ public class ApplicationOIVService extends ApplicationService{
 
 	public String assegnaFascia(final List<Interval> esperienzePeriodList, final List<Interval> oivPeriodSup250List, final List<Interval> oivPeriodInf250List) {
 		Long daysEsperienza = Long.valueOf(0), daysOIVInf250 = Long.valueOf(0), daysOIVSup250 = Long.valueOf(0);
-		List<Interval> esperienzePeriod = overlapping(esperienzePeriodList);
+		/**
+		 * Per il calcolo dell'esperienza bisogna tener conto anche dell'esperienza OIV
+		 */
+		List<Interval> periodo = new ArrayList<Interval>();
+		periodo.addAll(esperienzePeriodList);
+		periodo.addAll(oivPeriodSup250List);
+		periodo.addAll(oivPeriodInf250List);
+		
+		List<Interval> esperienzePeriod = overlapping(periodo);
 		List<Interval> oivPeriodSup250 = overlapping(oivPeriodSup250List);
 		List<Interval> oivPeriodInf250 = overlapping(oivPeriodInf250List);
 		LOGGER.info("esperienzePeriod: {}", esperienzePeriod);

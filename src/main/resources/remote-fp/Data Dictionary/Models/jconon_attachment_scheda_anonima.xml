@@ -41,7 +41,7 @@
 			<parameter name="allowedValues">
 				<list>
 					<value>&lt;250</value>
-					<value>&gt;250</value>
+					<value>&gt;=250</value>
 				</list>
 			</parameter>
 		</constraint>
