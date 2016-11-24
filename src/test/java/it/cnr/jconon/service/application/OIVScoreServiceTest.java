@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import it.cnr.si.cool.jconon.CoolJcononApplication;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 
@@ -26,32 +27,32 @@ public class OIVScoreServiceTest {
     private ApplicationOIVService applicationOIVService;
 
 	public static GregorianCalendar 
-			QUATTRO_INIZIO 		= new GregorianCalendar(2004,1,1),
-			QUATTRO_FINE 		= new GregorianCalendar(2004,12,31),
-			CINQUE_INIZIO 		= new GregorianCalendar(2005,1,1),
-			CINQUE_FINE 		= new GregorianCalendar(2005,12,31),
-			SEI_INIZIO 			= new GregorianCalendar(2006,1,1),
-			SEI_FINE 			= new GregorianCalendar(2006,12,31),
-			SETTE_INIZIO 		= new GregorianCalendar(2007,1,1),
-			SETTE_FINE 			= new GregorianCalendar(2007,12,31),
-			OTTO_INIZIO 		= new GregorianCalendar(2008,1,1),
-			OTTO_FINE 			= new GregorianCalendar(2008,12,31),
-			NOVE_INIZIO 		= new GregorianCalendar(2009,1,1),
-			NOVE_FINE 			= new GregorianCalendar(2009,12,31),
-			DIECI_INIZIO 		= new GregorianCalendar(2010,1,1),
-			DIECI_FINE 			= new GregorianCalendar(2010,12,31),
-			UNDICI_INIZIO 		= new GregorianCalendar(2011,1,1),
-			UNDICI_FINE 		= new GregorianCalendar(2011,12,31),
-			DODICI_INIZIO 		= new GregorianCalendar(2012,1,1),
-			DODICI_FINE 		= new GregorianCalendar(2012,12,31),
-			TREDICI_INIZIO 		= new GregorianCalendar(2013,1,1),
-			TREDICI_FINE 		= new GregorianCalendar(2013,12,31),
-			QUATTORDICI_INIZIO 	= new GregorianCalendar(2014,1,1),
-			QUATTORDICI_FINE 	= new GregorianCalendar(2014,12,31),			
-			QUINDICI_INIZIO 	= new GregorianCalendar(2015,1,1),
-			QUINDICI_FINE 		= new GregorianCalendar(2015,12,31),			
-			SEDICI_INIZIO 		= new GregorianCalendar(2016,1,1),
-			SEDICI_FINE 		= new GregorianCalendar(2016,12,31);
+			QUATTRO_INIZIO 		= new GregorianCalendar(2004,Calendar.JANUARY,1),
+			QUATTRO_FINE 		= new GregorianCalendar(2004,Calendar.DECEMBER,31),
+			CINQUE_INIZIO 		= new GregorianCalendar(2005,Calendar.JANUARY,1),
+			CINQUE_FINE 		= new GregorianCalendar(2005,Calendar.DECEMBER,31),
+			SEI_INIZIO 			= new GregorianCalendar(2006,Calendar.JANUARY,1),
+			SEI_FINE 			= new GregorianCalendar(2006,Calendar.DECEMBER,31),
+			SETTE_INIZIO 		= new GregorianCalendar(2007,Calendar.JANUARY,1),
+			SETTE_FINE 			= new GregorianCalendar(2007,Calendar.DECEMBER,31),
+			OTTO_INIZIO 		= new GregorianCalendar(2008,Calendar.JANUARY,1),
+			OTTO_FINE 			= new GregorianCalendar(2008,Calendar.DECEMBER,31),
+			NOVE_INIZIO 		= new GregorianCalendar(2009,Calendar.JANUARY,1),
+			NOVE_FINE 			= new GregorianCalendar(2009,Calendar.DECEMBER,31),
+			DIECI_INIZIO 		= new GregorianCalendar(2010,Calendar.JANUARY,1),
+			DIECI_FINE 			= new GregorianCalendar(2010,Calendar.DECEMBER,31),
+			UNDICI_INIZIO 		= new GregorianCalendar(2011,Calendar.JANUARY,1),
+			UNDICI_FINE 		= new GregorianCalendar(2011,Calendar.DECEMBER,31),
+			DODICI_INIZIO 		= new GregorianCalendar(2012,Calendar.JANUARY,1),
+			DODICI_FINE 		= new GregorianCalendar(2012,Calendar.DECEMBER,31),
+			TREDICI_INIZIO 		= new GregorianCalendar(2013,Calendar.JANUARY,1),
+			TREDICI_FINE 		= new GregorianCalendar(2013,Calendar.DECEMBER,31),
+			QUATTORDICI_INIZIO 	= new GregorianCalendar(2014,Calendar.JANUARY,1),
+			QUATTORDICI_FINE 	= new GregorianCalendar(2014,Calendar.DECEMBER,31),			
+			QUINDICI_INIZIO 	= new GregorianCalendar(2015,Calendar.JANUARY,1),
+			QUINDICI_FINE 		= new GregorianCalendar(2015,Calendar.DECEMBER,31),			
+			SEDICI_INIZIO 		= new GregorianCalendar(2016,Calendar.JANUARY,1),
+			SEDICI_FINE 		= new GregorianCalendar(2016,Calendar.DECEMBER,31);
 
 	@Test
 	public void testAssegnaFasciaA()  {

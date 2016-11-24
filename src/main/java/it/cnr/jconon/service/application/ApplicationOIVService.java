@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -43,7 +45,8 @@ public class ApplicationOIVService extends ApplicationService{
 		JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A = "jconon_attachment:esperienza_professionale_a",
 		JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE = "jconon_scheda_anonima:esperienza_professionale",
 		JCONON_SCHEDA_ANONIMA_PRECEDENTE_INCARICO_OIV = "jconon_scheda_anonima:precedente_incarico_oiv";
-
+	public static BigDecimal DAYSINYEAR = BigDecimal.valueOf(365);
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationOIVService.class);
 
 	
@@ -145,7 +148,7 @@ public class ApplicationOIVService extends ApplicationService{
 	}
 
 	public String assegnaFascia(final List<Interval> esperienzePeriodList, final List<Interval> oivPeriodSup250List, final List<Interval> oivPeriodInf250List) {
-		Long daysEsperienza = Long.valueOf(0), daysOIVInf250 = Long.valueOf(0), daysOIVSup250 = Long.valueOf(0);
+		BigDecimal daysEsperienza = BigDecimal.ZERO, daysOIVInf250 = BigDecimal.ZERO, daysOIVSup250 = BigDecimal.ZERO;
 		/**
 		 * Per il calcolo dell'esperienza bisogna tener conto anche dell'esperienza OIV
 		 */
@@ -161,27 +164,28 @@ public class ApplicationOIVService extends ApplicationService{
 		LOGGER.info("oivPeriodSup250: {}", oivPeriodSup250);
 		LOGGER.info("oivPeriodInf250: {}", oivPeriodInf250);
 		for (Interval interval : esperienzePeriod) {
-			daysEsperienza = daysEsperienza + Duration.between(interval.getStartDate(), interval.getEndDate()).toDays();
+			daysEsperienza = daysEsperienza.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays()));
 		}
 		for (Interval interval : oivPeriodInf250) {
-			daysOIVInf250 = daysOIVInf250 + Duration.between(interval.getStartDate(), interval.getEndDate()).toDays();
+			daysOIVInf250 = daysOIVInf250.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays()));
 		}
 		for (Interval interval : oivPeriodSup250) {
-			daysOIVSup250 = daysOIVSup250 + Duration.between(interval.getStartDate(), interval.getEndDate()).toDays();
+			daysOIVSup250 = daysOIVSup250.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays()));
 		}
 
 		return getFascia(daysEsperienza, daysOIVInf250, daysOIVSup250);
 	}
 
-	private String getFascia(final Long daysEsperienza, final Long daysOIVInf250, final Long daysOIVSup250) {
+	private String getFascia(final BigDecimal daysEsperienza, final BigDecimal daysOIVInf250, final BigDecimal daysOIVSup250) {
 		LOGGER.info("Days Esperienza: {}", daysEsperienza);
 		LOGGER.info("Days OIV Inf 250: {}", daysOIVInf250);
 		LOGGER.info("Days OIV Sup 250: {}", daysOIVSup250);
 
 		if (!Long.valueOf(0).equals(daysEsperienza) ) {
-			Long years = daysEsperienza/new Long(365),
-					yearsOIVINF250 = daysOIVInf250/new Long(365),
-					yearsOIVSUP250 = daysOIVSup250/new Long(365);
+			Long years = 
+					daysEsperienza.divide(DAYSINYEAR, RoundingMode.HALF_UP).longValue(),
+					yearsOIVINF250 = daysOIVInf250.divide(DAYSINYEAR, RoundingMode.HALF_UP).longValue(),
+					yearsOIVSUP250 = daysOIVSup250.divide(DAYSINYEAR, RoundingMode.HALF_UP).longValue();
 			LOGGER.info("YEARS: {}", years);
 			if (years >= 12 && yearsOIVSUP250 >= 3) {
 				return FASCIA3;
