@@ -605,7 +605,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
             return x.trim().length > 0;
           })
           .map(function (x) {
-            x.length > 50 ? x.substr(0, 50) + "\u2026" : x;
+            return x.length > 50 ? x.substr(0, 50) + "\u2026" : x;
           })
           .join('<br>');
 
