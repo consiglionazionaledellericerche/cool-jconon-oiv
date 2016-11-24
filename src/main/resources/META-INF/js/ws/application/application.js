@@ -598,9 +598,15 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           .children('form')
           .validate()
           .errorList
-          .map(item => $(item.element).find('label').text())
-          .filter(x => x.trim().length > 0)
-          .map(x => x.length > 50 ? x.substr(0, 50) + "\u2026" : x)
+          .map(function (item) {
+            return $(item.element).find('label').text();
+          })
+          .filter(function (x) {
+            return x.trim().length > 0;
+          })
+          .map(function (x) {
+            x.length > 50 ? x.substr(0, 50) + "\u2026" : x;
+          })
           .join('<br>');
 
         UI.alert(i18n['message.improve.required.fields'] + '<br><br>' + msg)
