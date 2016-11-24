@@ -594,7 +594,17 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           window.location.href = cache.redirectUrl + "/my-applications";
         });
       } else {
-        UI.alert(i18n['message.improve.required.fields']);
+        var msg = content
+          .children('form')
+          .validate()
+          .errorList
+          .map(item => $(item.element).find('label').text())
+          .filter(x => x.trim().length > 0)
+          .map(x => x.length > 50 ? x.substr(0, 50) + "\u2026" : x)
+          .join('<br>');
+
+        UI.alert(i18n['message.improve.required.fields'] + '<br><br>' + msg)
+
       }
     });
   });
@@ -637,7 +647,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           schedeAnonimeAttachments = Application.completeList(
             dataCall['jconon_call:elenco_schede_anonime'],
             cache.jsonlistApplicationSchedeAnonime
-          ); 
+          );
           jconon.Data.application.main({
             type: 'GET',
             queue: true,
@@ -676,7 +686,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           });
         }
       });
-    });    
+    });
   }
   $('button', toolbar).tooltip({
     placement: 'bottom',
@@ -696,5 +706,5 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
 
   } else {
     main();
-  }  
+  }
 });
