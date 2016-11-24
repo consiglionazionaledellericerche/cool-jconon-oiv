@@ -56,7 +56,7 @@
 					<value>Pianificazione</value>
 					<value>Controllo di gestione</value>
 					<value>Programmazione finanziaria e di bilancio</value>
-					<value>Risk managment</value>
+					<value>Risk management</value>
 				</list>
 			</parameter>
 		</constraint>
@@ -64,7 +64,7 @@
 			<parameter name="allowedValues">
 				<list>
 					<value>&lt;250</value>
-					<value>&gt;250</value>
+					<value>&gt;=250</value>
 				</list>
 			</parameter>
 		</constraint>
