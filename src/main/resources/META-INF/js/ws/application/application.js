@@ -599,13 +599,17 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           .validate()
           .errorList
           .map(function (item) {
-            return $(item.element).find('label').text();
+            if ($(item.element).hasClass('widget')) {
+              return $(item.element).find('label').text();              
+            } else {
+              return $(item.element).parents('.control-group').find('label').text();
+            }
           })
           .filter(function (x) {
             return x.trim().length > 0;
           })
           .map(function (x) {
-            x.length > 50 ? x.substr(0, 50) + "\u2026" : x;
+            return x.length > 50 ? x.substr(0, 50) + "\u2026" : x;
           })
           .join('<br>');
 
