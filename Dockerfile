@@ -7,4 +7,4 @@ COPY target/*.war /opt/jconon.war
 EXPOSE 8080
 
 # https://spring.io/guides/gs/spring-boot-docker/#_containerize_it
-CMD ["echo", "funzione pubblica"]
+CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/opt/jconon.war"]
