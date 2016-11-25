@@ -23,7 +23,10 @@ Al termine dell’inserimento dei dati verrà inviata una email di conferma all�
         </p>
       <h5>
         <p>
+          <#if context.user.guest>
+          Per accedere utilizzare il link <a href="/login">${message('label.login')}</a>.<br>
           Per registrarsi utilizzare il link <a href="/create-account?guest=true">Nuova registrazione</a>.<br>
+          </#if>
           Per maggiori informazioni consultare il capitolo "Accesso / registrazione in procedura" del Manuale Utente.<br> 
           Per ricevere assistenza utilizzare il servizio di <a href="/helpdesk">Helpdesk</a>
         </p>
