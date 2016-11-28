@@ -4,3 +4,7 @@
 /logs/
 /node_modules/
 /*.sublime-workspace
+.classpath
+.project
+.settings/
+
