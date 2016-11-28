@@ -45,7 +45,7 @@ public class ApplicationOIVService extends ApplicationService{
 		JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A = "jconon_attachment:esperienza_professionale_a",
 		JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE = "jconon_scheda_anonima:esperienza_professionale",
 		JCONON_SCHEDA_ANONIMA_PRECEDENTE_INCARICO_OIV = "jconon_scheda_anonima:precedente_incarico_oiv";
-	public static BigDecimal DAYSINYEAR = BigDecimal.valueOf(365);
+	private static final BigDecimal DAYSINYEAR = BigDecimal.valueOf(365);
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationOIVService.class);
 
