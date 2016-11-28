@@ -1,5 +1,5 @@
-repository.base.url: http://alf4fp.cedrc.cnr.it:8080/alfresco/
-user.admin.password: Alf4FpPw
+repository.base.url: http://alfresco-community.test.si.cnr.it/alfresco/
+user.admin.password: admin
 rrd.path: remote-shared,remote-fp
 server.context-path: /
 mail.from.default: performance@governo.it
