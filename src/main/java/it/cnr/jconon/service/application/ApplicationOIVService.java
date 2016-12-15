@@ -3,6 +3,7 @@ package it.cnr.jconon.service.application;
 import it.cnr.cool.cmis.service.CMISService;
 import it.cnr.cool.service.I18nService;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
+import it.cnr.si.cool.jconon.service.application.ApplicationService;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
@@ -33,12 +34,7 @@ public class ApplicationOIVService extends ApplicationService{
 
 	public static final String 
 		JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI = "jconon_attachment:precedente_incarico_oiv_numero_dipendenti",
-		JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI = "jconon_application:precedente_incarico_oiv_numero_dipendenti",
 		JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA = "jconon_application:fascia_professionale_attribuita",
-		JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_A = "jconon_application:esperienza_professionale_a",
-		JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_DA = "jconon_application:esperienza_professionale_da",
-		JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_A = "jconon_application:precedente_incarico_oiv_a",
-		JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_DA = "jconon_application:precedente_incarico_oiv_da",
 		JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A = "jconon_attachment:precedente_incarico_oiv_a",
 		JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA = "jconon_attachment:precedente_incarico_oiv_da",
 		JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA = "jconon_attachment:esperienza_professionale_da", 
@@ -85,9 +81,7 @@ public class ApplicationOIVService extends ApplicationService{
 
 		List<Interval> oivPeriodSup250 = new ArrayList<>(), oivPeriodInf250 = new ArrayList<>();
 
-		List<Interval> esperienzePeriod =  esperienzePeriod(getQueryResultEsperienza(adminSession, application),
-				(Calendar) aspectProperties.get(JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_DA),
-				(Calendar) aspectProperties.get(JCONON_APPLICATION_ESPERIENZA_PROFESSIONALE_A));
+		List<Interval> esperienzePeriod =  esperienzePeriod(getQueryResultEsperienza(adminSession, application));
 
 		ItemIterable<QueryResult> queryResultsOiv = getQueryResultsOiv(adminSession, application);
 		for (QueryResult oiv : queryResultsOiv) {
@@ -99,17 +93,6 @@ public class ApplicationOIVService extends ApplicationService{
 				oivPeriodSup250.add(new Interval(da, a));
 			}
 		}
-		Calendar daOIV = (Calendar) aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_DA),
-				aOIV = (Calendar) aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_A);
-
-		if (daOIV != null && aOIV != null) {
-			if (aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(INF250)) {
-				oivPeriodInf250.add(new Interval(daOIV, aOIV));
-			} else if (aspectProperties.get(JCONON_APPLICATION_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(SUP250)) {
-				oivPeriodSup250.add(new Interval(daOIV, aOIV));
-			}
-		}
-
 
 		String fascia = assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);
 		LOGGER.info("fascia attribuita a {}: {}", objectId, fascia);
@@ -117,17 +100,13 @@ public class ApplicationOIVService extends ApplicationService{
 
 	}
 
-	private List<Interval> esperienzePeriod(ItemIterable<QueryResult> queryResultEsperienza, Calendar daEsperienza, Calendar aEsperienza) {
+	private List<Interval> esperienzePeriod(ItemIterable<QueryResult> queryResultEsperienza) {
 
 		List<Interval> esperienzePeriod = new ArrayList<>();
 		for (QueryResult esperienza : queryResultEsperienza) {
 			Calendar da = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA),
 				a = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A);
 			esperienzePeriod.add(new Interval(da, a));
-		}
-
-		if (daEsperienza != null && aEsperienza != null) {
-			esperienzePeriod.add(new Interval(daEsperienza, aEsperienza));
 		}
 
 		return esperienzePeriod;

@@ -60,33 +60,6 @@
 				</list>
 			</parameter>
 		</constraint>
-		<constraint name="jconon_application:elenco_area_specializzazione_values" type="LIST">
-			<parameter name="allowedValues">
-				<list>
-					<value>Misurazione e valutazione della performance organizzativa e individuale</value>
-					<value>Pianificazione</value>
-					<value>Controllo di gestione</value>
-					<value>Programmazione finanziaria e di bilancio</value>
-					<value>Risk management</value>
-				</list>
-			</parameter>
-		</constraint>
-		<constraint name="jconon_application:elenco_oiv_numero_dipendenti_values" type="LIST">
-			<parameter name="allowedValues">
-				<list>
-					<value>&lt;250</value>
-					<value>&gt;=250</value>
-				</list>
-			</parameter>
-		</constraint>
-		<constraint name="jconon_application:elenco_oiv_ruolo_values" type="LIST">
-			<parameter name="allowedValues">
-				<list>
-					<value>Componente</value>
-					<value>Monocratico/Presidente</value>
-				</list>
-			</parameter>
-		</constraint>
 	</constraints>
 	<types>
 		<type name="jconon_application:folder">
@@ -1961,97 +1934,6 @@
 					<type>d:boolean</type>
 					<mandatory>true</mandatory>
 				</property>
-				<property name="jconon_application:esperienza_professionale_da">
-					<title>Da</title>
-					<description>2] class:fl_esperienza_professionale_true</description>
-					<type>d:datetime</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:esperienza_professionale_a">
-					<title>A</title>
-					<description>3] class:fl_esperienza_professionale_true</description>
-					<type>d:datetime</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:esperienza_professionale_area_specializzazione">
-					<title>Indicare l'area di specializzazione</title>
-					<description>4] class:fl_esperienza_professionale_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-					<constraints>
-						<constraint ref="jconon_application:elenco_area_specializzazione_values" />
-					</constraints>
-				</property>
-				<property name="jconon_application:esperienza_professionale_datore_lavoro">
-					<title>Datore di Lavoro/Committente</title>
-					<description>5] class:fl_esperienza_professionale_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:esperienza_professionale_ruolo">
-					<title>Ruolo ricoperto</title>
-					<description>6] class:fl_esperienza_professionale_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:esperienza_professionale_nome">
-					<title>Nome</title>
-					<description>7] class:fl_esperienza_professionale_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:esperienza_professionale_citta">
-					<title>Città</title>
-					<description>8] class:fl_esperienza_professionale_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:esperienza_professionale_stato_estero">
-					<title>Nazione</title>
-					<description>9] class:fl_esperienza_professionale_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
 			</properties>
 		</aspect>
 		<aspect name="jconon_application:aspect_sentenza_giudicato">
@@ -2123,67 +2005,6 @@
 					<description>1] Flag precedente incarico OIV ui.radio</description>
 					<type>d:boolean</type>
 					<mandatory>true</mandatory>
-				</property>
-				<property name="jconon_application:precedente_incarico_oiv_da">
-					<title>Da</title>
-					<description>2] class:fl_precedente_incarico_oiv_true</description>
-					<type>d:datetime</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:precedente_incarico_oiv_a">
-					<title>A</title>
-					<description>3] class:fl_precedente_incarico_oiv_true</description>
-					<type>d:datetime</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:precedente_incarico_oiv_amministrazione">
-					<title>Amministrazione</title>
-					<description>4] class:fl_precedente_incarico_oiv_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_application:precedente_incarico_oiv_numero_dipendenti">
-					<title>N. dipendenti</title>
-					<description>5] class:fl_precedente_incarico_oiv_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-					<constraints>
-						<constraint ref="jconon_application:elenco_oiv_numero_dipendenti_values" />
-					</constraints>
-				</property>
-				<property name="jconon_application:precedente_incarico_oiv_ruolo">
-					<title>Ruolo</title>
-					<description>5] class:fl_precedente_incarico_oiv_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-					<constraints>
-						<constraint ref="jconon_application:elenco_oiv_ruolo_values" />
-					</constraints>
 				</property>
 			</properties>
 		</aspect>
