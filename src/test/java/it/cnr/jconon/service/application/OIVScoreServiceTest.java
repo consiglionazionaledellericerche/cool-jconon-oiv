@@ -3,6 +3,8 @@ package it.cnr.jconon.service.application;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import it.cnr.si.cool.jconon.CoolJcononApplication;
+import it.cnr.si.cool.jconon.service.application.ApplicationOIVService;
+import it.cnr.si.cool.jconon.service.application.Interval;
 
 import java.util.Arrays;
 import java.util.Calendar;

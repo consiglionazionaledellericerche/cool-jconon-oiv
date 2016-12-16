@@ -1,16 +1,19 @@
-package it.cnr.jconon.configuration;
+package it.cnr.si.cool.jconon.configuration;
 
 import it.cnr.cool.service.I18nServiceLocation;
 import it.cnr.cool.service.PageService;
+import it.cnr.si.cool.jconon.rest.ApplicationOIV;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by francesco on 14/11/16.
@@ -26,9 +29,10 @@ public class FunzionePubblicaConfiguration {
     private PageService pageService;
 
     private String LANGUAGE = Locale.ITALIAN.getLanguage();
-
-    public FunzionePubblicaConfiguration (PageService pageService) {
+    
+    public FunzionePubblicaConfiguration (PageService pageService, JerseyConfig jerseyConfig) {
         this.pageService = pageService;
+        jerseyConfig.register(ApplicationOIV.class);
     }
 
     @PostConstruct

@@ -1,4 +1,4 @@
-package it.cnr.jconon.service.application;
+package it.cnr.si.cool.jconon.service.application;
 
 import java.time.Instant;
 import java.util.Calendar;

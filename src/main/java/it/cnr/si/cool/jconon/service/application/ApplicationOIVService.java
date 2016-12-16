@@ -1,12 +1,33 @@
-package it.cnr.jconon.service.application;
+package it.cnr.si.cool.jconon.service.application;
 
 import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.service.I18nService;
+import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
-import it.cnr.si.cool.jconon.service.application.ApplicationService;
+import it.cnr.si.cool.jconon.model.ApplicationModel;
+import it.cnr.si.cool.jconon.model.PrintParameterModel;
+import it.cnr.si.cool.jconon.service.PrintService;
+import it.cnr.si.cool.jconon.service.QueueService;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
@@ -18,14 +39,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.Duration;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @Component
 @Primary
@@ -52,7 +68,12 @@ public class ApplicationOIVService extends ApplicationService{
 	private CMISService cmisService;
 	@Autowired
 	private I18nService i18nService;
-	
+	@Autowired
+	private CommonsMultipartResolver resolver;
+    @Autowired
+    private QueueService queueService;
+    @Autowired
+    private PrintService printService;
 
 	@Override
 	public Folder save(Session currentCMISSession,
@@ -78,11 +99,8 @@ public class ApplicationOIVService extends ApplicationService{
 	public void eseguiCalcolo(String objectId, Map<String, Object> aspectProperties) {
 		Session adminSession = cmisService.createAdminSession();
 		Folder application = (Folder) adminSession.getObject(objectId);
-
 		List<Interval> oivPeriodSup250 = new ArrayList<>(), oivPeriodInf250 = new ArrayList<>();
-
 		List<Interval> esperienzePeriod =  esperienzePeriod(getQueryResultEsperienza(adminSession, application));
-
 		ItemIterable<QueryResult> queryResultsOiv = getQueryResultsOiv(adminSession, application);
 		for (QueryResult oiv : queryResultsOiv) {
 			Calendar da = oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA),
@@ -93,22 +111,18 @@ public class ApplicationOIVService extends ApplicationService{
 				oivPeriodSup250.add(new Interval(da, a));
 			}
 		}
-
 		String fascia = assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);
 		LOGGER.info("fascia attribuita a {}: {}", objectId, fascia);
 		aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, fascia);
-
 	}
 
 	private List<Interval> esperienzePeriod(ItemIterable<QueryResult> queryResultEsperienza) {
-
 		List<Interval> esperienzePeriod = new ArrayList<>();
 		for (QueryResult esperienza : queryResultEsperienza) {
 			Calendar da = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA),
 				a = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A);
 			esperienzePeriod.add(new Interval(da, a));
 		}
-
 		return esperienzePeriod;
 	}
 
@@ -209,4 +223,32 @@ public class ApplicationOIVService extends ApplicationService{
 		Collections.sort(result);
 		return result;
 	}
+
+	public Map<String, Object> sendApplicationOIV(Session session, HttpServletRequest req, CMISUser user) throws CMISApplicationException, IOException {
+		final String userId = user.getId();
+    	MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
+		String idApplication = mRequest.getParameter("objectId");
+		LOGGER.debug("send application : {}", idApplication);
+    	MultipartFile file = mRequest.getFile("domandapdf");
+    	if (file.isEmpty())
+    		throw new ClientMessageException("Allegare la domanda firmata!");
+    	Folder application = loadApplicationById(cmisService.createAdminSession(), idApplication, null);    	
+    	String nameRicevutaReportModel = printService.getNameRicevutaReportModel(session, application, req.getLocale());
+    	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, file.getInputStream(), nameRicevutaReportModel, true);
+    	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(req.getLocale()), getContextURL(req));  
+    	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
+    	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), req.getLocale(), userId, applicationModel.getProperties(), applicationModel.getProperties());
+		return Collections.singletonMap("email_comunicazione", user.getEmail());
+	}
+	
+	public String getContextURL(HttpServletRequest req) {
+		return req.getScheme() + "://" + req.getServerName() + ":"
+				+ req.getServerPort() + req.getContextPath();
+	}
+	
+	@Override
+	protected void addToQueueForSend(String id, String contextURL, boolean email) {
+		queueService.queueAddContentToApplication().add(new PrintParameterModel(id, contextURL, email));
+	}
+	
 }

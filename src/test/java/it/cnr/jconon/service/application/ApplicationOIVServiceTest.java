@@ -2,6 +2,8 @@ package it.cnr.jconon.service.application;
 
 import it.cnr.cool.cmis.service.CMISService;
 import it.cnr.si.cool.jconon.CoolJcononApplication;
+import it.cnr.si.cool.jconon.service.application.ApplicationOIVService;
+
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
