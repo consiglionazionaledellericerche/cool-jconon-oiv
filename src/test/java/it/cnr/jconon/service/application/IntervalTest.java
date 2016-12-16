@@ -2,6 +2,8 @@ package it.cnr.jconon.service.application;
 
 import org.junit.Test;
 
+import it.cnr.si.cool.jconon.service.application.Interval;
+
 import java.util.GregorianCalendar;
 
 import static org.junit.Assert.assertEquals;

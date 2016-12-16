@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DomandaConcorso" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="28" bottomMargin="28" scriptletClass="net.sf.jasperreports.engine.JRDefaultScriptlet" uuid="6fccba99-1156-4661-99e5-3238586360bb">
-	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.zoom" value="1.024520183047606"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="681"/>
+	<property name="ireport.y" value="0"/>
 	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
 	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
 	<property name="ireport.background.image.properties" value="true,true,1.0,-8,-8,0,0,611,899"/>
@@ -322,7 +322,7 @@
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($F{jconon_application:sesso}.equals("F")?"LA SOTTOSCRITTA ":"IL SOTTOSCRITTO ") +
-$F{jconon_application:cognome}+" "+$F{jconon_application:nome} + "<br/>" +
+$F{jconon_application:nome}.toUpperCase() +" "+$F{jconon_application:cognome}.toUpperCase() + "<br/>" +
 ($F{jasperReport:call_ObjectTypeId}.equals("F:jconon_call_employees:folder")?
  "Matricola: " + $F{jasperReport:user_matricola} + " - E-Mail: " + $F{jasperReport:user_email_comunicazione}:"")]]></textFieldExpression>
 			</textField>
@@ -974,20 +974,6 @@ $F{jconon_documento_riconoscimento:data_scadenza}.length() > 0]]></printWhenExpr
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DomandaConcorso_detail.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
-		<band height="29" splitType="Prevent">
-			<staticText>
-				<reportElement key="textField-3" style="FONT_Normal" mode="Transparent" x="10" y="11" width="77" height="14" uuid="bc15afb7-01c4-4979-9cbc-e3635df2ddfc"/>
-				<textElement verticalAlignment="Top" markup="none">
-					<font size="10" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Data Domanda: ]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="90" y="11" width="213" height="15" uuid="203103f6-caf5-4dad-b57c-222dcfd33809"/>
-				<textElement verticalAlignment="Top"/>
-				<textFieldExpression><![CDATA[$F{jconon_application:data_domanda}.isEmpty()?"":new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse($F{jconon_application:data_domanda}))]]></textFieldExpression>
-			</textField>
-		</band>
 	</detail>
 	<pageFooter>
 		<band height="50">
@@ -1012,28 +998,68 @@ new java.util.Date():new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Simp
 		</band>
 	</pageFooter>
 	<lastPageFooter>
-		<band height="100">
+		<band height="286">
 			<image>
-				<reportElement x="442" y="0" width="72" height="52" uuid="07c63b6f-f10d-40c8-bf1c-32343dd3e1d2"/>
+				<reportElement x="10" y="184" width="72" height="52" uuid="07c63b6f-f10d-40c8-bf1c-32343dd3e1d2"/>
 				<imageExpression><![CDATA[$P{QRCODE}]]></imageExpression>
 			</image>
 			<line>
-				<reportElement x="0" y="62" width="515" height="1" uuid="3c62767d-189a-4d67-9e4d-061b43d1ca38"/>
+				<reportElement x="0" y="249" width="515" height="1" uuid="3c62767d-189a-4d67-9e4d-061b43d1ca38"/>
 			</line>
 			<textField>
-				<reportElement x="178" y="71" width="80" height="15" uuid="1d9c0074-db89-4fdb-822e-5b4765bc4e30"/>
+				<reportElement x="178" y="258" width="80" height="15" uuid="1d9c0074-db89-4fdb-822e-5b4765bc4e30"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA["Pagina " + String.valueOf($V{PAGE_NUMBER}) + " di"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
-				<reportElement x="258" y="71" width="75" height="15" uuid="6e28c5ef-2601-4f07-8572-d438141f577c"/>
+				<reportElement x="258" y="258" width="75" height="15" uuid="6e28c5ef-2601-4f07-8572-d438141f577c"/>
 				<textFieldExpression><![CDATA[" " + String.valueOf($V{PAGE_NUMBER})]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy HH.mm.ss">
-				<reportElement x="355" y="71" width="137" height="15" uuid="734c9b07-f63a-4349-9820-678850cf8321"/>
+				<reportElement x="355" y="258" width="137" height="15" uuid="734c9b07-f63a-4349-9820-678850cf8321"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[($F{jconon_application:data_domanda} == null || $F{jconon_application:data_domanda}.isEmpty())?
 new java.util.Date():new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse($F{jconon_application:data_domanda}))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement key="staticText-42" style="FONT_Bold" x="10" y="10" width="505" height="117" uuid="3108fe57-20e3-4932-94f8-769d8734b2ac"/>
+				<textElement verticalAlignment="Top">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Visto il D.P.R. 28 dicembre 2000, n. 445 concernente “T.U. delle disposizioni legislative e regolamentari in materia di documentazione amministrativa” e successive modifiche ed integrazioni;
+
+Vista la Legge 12 novembre 2011, n. 183 ed in particolare l’art. 15 concernente le nuove disposizioni in materia di certificati e dichiarazioni sostitutive (*);
+
+Consapevole che, ai sensi dell’art.76 del DPR 445/2000, le dichiarazioni mendaci, la falsità negli atti e l’uso di atti falsi sono punite ai sensi del Codice penale e delle leggi speciali vigenti in materia,  dichiara sotto la propria responsabilità:
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-42" style="FONT_Bold" x="10" y="128" width="505" height="43" uuid="cdc885ea-c5a7-44a9-a203-62b50fd23150"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[che quanto dichiarato nel curriculum vitae e nella domanda di iscrizione all’Elenco Nazionale dei componenti OIV, comprese le informazioni relative alle esperienze professionali, corrisponde a verità]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="staticText-42" style="FONT_Bold" x="342" y="193" width="168" height="43" uuid="1aff9cda-63f7-415d-ab0f-3c1e57051dc4"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[ FIRMA
+
+_________________]]></text>
+			</staticText>
+			<staticText>
+				<reportElement key="textField-3" style="FONT_Normal" mode="Transparent" x="90" y="221" width="77" height="14" uuid="bc15afb7-01c4-4979-9cbc-e3635df2ddfc"/>
+				<textElement verticalAlignment="Top" markup="none">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Domanda: ]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="170" y="221" width="128" height="15" uuid="203103f6-caf5-4dad-b57c-222dcfd33809"/>
+				<textElement verticalAlignment="Top"/>
+				<textFieldExpression><![CDATA[$F{jconon_application:data_domanda}.isEmpty()?"":new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse($F{jconon_application:data_domanda}))]]></textFieldExpression>
 			</textField>
 		</band>
 	</lastPageFooter>
