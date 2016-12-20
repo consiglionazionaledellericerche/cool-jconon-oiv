@@ -60,6 +60,443 @@
 				</list>
 			</parameter>
 		</constraint>
+		<constraint name="jconon_application:elenco_lauree" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>ARCHITETTURA</value>
+					<value>ASTRONOMIA</value>
+					<value>BIOTECNOLOGIE AGRO-INDUSTRIALI</value>
+					<value>BIOTECNOLOGIE INDIRIZZO</value>
+					<value>BIOTECNOLOGIE AGRARIE VEGETALI</value>
+					<value>BIOTECNOLOGIE INDIRIZZO</value>
+					<value>BIOTECNOLOGIE MEDICHE</value>
+					<value>BIOTECNOLOGIE FARMACEUTICHE</value>
+					<value>VETERINARIE E FARMACEUTICHE VETERINARIE E FARMACEUTICHE</value>
+					<value>BIOTECNOLOGIE INDIRIZZO</value>
+					<value>BIOTECNOLOGIE INDUSTRIALI</value>
+					<value>BIOTECNOLOGIE INDIRIZZO</value>
+					<value>BIOTECNOLOGIE MEDICHE</value>
+					<value>BIOTECNOLOGIE INDIRIZZO</value>
+					<value>BIOTECNOLOGIE VETERINARIE</value>
+					<value>CHIMICA</value>
+					<value>CHIMICA E TECNOLOGIE FARMACEUTICHE</value> 
+					<value>CHIMICA INDUSTRIALE</value>
+					<value>COMUNICAZIONE INTERNAZIONALE</value> 
+					<value>CONSERVAZIONE DEI BENI CULTURALI</value>
+					<value>DISCIPLINE DELLE ARTI, DELLA MUSICA E DELLO SPETTACOLO</value>
+					<value>DISCIPLINE ECONOMICHE E SOCIALI</value>
+					<value>DISEGNO INDUSTRIALE</value>
+					<value>ECONOMIA AMBIENTALE</value>
+					<value>ECONOMIA ASSICURATIVA E PREVIDENZIALE</value>
+					<value>ECONOMIA AZIENDALE</value>
+					<value>ECONOMIA BANCARIA</value>
+					<value>ECONOMIA BANCARIA, FINANZIARIA E ASSICURATIVA</value>
+					<value>ECONOMIA DEL COMMERCIO INTERNAZIONALE E DEI MERCATI VALUTARI</value>
+					<value>ECONOMIA DEL TURISMO</value>
+					<value>ECONOMIA DELLE AMMINISTRAZIONI DELL'ECONOMIA PUBBLICHE E DELLE ISTITUZIONI INTERNAZIONALI</value>
+					<value>ECONOMIA DELLE ISTITUZIONI E DEI MERCATI FINANZIARI</value>
+					<value>ECONOMIA E COMMERCIO</value> 
+					<value>ECONOMIA E FINANZA</value> 
+					<value>ECONOMIA E LEGISLAZIONE PER L'IMPRESA</value>
+					<value>ECONOMIA INDUSTRIALE</value>
+					<value>ECONOMIA MARITTIMA E DEI TRASPORTI</value>
+					<value>ECONOMIA PER LE ARTI, LA CULTURA E LA E LA CULTURA COMUNICAZIONE</value>
+					<value>ECONOMIA POLITICA</value>
+					<value>FARMACIA</value>
+					<value>FILOLOGIA E STORIA DELL'EUROPA ORIENTALE</value>
+					<value>FILOLOGIE, STORIA E CULTURA DEI PAESI ISLAMICI</value>
+					<value>FILOSOFIA</value>
+					<value>FISICA</value>
+					<value>GEOGRAFIA</value>
+					<value>GIURISPRUDENZA</value>
+					<value>INFORMATICA</value>
+					<value>INGEGNERIA AEROSPAZIALE</value>
+					<value>INGEGNERIA BIOMEDICA</value> 
+					<value>INGEGNERIA CHIMICA</value>
+					<value>INGEGNERIA CIVILE</value>
+					<value>INGEGNERIA DELLE TELECOMUNICAZIONI</value>
+					<value>INGEGNERIA EDILE</value>
+					<value>INGEGNERIA EDILE - ARCHITETTURA</value>
+					<value>INGEGNERIA ELETTRICA</value>
+					<value>INGEGNERIA ELETTRONICA</value>
+					<value>INGEGNERIA GESTIONALE</value>
+					<value>INGEGNERIA INDUSTRIALE</value>
+					<value>INGEGNERIA INFORMATICA</value>
+					<value>INGEGNERIA MECCANICA</value>
+					<value>INGEGNERIA MEDICA</value> 
+					<value>INGEGNERIA NAVALE</value>
+					<value>INGEGNERIA NUCLEARE</value>
+					<value>INGEGNERIA PER L'AMBIENTE E IL TERRITORIO</value>
+					<value>LETTERE</value>
+					<value>LINGUA E CULTURA ITALIANA</value> 
+					<value>LINGUE, CULTURE ED ISTITUZIONI DEI PAESI DEL MEDITERRANEO</value>
+					<value>LINGUE E CIVILTA' ORIENTALI</value>
+					<value>LINGUE E CULTURE DELL'EUROPA ORIENTALE</value>
+					<value>LINGUE E CULTURE EUROPEE</value>
+					<value>LINGUE E LETTERATURE ORIENTALI</value>
+					<value>LINGUE E LETTERATURE STRANIERE</value>
+					<value>MARKETING</value> 
+					<value>MATEMATICA</value>
+					<value>MATERIE LETTERARIE</value> 
+					<value>MEDICINA E CHIRURGIA</value>
+					<value>MEDICINA VETERINARIA</value>
+					<value>MUSICOLOGIA</value>
+					<value>ODONTOIATRIA E PROTESI DENTARIA</value> 
+					<value>PEDAGOGIA</value> 
+					<value>PIANIFICAZIONE TERRITORIALE E URBANISTICA</value>
+					<value>PIANIFICAZIONE TERRITORIALE, URBANISTICA E AMBIENTALE</value>
+					<value>POLITICA DEL TERRITORIO</value>
+					<value>PSICOLOGIA</value>
+					<value>RELAZIONI PUBBLICHE</value>
+					<value>SCIENZA DEI MATERIALI</value>
+					<value>SCIENZE AGRARIE</value>
+					<value>SCIENZE AGRARIE TROPICALI E SUBTROPICALI</value>
+					<value>SCIENZE AMBIENTALI</value>
+					<value>SCIENZE BIOLOGICHE</value>
+					<value>SCIENZE DELL'AMMINISTRAZIONE</value>
+					<value>SCIENZE DELL'EDUCAZIONE</value>
+					<value>SCIENZE DELL'INFORMAZIONE</value>
+					<value>SCIENZE DELLA COMUNICAZIONE</value>
+					<value>SCIENZE DELLA CULTURA</value>
+					<value>SCIENZE DELLA FORMAZIONE PRIMARIA</value>
+					<value>SCIENZE DELLA PRODUZIONE ANIMALE</value>
+					<value>SCIENZE DELLE PRODUZIONI ANIMALI</value>
+					<value>SCIENZE DELLA PROGRAMMAZIONE SANITARIA</value>
+					<value>SCIENZE E TECNICHE SOCIALI DELL'INTERCULTURALITA'</value>
+					<value>SCIENZE E TECNOLOGIE AGRARIE</value>
+					<value>SCIENZE E TECNOLOGIE ALIMENTARI</value>
+					<value>SCIENZE E TECNOLOGIE DELLE PRODUZIONI ANIMALI</value>
+					<value>SCIENZE ECONOMICHE, STATISTICHE E SOCIALI</value>
+					<value>SCIENZE FORESTALI</value>
+					<value>SCIENZE FORESTALI E AMBIENTALI</value>
+					<value>SCIENZE GEOLOGICHE</value>
+					<value>SCIENZE INTERNAZIONALI E DIPLOMATICHE</value>
+					<value>SCIENZE MOTORIE</value>
+					<value>SCIENZE NATURALI</value>
+					<value>SCIENZE NAUTICHE</value>
+					<value>SCIENZE POLITICHE</value>
+					<value>SCIENZE STATISTICHE DEMOGRAFICHE E SOCIALI</value>
+					<value>SCIENZE STATISTICHE ED ATTUARIALI</value>
+					<value>SCIENZE STATISTICHE ED ECONOMICHE</value>
+					<value>SCIENZE STRATEGICHE</value>
+					<value>SCIENZE TURISTICHE</value>
+					<value>SERVIZIO SOCIALE</value>
+					<value>SOCIOLOGIA</value>
+					<value>STATISTICA</value>
+					<value>STATISTICA E INFORMATICA PER L'AZIENDA</value>
+					<value>STORIA</value>
+					<value>STORIA E CONSERVAZIONE DEI BENI ARCHITETTONICI E AMBIENTALI</value>
+					<value>STORIA E CONSERVAZIONE DEI BENI CULTURALI</value>
+					<value>STUDI COMPARATISTICI</value>
+					<value>TRADUZIONE ED INTERPRETAZIONE</value>
+					<value>URBANISTICA</value>
+					<value>1/S - ANTROPOLOGIA CULTURALE ED ETNOLOGIA</value>
+					<value>2/S - ARCHEOLOGIA</value>
+					<value>3/S - ARCHITETTURA DEL PAESAGGIO</value>
+					<value>4/S - ARCHITETTURA E INGEGNERIA EDILE</value>
+					<value>5/S - ARCHIVISTICA E BIBLIOTECONOMIA</value>
+					<value>6/S - BIOLOGIA</value>
+					<value>7/S - BIOTECNOLOGIE AGRARIE</value>
+					<value>8/S - BIOTECNOLOGIE INDUSTRIALI</value>
+					<value>9/S - BIOTECNOLOGIE MEDICHE, VETERINARIE E FARMACEUTICHE</value>
+					<value>10/S - CONSERVAZIONE DEI BENI ARCHITETTONICI E AMBIENTALI</value>
+					<value>11/S - CONSERVAZIONE DEI BENI SCIENTIFICI E DELLA CIVILTA' INDUSTRIALE</value>
+					<value>12/S - CONSERVAZIONE E RESTAURO DEL PATRIMONIO STORICO-ARTISTICO</value>
+					<value>13/S - EDITORIA, COMUNICAZIONE MULTIMEDIALE E GIORNALISMO</value>
+					<value>14/S - FARMACIA E FARMACIA INDUSTRIALE</value>
+					<value>15/S - FILOLOGIA E LETTERATURE DELL'ANTICHITA'</value>
+					<value>16/S - FILOLOGIA MODERNA</value>
+					<value>17/S - FILOSOFIA E STORIA DELLA SCIENZA</value>
+					<value>18/S - FILOSOFIA TEORETICA, MORALE, POLITICA ED ESTETICA</value>
+					<value>19/S - FINANZA</value>
+					<value>20/S - FISICA</value>
+					<value>21/S - GEOGRAFIA</value>
+					<value>22/S - GIURISPRUDENZA</value>
+					<value>23/S - INFORMATICA</value>
+					<value>24/S - INFORMATICA PER LE DISCIPLINE UMANISTICHE</value>
+					<value>25/S - INGEGNERIA AEROSPAZIALE E ASTRONAUTICA</value>
+					<value>26/S - INGEGNERIA BIOMEDICA</value>
+					<value>27/S - INGEGNERIA CHIMICA</value>
+					<value>28/S - INGEGNERIA CIVILE</value>
+					<value>29/S - INGEGNERIA DELL'AUTOMAZIONE</value>
+					<value>30/S - INGEGNERIA DELLE TELECOMUNICAZIONI</value>
+					<value>31/S - INGEGNERIA ELETTRICA</value>
+					<value>32/S - INGEGNERIA ELETTRONICA</value>
+					<value>33/S - INGEGNERIA ENERGETICA E NUCLEARE</value>
+					<value>34/S - INGEGNERIA GESTIONALE</value>
+					<value>35/S - INGEGNERIA INFORMATICA</value>
+					<value>36/S - INGEGNERIA MECCANICA</value>
+					<value>37/S - INGEGNERIA NAVALE</value>
+					<value>38/S - INGEGNERIA PER L'AMBIENTE E IL TERRITORIO</value>
+					<value>39/S - INTERPRETARIATO DI CONFERENZA</value>
+					<value>40/S - LINGUA E CULTURA ITALIANA</value>
+					<value>41/S - LINGUE E LETTERATURE AFROASIATICHE</value>
+					<value>42/S - LINGUE E LETTERATURE MODERNE EUROAMERICANE</value>
+					<value>43/S - LINGUE STRANIERE PER LA COMUNICAZIONE INTERNAZIONALE</value>
+					<value>44/S - LINGUISTICA</value>
+					<value>45/S - MATEMATICA</value>
+					<value>46/S - MEDICINA E CHIRURGIA</value>
+					<value>47/S - MEDICINA VETERINARIA</value>
+					<value>48/S - METODI PER L'ANALISI VALUTATIVA DEI SISTEMI COMPLESSI</value>
+					<value>49/S - METODI PER LA RICERCA EMPIRICA NELLE SCIENZE SOCIALI</value>
+					<value>50/S - MODELLISTICA MATEMATICO-FISICA PER L'INGEGNERIA</value>
+					<value>51/S - MUSICOLOGIA E BENI MUSICALI</value>
+					<value>52/S - ODONTOIATRIA E PROTESI DENTARIA</value>
+					<value>53/S - ORGANIZZAZIONE E GESTIONE DEI SERVIZI PER LO SPORT E LE ATTIVITA' MOTORIE</value>
+					<value>54/S - PIANIFICAZIONE TERRITORIALE URBANISTICA E AMBIENTALE</value>
+					<value>55/S - PROGETTAZIONE E GESTIONE DEI SISTEMI TURISTICI</value>
+					<value>56/S - PROGRAMMAZIONE E GESTIONE DEI SERVIZI EDUCATIVI E FORMATIVI</value>
+					<value>57/A - PROGRAMMAZIONE E GESTIONE DELLE POLITICHE E DEI SERVIZI SOCIALI</value>
+					<value>58/A - PSICOLOGIA</value>
+					<value>59/S - PUBBLICITA' E COMUNICAZIONE D'IMPRESA</value>
+					<value>60/S - RELAZIONI INTERNAZIONALI</value>
+					<value>61/S - SCIENZA E INGEGNERIA DEI MATERIALI</value>
+					<value>62/S - SCIENZE CHIMICHE</value>
+					<value>63/S - SCIENZE COGNITIVE</value>
+					<value>64/S - SCIENZE DELL'ECONOMIA</value>
+					<value>65/S - SCIENZE DELL'EDUCAZIONE DEGLI ADULTI E DELLA FORMAZIONE CONTINUA</value>
+					<value>66/S - SCIENZE DELL'UNIVERSO</value>
+					<value>67/S - SCIENZE DELLA COMUNICAZIONE SOCIALE E ISTITUZIONALE</value>
+					<value>68/S - SCIENZE DELLA NATURA</value>
+					<value>69/S - SCIENZE DELLA NUTRIZIONE UMANA</value>
+					<value>70/S - SCIENZE DELLA POLITICA</value>
+					<value>71/S - SCIENZE DELLE PUBBLICHE AMMINISTRAZIONI</value>
+					<value>72/S - SCIENZE DELLE RELIGIONI</value>
+					<value>73/S - SCIENZE DELLO SPETTACOLO E DELLA PRODUZIONE MULTIMEDIALE</value>
+					<value>74/S - SCIENZE E GESTIONE DELLE RISORSE RURALI E FORESTALI</value>
+					<value>75/S - SCIENZE E TECNICA DELLO SPORT</value>
+					<value>76/S - SCIENZE E TECNICHE DELLE ATTIVITA' MOTORIE PREVENTIVE E ADATTATIVE</value>
+					<value>77/S - SCIENZE E TECNOLOGIE AGRARIE</value>
+					<value>78/S - SCIENZE E TECNOLOGIE AGROALIMENTARI</value>
+					<value>79/S - SCIENZE E TECNOLOGIE AGROZOOTECNICHE</value>
+					<value>80/S - SCIENZE E TECNOLOGIE DEI SISTEMI DI NAVIGAZIONE</value>
+					<value>81/S - SCIENZE E TECNOLOGIE DELLA CHIMICA INDUSTRIALE</value>
+					<value>82/S - SCIENZE E TECNOLOGIE PER L'AMBIENTE E IL TERRITORIO</value>
+					<value>83/S - SCIENZE ECONOMICHE PER L'AMBIENTE E LA CULTURA</value>
+					<value>84/S - SCIENZE ECONOMICO-AZIENDALI</value>
+					<value>85/S - SCIENZE GEOFISICHE</value>
+					<value>86/S - SCIENZE GEOLOGICHE</value>
+					<value>87/S - SCIENZE PEDAGOGICHE</value>
+					<value>88/S - SCIENZE PER LA COOPERAZIONE ALLO SVILUPPO</value>
+					<value>89/S - SOCIOLOGIA</value>
+					<value>90/S - STATISTICA DEMOGRAFICA E SOCIALE</value>
+					<value>91/S - STATISTICA ECONOMICA, FINANZIARIA ED ATTUARIALE</value>
+					<value>92/S - STATISTICA PER LA RICERCA SPERIMENTALE</value>
+					<value>93/S - STORIA ANTICA</value>
+					<value>94/S - STORIA CONTEMPORANEA</value>
+					<value>95/S - STORIA DELL'ARTE</value>
+					<value>96/S - STORIA DELLA FILOSOFIA</value>
+					<value>97/S - STORIA MEDIOEVALE</value>
+					<value>98/S - STORIA MODERNA</value>
+					<value>99/S - STUDI EUROPEI</value>
+					<value>100/S TECNICHE E METODI PER LA SOCIETA' DELL'INFORMAZIONE</value>
+					<value>101/S TEORIA DELLA COMUNICAZIONE</value>
+					<value>102/S TEORIA E TECNICHE DELLA NORMAZIONE E DELL'INFORMAZIONE GIURIDICA</value>
+					<value>103/S TEORIE E METODI DEL DISEGNO INDUSTRIALE</value>
+					<value>104/S TRADUZIONE LETTERARIA E TRADUZIONE TECNICO-SCIENTIFICA</value>
+					<value>LM-1 ANTROPOLOGIA CULTURALE ED ETNOLOGIA</value>
+					<value>LM-2 ARCHEOLOGIA</value>
+					<value>LM-3 ARCHITETTURA DEL PAESAGGIO</value>
+					<value>LM-4 ARCHITETTURA E INGEGNERIA EDILE‐ARCHITETTURA</value>
+					<value>LM-5 ARCHIVISTICA E BIBLIOTECONOMIA</value>
+					<value>LM-6 BIOLOGIA</value>
+					<value>LM-7 BIOTECNOLOGIE AGRARIE</value>
+					<value>LM-8 BIOTECNOLOGIE INDUSTRIALI</value>
+					<value>LM-9 BIOTECNOLOGIE MEDICHE, VETERINARIE E FARMACEUTICHE</value>
+					<value>LM-10 CONSERVAZIONE DEI BENI ARCHITETTONICI E AMBIENTALI</value>
+					<value>LM-11 CONSERVAZIONE E RESTAURO DEI BENI CULTURALI</value>
+					<value>LM-12 DESIGN</value>
+					<value>LM-13 FARMACIA E FARMACIA INDUSTRIALE</value>
+					<value>LM-14 FILOLOGIA MODERNA</value>
+					<value>LM-15 FILOLOGIA, LETTERATURE E STORIA DELL'ANTICHITA</value>
+					<value>LM-16 FINANZA</value>
+					<value>LM-17 FISICA</value>
+					<value>LMG/01 GIURISPRUDENZA</value>
+					<value>LM-18 INFORMATICA</value>
+					<value>LM-19 INFORMAZIONE E SISTEMI EDITORIALI</value>
+					<value>LM-20 INGEGNERIA AEROSPAZIALE E ASTRONAUTICA</value>
+					<value>LM-21 INGEGNERIA BIOMEDICA</value>
+					<value>LM-22 INGEGNERIA CHIMICA</value>
+					<value>LM-23 INGEGNERIA CIVILE</value>
+					<value>LM-24 INGEGNERIA DEI SISTEMI EDILIZI</value>
+					<value>LM-25 INGEGNERIA DELL'AUTOMAZIONE</value>
+					<value>LM-26 INGEGNERIA DELLA SICUREZZA</value>
+					<value>LM-27 INGEGNERIA DELLE TELECOMUNICAZIONI</value>
+					<value>LM-28 INGEGNERIA ELETTRICA</value>
+					<value>LM-29 INGEGNERIA ELETTRONICA</value>
+					<value>LM-30 INGEGNERIA ENERGETICA E NUCLEARE</value>
+					<value>LM-31 INGEGNERIA GESTIONALE</value>
+					<value>LM-32 INGEGNERIA INFORMATICA</value>
+					<value>LM-33 INGEGNERIA MECCANICA</value>
+					<value>LM-34 INGEGNERIA NAVALE</value>
+					<value>LM-35 INGEGNERIA PER L'AMBIENTE E IL TERRITORIO</value>
+					<value>LM-36 LINGUE E LETTERATURE DELL'AFRICA E DELL'ASIA</value>
+					<value>LM-37 LINGUE E LETTERATURE MODERNE EUROPEE E AMERICANE</value>
+					<value>LM-38 LINGUE MODERNE PER LA COMUNICAZIONE E LA COOPERAZIONE INTERNAZIONALE</value>
+					<value>LM-39 LINGUISTICA</value>
+					<value>LM-40 MATEMATICA</value>
+					<value>LM-41 MEDICINA E CHIRURGIA</value>
+					<value>LM-42 MEDICINA VETERINARIA</value>
+					<value>LM-43 METODOLOGIE INFORMATICHE PER LE DISCIPLINE UMANISTICHE</value>
+					<value>LM-44 MODELLISTICA MATEMATICO‐FISICA PER L'INGEGNERIA</value>
+					<value>LM-45 MUSICOLOGIA E BENI MUSICALI</value>
+					<value>LM-46 ODONTOIATRIA E PROTESI DENTARIA</value>
+					<value>LM-47 ORGANIZZAZIONE E GESTIONE DEI SERVIZI PER LO SPORT E LE ATTIVITA MOTORIE</value>
+					<value>LM-48 PIANIFICAZIONE TERRITORIALE URBANISTICA E AMBIENTALE</value>
+					<value>LM-49 PROGETTAZIONE E GESTIONE DEI SISTEMI TURISTICI</value>
+					<value>LM-50 PROGRAMMAZIONE E GESTIONE DEI SERVIZI EDUCATIVI</value>
+					<value>LM-51 PSICOLOGIA</value>
+					<value>LM-52 RELAZIONI INTERNAZIONALI</value>
+					<value>LM-53 SCIENZA E INGEGNERIA DEI MATERIALI</value>
+					<value>LM-54 SCIENZE CHIMICHE</value>
+					<value>LM-55 SCIENZE COGNITIVE</value>
+					<value>LM-56 SCIENZE DELL'ECONOMIA</value>
+					<value>LM-57 SCIENZE DELL'EDUCAZIONE DEGLI ADULTI E DELLA FORMAZIONE CONTINUA</value>
+					<value>LM-58 SCIENZE DELL'UNIVERSO</value>
+					<value>LM-59 SCIENZE DELLA COMUNICAZIONE PUBBLICA, D'IMPRESA E PUBBLICITA</value>
+					<value>LM-60 SCIENZE DELLA NATURA</value>
+					<value>LM-61 SCIENZE DELLA NUTRIZIONE UMANA</value>
+					<value>LM-62 SCIENZE DELLA POLITICA</value>
+					<value>LM-63 SCIENZE DELLE PUBBLICHE AMMINISTRAZIONI</value>
+					<value>LM-64 SCIENZE DELLE RELIGIONI</value>
+					<value>LM-65 SCIENZE DELLO SPETTACOLO E PRODUZIONE MULTIMEDIALE</value>
+					<value>LM-68 SCIENZE E TECNICHE DELLO SPORT</value>
+					<value>LM-67 SCIENZE E TECNICHE DELLE ATTIVITA MOTORIE PREVENTIVE E ADATTATE</value>
+					<value>LM-69 SCIENZE E TECNOLOGIE AGRARIE</value>
+					<value>LM-70 SCIENZE E TECNOLOGIE ALIMENTARI</value>
+					<value>LM-71 SCIENZE E TECNOLOGIE DELLA CHIMICA INDUSTRIALE</value>
+					<value>LM-75 SCIENZE E TECNOLOGIE PER L'AMBIENTE E IL TERRITORIO</value>
+					<value>LM-72 SCIENZE E TECNOLOGIE DELLA NAVIGAZIONE (80/M)</value>
+					<value>LM-73 SCIENZE E TECNOLOGIE FORESTALI ED AMBIENTALI</value>
+					<value>LM-74 SCIENZE E TECNOLOGIE GEOLOGICHE</value>
+					<value>LM-76 SCIENZE ECONOMICHE PER L'AMBIENTE E LA CULTURA</value>
+					<value>LM-77 SCIENZE ECONOMICO‐AZIENDALI</value>
+					<value>LM-78 SCIENZE FILOSOFICHE</value>
+					<value>LM-79 SCIENZE GEOFISICHE</value>
+					<value>LM-80 SCIENZE GEOGRAFICHE</value>
+					<value>LM-81 SCIENZE PER LA COOPERAZIONE ALLO SVILUPPO</value>
+					<value>LM-82 SCIENZE STATISTICHE</value>
+					<value>LM-83 SCIENZE STATISTICHE ATTUARIALI E FINANZIARIE</value>
+					<value>LM-84 SCIENZE STORICHE</value>
+					<value>LM-85 SCIENZE PEDAGOGICHE</value>
+					<value>LM-86 SCIENZE ZOOTECNICHE E TECNOLOGIE ANIMALI</value>
+					<value>LM-87 SERVIZIO SOCIALE E POLITICHE SOCIALI</value>
+					<value>LM-66 SICUREZZA INFORMATICA</value>
+					<value>LM-88 SOCIOLOGIA E RICERCA SOCIALE</value>
+					<value>LM-89 STORIA DELL'ARTE</value>
+					<value>LM-90 STUDI EUROPEI</value>
+					<value>LM-91 TECNICHE E METODI PER LA SOCIETA' DELL'INFORMAZIONE</value>
+					<value>LM-92 TEORIE DELLA COMUNICAZIONE</value>
+					<value>LM-93 TEORIE E METODOLOGIE DELL'E‐LEARNING E DELLA MEDIA EDUCATION</value>
+					<value>LM-94 TRADUZIONE SPECIALISTICA E INTERPRETARIATO</value>
+					<value>ALTRE LAUREE</value>
+				</list>
+			</parameter>
+		</constraint>
+		<constraint name="jconon_application:elenco_istituti_lauree" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>UNIVERSITA' DEGLI STUDI DI BARI ALDO MORO</value>
+					<value>POLITECNICO DI BARI</value>
+					<value>LUM 'JEAN MONNET'</value>
+					<value>UNIVERSITA' DEGLI STUDI DELLA BASILICATA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI BERGAMO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI BOLOGNA</value>
+					<value>LIBERA UNIVERSITA' DI BOLZANO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI BRESCIA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI CAGLIARI</value>
+					<value>UNIVERSITA' DELLA CALABRIA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI CAMERINO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI CASSINO E DEL LAZIO MERIDIONALE</value>
+					<value>UNIVERSITA' 'CARLO CATTANEO' - LIUC</value>
+					<value>UNIVERSITA' DEGLI STUDI DI CATANIA</value>
+					<value>UNIVERSITA' DEGLI STUDI 'MAGNA GRAECIA' DI CATANZARO</value>
+					<value>UNIVERSITA' DEGLI STUDI 'G. D'ANNUNZIO' CHIETI-PESCARA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI SCIENZE GASTRONOMICHE</value>
+					<value>UKE - UNIVERSITA' KORE DI ENNA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI FERRARA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI FIRENZE</value>
+					<value>UNIVERSITA' DEGLI STUDI DI FOGGIA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI GENOVA</value>
+					<value>UNIVERSITA' DEGLI STUDI INSUBRIA VARESE-COMO</value>
+					<value>UNIVERSITA' DEGLI STUDI DE L'AQUILA</value>
+					<value>GRAN SASSO SCIENCE INSTITUTE - SCUOLA DI DOTTORATO INTERNAZIONALE</value>
+					<value>UNIVERSITA' DEGLI STUDI DI MACERATA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI MESSINA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI MILANO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI MILANO-BICOCCA</value>
+					<value>POLITECNICO DI MILANO</value>
+					<value>UNIVERSITA' COMMERCIALE 'LUIGI BOCCONI' MILANO</value>
+					<value>UNIVERSITA' CATTOLICA DEL SACRO CUORE</value>
+					<value>HUMANITAS UNIVERSITY</value>
+					<value>LIBERA UNIVERSITA' DI LINGUE E COMUNICAZIONE IULM-MI</value>
+					<value>LIBERA UNIVERSITA' 'VITA SALUTE S.RAFFAELE' MILANO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI MODENA E REGGIO EMILIA</value>
+					<value>UNIVERSITA' DEGLI STUDI DEL MOLISE</value>
+					<value>UNIVERSITA' DEGLI STUDI DI NAPOLI 'FEDERICO II'</value>
+					<value>UNIVERSITA' DEGLI STUDI DELLA CAMPANIA 'LUIGI VANVITELLI'</value>
+					<value>UNIVERSITA' DEGLI STUDI DI NAPOLI 'PARTHENOPE'</value>
+					<value>UNIVERSITA' DEGLI STUDI DI NAPOLI 'L'ORIENTALE'</value>
+					<value>UNIVERSITA' DEGLI STUDI SUOR ORSOLA BENINCASA - NAPOLI</value>
+					<value>UNIVERSITA' DEGLI STUDI DI PADOVA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI PALERMO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI PARMA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI PAVIA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI PERUGIA</value>
+					<value>UNIVERSITA' PER STRANIERI DI PERUGIA</value>
+					<value>UNIVERSITA' DEGLI STUDI DEL PIEMONTE ORIENTALE 'AMEDEO AVOGADRO'-VERCELLI</value>
+					<value>UNIVERSITA' DI PISA</value>
+					<value>SCUOLA NORMALE SUPERIORE DI PISA</value>
+					<value>SCUOLA SUPERIORE DI STUDI UNIVERSITARI E PERFEZIONAMENTO SANT'ANNA</value>
+					<value>UNIVERSITA' POLITECNICA DELLE MARCHE</value>
+					<value>UNIVERSITA' DEGLI STUDI 'MEDITERRANEA' DI REGGIO CALABRIA</value>
+					<value>UNIVERSITA' PER STRANIERI 'DANTE ALIGHIERI' DI REGGIO CALABRIA</value>
+					<value>UNIVERSITA' DEGLI STUDI EUROPEA DI ROMA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI ROMA 'FORO ITALICO'</value>
+					<value>UNIVERSITA' DEGLI STUDI DI ROMA 'LA SAPIENZA'</value>
+					<value>UNIVERSITA' DEGLI STUDI DI ROMA 'TOR VERGATA'</value>
+					<value>UNIVERSITA' DEGLI STUDI ROMA TRE</value>
+					<value>UNIVERSITA' 'CAMPUS BIO-MEDICO' DI ROMA</value>
+					<value>LIBERA UNIV. INTER.LE STUDI SOCIALI 'GUIDO CARLI' LUISS-ROMA</value>
+					<value>UNIVERSITA' DEGLI STUDI INTERNAZIONALI DI ROMA (UNINT)</value>
+					<value>LIBERA UNIVERSITA' DEGLI STUDI 'MARIA SS.ASSUNTA' - LUMSA</value>
+					<value>LINK CAMPUS UNIVERSITY</value>
+					<value>UNIVERSITA' DEL SALENTO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI SALERNO</value>
+					<value>UNIVERSITA' DEGLI STUDI DEL SANNIO DI BENEVENTO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI SASSARI</value>
+					<value>UNIVERSITA' DEGLI STUDI DI SIENA</value>
+					<value>UNIVERSITA' PER STRANIERI DI SIENA</value>
+					<value>UNIVERSITA' TELEMATICA 'LEONARDO DA VINCI'</value>
+					<value>UNIVERSITA' TELEMATICA 'E-CAMPUS'</value>
+					<value>UNIVERSITA' TELEMATICA 'GIUSTINO FORTUNATO'</value>
+					<value>UNIVERSITA' TELEMATICA GUGLIELMO MARCONI</value>
+					<value>UNIVERSITA' TELEMATICA SAN RAFFAELE ROMA</value>
+					<value>UNIVERSITA' TELEMATICA INTERNAZIONALE UNINETTUNO</value>
+					<value>UNIVERSITA' TELEMATICA 'ITALIAN UNIVERSITY LINE' - IUL</value>
+					<value>UNIVERSITA' TELEMATICA PEGASO</value>
+					<value>UNIVERSITA' TELEMATICA UNITELMA SAPIENZA</value>
+					<value>UNICUSANO UNIVERSITA' DEGLI STUDI NICCOLÒ CUSANO -TELEMATICA ROMA</value>
+					<value>UNIVERSITA' TELEMATICA 'UNIVERSITAS MERCATORUM'</value>
+					<value>UNIVERSITA' DEGLI STUDI DI TERAMO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI TORINO</value>
+					<value>POLITECNICO DI TORINO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI TRENTO</value>
+					<value>UNIVERSITA' DEGLI STUDI DI TRIESTE</value>
+					<value>SCUOLA INTERNAZIONALE SUPERIORE DI STUDI AVANZATI DI TRIESTE</value>
+					<value>UNIVERSITA' DEGLI STUDI DELLA TUSCIA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI UDINE</value>
+					<value>UNIVERSITA' DEGLI STUDI DI URBINO CARLO BO</value>
+					<value>UNIVERSITA' DELLA VALLE D'AOSTA</value>
+					<value>UNIVERSITA' 'CA' FOSCARI' VENEZIA</value>
+					<value>UNIVERSITA' IUAV DI VENEZIA</value>
+					<value>UNIVERSITA' DEGLI STUDI DI VERONA</value>
+					<value>SCUOLA IMT - ISTITUZIONI, MERCATI, TECNOLOGIE - ALTI STUDI - LUCCA</value>
+					<value>I.U.S.S. - ISTITUTO UNIVERSITARIO DI STUDI SUPERIORI - PAVIA</value>
+					<value>ALTRA UNIVERSITA'</value>
+				</list>
+			</parameter>
+		</constraint>					
 	</constraints>
 	<types>
 		<type name="jconon_application:folder">
@@ -795,13 +1232,17 @@
 				</property>
 				<property name="jconon_application:tipo_laurea">
 					<title>Tipo Laurea</title>
-					<description>Tipo Laurea</description>
+					<description>class:input-xlarge</description>
 					<type>d:text</type>
+					<mandatory>true</mandatory>
 					<index enabled="true">
 						<atomic>true</atomic>
 						<stored>false</stored>
 						<tokenised>both</tokenised>
 					</index>
+					<constraints>
+						<constraint ref="jconon_application:elenco_lauree" />
+					</constraints>					
 				</property>
 				<property name="jconon_application:data_laurea">
 					<title>Data Conseguimento Laurea</title>
@@ -820,13 +1261,17 @@
 				</property>
 				<property name="jconon_application:istituto_laurea">
 					<title>Universita Conseguimento Laurea</title>
-					<description>Universita Conseguimento Laurea</description>
+					<description>class:input-xlarge</description>
 					<type>d:text</type>
+					<mandatory>true</mandatory>					
 					<index enabled="true">
 						<atomic>true</atomic>
 						<stored>false</stored>
 						<tokenised>both</tokenised>
 					</index>
+					<constraints>
+						<constraint ref="jconon_application:elenco_istituti_lauree" />
+					</constraints>
 				</property>
 				<property name="jconon_application:fl_laurea_equipollente">
 					<title>Flag Laurea equipollente</title>
