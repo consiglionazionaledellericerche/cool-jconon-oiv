@@ -423,6 +423,12 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
               item.jsonlist = jsonlistLingueConosciute;
             }
           }
+          if (item.name === 'email_pec_comunicazioni') {
+            item.class = 'input-xlarge';
+          }
+          if (item.name === 'email_comunicazioni') {
+            item.class = 'input-xlarge';
+          }
         },
         afterCreateForm: function (form) {
           var rows = form.find('#affix_tabDichiarazioni table tr'),
@@ -590,41 +596,50 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     }
     UI.confirm(i18n.prop(message, placeholder), function () {
       if (bulkinfo.validate()) {
-        var data = $('<form method="post" id="importaPDF" class="form-search">' +
-          '<input type="hidden" name="objectId" value="' + cmisObjectId + '">' +
-          '<div class="input-group">' +
-          '<input type="text" class="form-control input-xlarge" id="upload-file-info" disabled>' +
-          '<label class="btn btn-primary" for="my-file-selector">' +
-          '<input id="my-file-selector" name="domandapdf" type="file" ' +
-          'style="display:none;" onchange="$(this).parents(\'div.input-group\').find(\'input:text\').val($(this).val());">' + '<i class="icon-upload"></i> Upload Domanda firmata</label>' +
-          '</div></form>'),
-          btnPrimary,
-          newPrint = $('<button class="btn btn-success"><i class="icon-file"></i> Scarica stampa</button>'),
-          m = UI.modal('<i class="icon-upload animated flash"></i> Invia domanda', data, function () {
-            var data = new FormData(document.getElementById("importaPDF"));
-            var close = UI.progress();
-            $.ajax({
-                type: "POST",
-                url: cache.baseUrl + "/rest/application-fp/send-application",
-                data:  data,
-                enctype: 'multipart/form-data',
-                processData: false,  // tell jQuery not to process the data
-                contentType: false,   // tell jQuery not to set contentType
-                dataType: "json",
-                success: function(data){
-                  UI.success(i18n.prop('message.conferma.application.done', data.email_comunicazione), function () {
-                    window.location.href = cache.baseUrl + "/my-applications";
-                  });
-                },
-                complete: close,
-                error: URL.errorFn
+        jconon.Data.application.main({
+          type: 'POST',
+          data: bulkinfo.getData(),
+          success: function (result) {
+            $('#fascia_professionale_attribuita').val(result['jconon_application:fascia_professionale_attribuita'] || '');
+            var data = $('<form method="post" id="importaPDF" class="form-search">' +
+              '<input type="hidden" name="objectId" value="' + cmisObjectId + '">' +
+              '<div class="input-group">' +
+              '<input type="text" class="form-control input-xlarge" id="upload-file-info" disabled>' +
+              '<label class="btn btn-primary" for="my-file-selector">' +
+              '<input id="my-file-selector" name="domandapdf" type="file" ' +
+              'style="display:none;" onchange="$(this).parents(\'div.input-group\').find(\'input:text\').val($(this).val());">' + '<i class="icon-upload"></i> Upload Domanda firmata</label>' +
+              '</div></form>'),
+            btnPrimary,
+            newPrint = $('<button class="btn btn-success"><i class="icon-file"></i> Scarica stampa</button>'),
+            m = UI.modal('<i class="icon-upload animated flash"></i> Invia domanda', data, function () {
+              var data = new FormData(document.getElementById("importaPDF"));
+              var close = UI.progress();
+              $.ajax({
+                  type: "POST",
+                  url: cache.baseUrl + "/rest/application-fp/send-application",
+                  data:  data,
+                  enctype: 'multipart/form-data',
+                  processData: false,  // tell jQuery not to process the data
+                  contentType: false,   // tell jQuery not to set contentType
+                  dataType: "json",
+                  success: function(data){
+                    UI.success(i18n.prop('message.conferma.application.done', data.email_comunicazione), function () {
+                      window.location.href = cache.baseUrl + "/my-applications";
+                    });
+                  },
+                  complete: close,
+                  error: URL.errorFn
+              });
             });
-          });
-          btnPrimary = m.find(".modal-footer").find(".btn-primary");
-          btnPrimary.before(newPrint);
-          newPrint.click(function () {
-            window.location = 'rest/application/print-immediate?nodeRef=' + cmisObjectId;
-          });
+            btnPrimary = m.find(".modal-footer").find(".btn-primary");
+            btnPrimary.before(newPrint);
+            newPrint.click(function () {
+              window.location = 'rest/application/print-immediate?nodeRef=' + cmisObjectId;
+            });
+            saved = true;
+          },
+          error: URL.errorFn
+        });
       } else {
         var msg = content
           .children('form')
