@@ -1,10 +1,16 @@
 package it.cnr.si.cool.jconon.service.application;
 
+import freemarker.template.TemplateException;
 import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.cool.mail.MailService;
+import it.cnr.cool.mail.model.AttachmentBean;
+import it.cnr.cool.mail.model.EmailMessage;
+import it.cnr.cool.rest.util.Util;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.service.I18nService;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
+import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
 import it.cnr.si.cool.jconon.service.PrintService;
@@ -21,8 +27,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,6 +45,8 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -74,7 +84,13 @@ public class ApplicationOIVService extends ApplicationService{
     private QueueService queueService;
     @Autowired
     private PrintService printService;
-
+    @Autowired	
+	private ApplicationContext context;
+	@Autowired
+	private MailService mailService;
+	@Value("${mail.from.default}")
+	private String mailFromDefault;
+	
 	@Override
 	public Folder save(Session currentCMISSession,
 			String contextURL, Locale locale,
@@ -224,7 +240,7 @@ public class ApplicationOIVService extends ApplicationService{
 		return result;
 	}
 
-	public Map<String, Object> sendApplicationOIV(Session session, HttpServletRequest req, CMISUser user) throws CMISApplicationException, IOException {
+	public Map<String, Object> sendApplicationOIV(Session session, HttpServletRequest req, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
 		final String userId = user.getId();
     	MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
 		String idApplication = mRequest.getParameter("objectId");
@@ -232,12 +248,37 @@ public class ApplicationOIVService extends ApplicationService{
     	MultipartFile file = mRequest.getFile("domandapdf");
     	if (file.isEmpty())
     		throw new ClientMessageException("Allegare la domanda firmata!");
-    	Folder application = loadApplicationById(cmisService.createAdminSession(), idApplication, null);    	
+    	Folder application = loadApplicationById(cmisService.createAdminSession(), idApplication, null); 
+    	Folder call = loadCallById(session, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
+
     	String nameRicevutaReportModel = printService.getNameRicevutaReportModel(session, application, req.getLocale());
     	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, file.getInputStream(), nameRicevutaReportModel, true);
+    	
     	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(req.getLocale()), getContextURL(req));  
     	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
     	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), req.getLocale(), userId, applicationModel.getProperties(), applicationModel.getProperties());
+		Map<String, Object> mailModel = new HashMap<String, Object>();
+
+		List<String> emailList = new ArrayList<String>();
+		emailList.add(user.getEmail());
+		mailModel.put("contextURL", getContextURL(req));
+		mailModel.put("folder", application);
+		mailModel.put("call", call);
+		mailModel.put("message", context.getBean("messageMethod", req.getLocale()));
+		mailModel.put("email_comunicazione", user.getEmail());
+		EmailMessage message = new EmailMessage();
+		message.setRecipients(emailList);		
+		message.setBccRecipients(Arrays.asList(mailFromDefault));
+		String body = Util.processTemplate(mailModel, "/pages/application/application.registration.html.ftl");
+		message.setSubject(i18nService.getLabel("subject-info", req.getLocale()) + i18nService.getLabel("subject-confirm-domanda", req.getLocale(), 
+				call.getProperty(JCONONPropertyIds.CALL_CODICE.value()).getValueAsString()));
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put(JCONONPropertyIds.APPLICATION_DUMMY.value(), "{\"stampa_archiviata\" : true}");
+		application.updateProperties(properties);					
+		message.setBody(body);
+		message.setAttachments(Arrays.asList(new AttachmentBean(nameRicevutaReportModel, file.getBytes())));
+		mailService.send(message);
+    	
 		return Collections.singletonMap("email_comunicazione", user.getEmail());
 	}
 	

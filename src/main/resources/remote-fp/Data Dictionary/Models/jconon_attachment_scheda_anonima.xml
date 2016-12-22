@@ -114,7 +114,7 @@
 					</index>
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_ruolo">
-					<title>Ruolo ricoperto</title>
+					<title>Ruolo</title>
 					<description>6]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
@@ -125,7 +125,7 @@
 					</index>
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_citta">
-					<title>Città</title>
+					<title>Comune</title>
 					<description>8]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
@@ -149,12 +149,12 @@
 			</properties>	
 		</type>
 		<type name="jconon_scheda_anonima:precedente_incarico_oiv">
-			<title>Incarichi OIV</title>
+			<title>Incarichi OIV/Nuclei</title>
 			<parent>jconon_scheda_anonima:document</parent>
 			<properties>
 				<property name="jconon_attachment:precedente_incarico_oiv_da">
 					<title>Da</title>
-					<description>2]</description>
+					<description>a]</description>
 					<type>d:datetime</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -165,7 +165,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_a">
 					<title>A</title>
-					<description>3]</description>
+					<description>b]</description>
 					<type>d:datetime</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -175,8 +175,8 @@
 					</index>
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_amministrazione">
-					<title>Amministrazione</title>
-					<description>4]</description>
+					<title>Amministrazione pubblica</title>
+					<description>c]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -185,9 +185,63 @@
 						<tokenised>both</tokenised>
 					</index>
 				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_sede">
+					<title>Sede</title>
+					<description>d] class:input-xxlarge</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_comune">
+					<title>Comune</title>
+					<description>e] class:input-xlarge</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_indirizzo">
+					<title>Indirizzo</title>
+					<description>f] class:input-xxlarge</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_cap">
+					<title>CAP</title>
+					<description>g] class:input-medium</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_telefono">
+					<title>Telefono</title>
+					<description>h] class:input-large</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_numero_dipendenti">
 					<title>N. dipendenti</title>
-					<description>5]</description>
+					<description>i]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -201,7 +255,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_ruolo">
 					<title>Ruolo</title>
-					<description>5]</description>
+					<description>l]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -215,6 +269,5 @@
 				</property>
 			</properties>
 		</type>
-
 	</types>
 </model>

@@ -1,7 +1,7 @@
 /*global params*/
 define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url',
-  'cnr/cnr.application', 'cnr/cnr.attachments', 'json!cache', 'cnr/cnr.call', 'cnr/cnr.ui.wysiwyg', 'cnr/cnr.ui.country',
-  'cnr/cnr.ui.city', 'cnr/cnr'], function ($, header, i18n, UI, BulkInfo, common, jconon, URL, Application, Attachments, cache, Call, CNR) {
+  'cnr/cnr.application', 'cnr/cnr.attachments', 'json!cache', 'cnr/cnr.call', 'cnr/cnr', 'cnr/cnr.ui.wysiwyg', 'cnr/cnr.ui.country',
+  'cnr/cnr.ui.city'], function ($, header, i18n, UI, BulkInfo, common, jconon, URL, Application, Attachments, cache, Call, CNR) {
   "use strict";
 
   var content = $('#field'), bulkinfo, forms = [], aspects = [],
@@ -9,7 +9,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     callId = params.callId,
     callCodice = params.callCodice,
     toolbar = $('#toolbar-call'),
-    charCodeAspect = 65,
+    charCodeAspect = 97,
     preview = params.preview,
     showTitoli, showCurriculum, showProdottiScelti, showProdotti, showSchedeAnonime,
     applicationAttachments, curriculumAttachments, prodottiAttachments, schedeAnonimeAttachments,
@@ -601,26 +601,50 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           data: bulkinfo.getData(),
           success: function (result) {
             $('#fascia_professionale_attribuita').val(result['jconon_application:fascia_professionale_attribuita'] || '');
-            var data = $('<form method="post" id="importaPDF" class="form-search">' +
-              '<input type="hidden" name="objectId" value="' + cmisObjectId + '">' +
-              '<div class="input-group">' +
-              '<input type="text" class="form-control input-xlarge" id="upload-file-info" disabled>' +
-              '<label class="btn btn-primary" for="my-file-selector">' +
-              '<input id="my-file-selector" name="domandapdf" type="file" ' +
-              'style="display:none;" onchange="$(this).parents(\'div.input-group\').find(\'input:text\').val($(this).val());">' + '<i class="icon-upload"></i> Upload Domanda firmata</label>' +
-              '</div></form>'),
-            btnPrimary,
-            newPrint = $('<button class="btn btn-success"><i class="icon-file"></i> Scarica stampa</button>'),
-            m = UI.modal('<i class="icon-upload animated flash"></i> Invia domanda', data, function () {
-              var data = new FormData(document.getElementById("importaPDF"));
+            var container = $('<div class="fileupload fileupload-new" data-provides="fileupload"></div>'),
+              input = $('<div class="input-append"></div>'),
+              btn = $('<span class="btn btn-file btn-primary"></span>'),
+              inputFile = $('<input type="file" name="domandapdf"/>'),
+              btnPrimary,
+              m,
+              newPrint = $('<button class="btn btn-success"><i class="icon-file"></i> Scarica stampa</button>');
+
+            btn
+              .append('<span class="fileupload-new"><i class="icon-upload"></i> Upload Domanda firmata</span>')
+              .append('<span class="fileupload-exists">Cambia</span>')
+              .append(inputFile);
+
+            input
+              .append('<div class="uneditable-input input-xlarge"><i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span></div>')
+              .append(btn)
+              .appendTo(container);
+
+            // set widget 'value'
+            function setValue(value) {
+              container.data('value', value);
+            }
+
+            setValue(null);
+            input.append('<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Rimuovi</a>');
+            inputFile.on('change', function (e) {
+              var path = $(e.target).val();
+              setValue(path);
+            });
+
+            function sendFile() {
+              var fd = new CNR.FormData();
+              fd.data.append("objectId", cmisObjectId);
+              $.each(inputFile[0].files || [], function (i, file) {
+                fd.data.append('domandapdf', file);
+              });
               var close = UI.progress();
               $.ajax({
                   type: "POST",
                   url: cache.baseUrl + "/rest/application-fp/send-application",
-                  data:  data,
-                  enctype: 'multipart/form-data',
-                  processData: false,  // tell jQuery not to process the data
-                  contentType: false,   // tell jQuery not to set contentType
+                  data:  fd.getData(),
+                  enctype: fd.contentType,
+                  processData: false,
+                  contentType: false,
                   dataType: "json",
                   success: function(data){
                     UI.success(i18n.prop('message.conferma.application.done', data.email_comunicazione), function () {
@@ -630,7 +654,9 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
                   complete: close,
                   error: URL.errorFn
               });
-            });
+            }
+
+            m = UI.modal('<i class="icon-upload animated flash"></i> Invia domanda', container, sendFile);
             btnPrimary = m.find(".modal-footer").find(".btn-primary");
             btnPrimary.before(newPrint);
             newPrint.click(function () {

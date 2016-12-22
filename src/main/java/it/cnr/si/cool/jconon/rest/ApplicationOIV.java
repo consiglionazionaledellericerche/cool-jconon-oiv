@@ -1,7 +1,9 @@
 package it.cnr.si.cool.jconon.rest;
 
+import freemarker.template.TemplateException;
 import it.cnr.cool.cmis.service.CMISService;
 import it.cnr.cool.security.SecurityChecked;
+import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.service.application.ApplicationOIVService;
 
@@ -34,21 +36,20 @@ public class ApplicationOIV {
 	private ApplicationOIVService applicationOIVService;
 	@Autowired
 	private CMISService cmisService;
-	
+
 	@POST
 	@Path("send-application")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response sendApplication(@Context HttpServletRequest req) throws IOException{
 		ResponseBuilder rb;
 		try {
-	        Session session = cmisService.getCurrentCMISSession(req);		
+			Session session = cmisService.getCurrentCMISSession(req);		
 			Map<String, Object> model = applicationOIVService.sendApplicationOIV(session, req, cmisService.getCMISUserFromSession(req));
 			rb = Response.ok(model);			
-		} catch (ClientMessageException e) {
-			LOGGER.error("send error", e);
+		} catch (ClientMessageException | CMISApplicationException | TemplateException e) {
+			LOGGER.warn("send error", e);
 			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
 		}
 		return rb.build();
-	}	
-
+	}
 }
