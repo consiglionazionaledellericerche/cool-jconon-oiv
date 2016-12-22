@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -246,8 +247,7 @@ public class ApplicationOIVService extends ApplicationService{
 		String idApplication = mRequest.getParameter("objectId");
 		LOGGER.debug("send application : {}", idApplication);
     	MultipartFile file = mRequest.getFile("domandapdf");
-    	if (file.isEmpty())
-    		throw new ClientMessageException("Allegare la domanda firmata!");
+    	Optional.ofNullable(file).orElseThrow(() -> new ClientMessageException("Allegare la domanda firmata!"));    	
     	Folder application = loadApplicationById(cmisService.createAdminSession(), idApplication, null); 
     	Folder call = loadCallById(session, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
 
