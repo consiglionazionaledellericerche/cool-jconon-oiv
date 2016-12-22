@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DomandaConcorso" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="28" bottomMargin="28" scriptletClass="net.sf.jasperreports.engine.JRDefaultScriptlet" uuid="6fccba99-1156-4661-99e5-3238586360bb">
 	<property name="ireport.zoom" value="1.024520183047606"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="96"/>
 	<property name="net.sf.jasperreports.export.pdf.tagged" value="true"/>
 	<property name="net.sf.jasperreports.export.pdf.tag.language" value="EN-US"/>
 	<property name="ireport.background.image.properties" value="true,true,1.0,-8,-8,0,0,611,899"/>
@@ -287,10 +287,10 @@
 		<band height="28">
 			<textField>
 				<reportElement x="0" y="1" width="515" height="15" uuid="8568af6a-b7f3-46b4-86c2-a830e576ba85"/>
-				<textElement textAlignment="Right" verticalAlignment="Top">
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{jconon_call:codice}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{jconon_call:descrizione_ridotta}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="0" y="17" width="514" height="1" uuid="ddffa55c-e06c-4fbe-a876-86da7f96ed61"/>
@@ -448,7 +448,7 @@ new SimpleDateFormat("dd/MM/yyyy").format(new SimpleDateFormat("yyyy-MM-dd'T'HH:
 			<textField isBlankWhenNull="true">
 				<reportElement x="355" y="118" width="160" height="15" uuid="7af30dc9-7d92-432e-a80c-ef7eb56660a5"/>
 				<textElement verticalAlignment="Top"/>
-				<textFieldExpression><![CDATA[$F{jconon_application:fl_cittadino_italiano}?$F{jconon_application:codice_fiscale}:$F{jconon_application:cittadinanza}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{jconon_application:fl_cittadino_italiano}?$F{jconon_application:codice_fiscale}.toUpperCase():$F{jconon_application:cittadinanza}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement key="staticText-42" style="FONT_Bold" x="243" y="118" width="98" height="11" uuid="196e9f24-57fc-43b4-804b-4948669d953e">
@@ -563,7 +563,7 @@ new SimpleDateFormat("dd/MM/yyyy").format(new SimpleDateFormat("yyyy-MM-dd'T'HH:
 				<textElement textAlignment="Center" markup="html">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["CHIEDE DI PARTECIPARE ALLA PREDETTA PROCEDURA"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["CHIEDE L'ISCRIZIONE ALL’ELENCO NAZIONALE"]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="FONT_Bold" x="5" y="17" width="505" height="17" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" uuid="70dd89d0-4398-4ab9-bb1f-63785cf492e8"/>
