@@ -1232,7 +1232,7 @@
 				</property>
 				<property name="jconon_application:tipo_laurea">
 					<title>Tipo Laurea</title>
-					<description>class:input-xlarge</description>
+					<description>class:input-xxlarge</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -1261,7 +1261,7 @@
 				</property>
 				<property name="jconon_application:istituto_laurea">
 					<title>Universita Conseguimento Laurea</title>
-					<description>class:input-xlarge</description>
+					<description>class:input-xxlarge</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>					
 					<index enabled="true">
