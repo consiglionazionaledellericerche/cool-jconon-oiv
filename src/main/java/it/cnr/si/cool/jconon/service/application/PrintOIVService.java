@@ -1,9 +1,11 @@
 package it.cnr.si.cool.jconon.service.application;
 
+import it.cnr.cool.util.Pair;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.service.PrintService;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -17,6 +19,16 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class PrintOIVService extends PrintService {
+	@Override
+	public Pair<String, byte[]> printApplicationImmediate(Session cmisSession,
+			String nodeRef, String contextURL, Locale locale) {
+		Pair<String, byte[]>  result = super.printApplicationImmediate(cmisSession, nodeRef, contextURL, locale);
+		Folder application = (Folder)cmisSession.getObject(nodeRef);
+		archiviaRicevutaReportModel(cmisSession, application, new ByteArrayInputStream(result.getSecond()), 
+				getNameRicevutaReportModel(cmisSession, application, locale), false);
+		return result;
+	}
+	
 	@Override
 	protected int getFirstLetterOfDichiarazioni() {
 		return 97;

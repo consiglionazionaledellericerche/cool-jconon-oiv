@@ -277,11 +277,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
       existApplication = application && application["jconon_application:stato_domanda"] !== 'I',
       isTemp = existApplication && application["jconon_application:stato_domanda"] === 'P',
       lastName = application && application["jconon_application:cognome"] !== undefined ? application["jconon_application:cognome"] : dataPeopleUser.lastName,
-      firstName = application && application["jconon_application:nome"] !== undefined ? application["jconon_application:nome"] : dataPeopleUser.firstName,
-      divLabelStato = $('<div></div>')
-        .addClass("alert")
-        .addClass(isTemp ? 'alert-error' : 'alert-success')
-        .append(isTemp ? i18n['application.status.provvisoria'] : i18n['application.status.definitiva']);
+      firstName = application && application["jconon_application:nome"] !== undefined ? application["jconon_application:nome"] : dataPeopleUser.firstName;
     if (call["cmis:objectTypeId"] === 'F:jconon_call_mobility_open:folder') {
       $('#application-title').hide();
     } else if (call["cmis:objectTypeId"] === 'F:jconon_call_mobility:folder') {
@@ -295,7 +291,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
       .on('click', 'button', function () {
         Call.displayAttachments(callId);
       });
-    $('#call-desc').append(call["jconon_call:descrizione"]).append(existApplication ? divLabelStato : null);
+    $('#call-desc').append(call["jconon_call:descrizione"]);
     if (call["jconon_call:sede"] && call["jconon_call:sede"].length) {
       descRid = (descRid !== null ? descRid + '</br>' : '') + call["jconon_call:sede"];
     } else if (call["jconon_call:elenco_settori_tecnologici"] && call["jconon_call:elenco_settori_tecnologici"].length) {
