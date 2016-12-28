@@ -10,6 +10,7 @@ import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.service.I18nService;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
+import it.cnr.si.cool.jconon.cmis.model.JCONONDocumentType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
@@ -38,11 +39,13 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +60,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @Component
 @Primary
 public class ApplicationOIVService extends ApplicationService{
+
 	private static final String INF250 = "<250", SUP250=">=250";
 
 	public static final String 
@@ -107,9 +111,8 @@ public class ApplicationOIVService extends ApplicationService{
 			final Locale locale, String userId, Map<String, Object> properties, Map<String, Object> aspectProperties) {
 		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
 		eseguiCalcolo(objectId, aspectProperties);
-		if (aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA) == null)
-			throw new ClientMessageException(
-					i18nService.getLabel("message.error.domanda.fascia", Locale.ITALIAN));			
+		Optional.ofNullable(aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).orElseThrow(() -> new ClientMessageException(
+				i18nService.getLabel("message.error.domanda.fascia", Locale.ITALIAN)));		
 		return super.sendApplication(currentCMISSession, applicationSourceId, contextURL, locale, userId, properties, aspectProperties);
 	}
 	
@@ -251,14 +254,31 @@ public class ApplicationOIVService extends ApplicationService{
     	Folder application = loadApplicationById(cmisService.createAdminSession(), idApplication, null); 
     	Folder call = loadCallById(session, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
 
+		String docId = printService.findRicevutaApplicationId(session, application);
+		try {
+			Document latestDocumentVersion = (Document) session.getObject(session.getLatestDocumentVersion(docId, true, session.getDefaultContext()));
+	    	Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
+	    		if (fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA))) {
+	    			throw new ClientMessageException(
+	    					i18nService.getLabel("message.error.domanda.fascia.equals", Locale.ITALIAN, fascia));
+	    		}
+	    	});			
+		} catch (CmisObjectNotFoundException _ex) {
+			LOGGER.warn("There is no major version for application id : {}", idApplication);
+		}
+		
     	String nameRicevutaReportModel = printService.getNameRicevutaReportModel(session, application, req.getLocale());
-    	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, file.getInputStream(), nameRicevutaReportModel, true);
+    	Map<String, Object> objectPrintModel = new HashMap<String, Object>();    	
+		objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
+		objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
+		objectPrintModel.put(PropertyIds.NAME, nameRicevutaReportModel);    	
+    	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, objectPrintModel, file.getInputStream(), nameRicevutaReportModel, true);
     	
     	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(req.getLocale()), getContextURL(req));  
     	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
     	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), req.getLocale(), userId, applicationModel.getProperties(), applicationModel.getProperties());
-		Map<String, Object> mailModel = new HashMap<String, Object>();
-
+    	
+    	Map<String, Object> mailModel = new HashMap<String, Object>();
 		List<String> emailList = new ArrayList<String>();
 		emailList.add(user.getEmail());
 		mailModel.put("contextURL", getContextURL(req));
