@@ -19,23 +19,9 @@
 					CF: {{jconon_application_codice_fiscale}},
 					Data di nascita: {{date jconon_application_data_nascita "DD/MM/YYYY"}}
 				<br>
-
-				{{#with relationships.parent.[0]}}
-					{{declare "data_gu_format" jconon_call_data_gu}}
-					{{datify "data_gu_format" "DD/MM/YYYY"}}
-					{{#if jconon_call_profilo}}
-						{{i18n "label.th.jconon_bando_profilo"}}: {{jconon_call_profilo}}<br/>
-					{{/if}}
-					<br>
-					{{#if jconon_call_elenco_macroaree}}
-						{{i18n "label.th.jconon_bando_elenco_macroaree"}}: <strong>{{jconon_call_elenco_macroaree.[0]}}</strong>
-						<br/>
-					{{/if}}
-					{{#if jconon_call_elenco_settori_tecnologici}}
-						{{i18n "label.th.jconon_bando_elenco_settori_tecnologici"}}: <strong>{{jconon_call_elenco_settori_tecnologici.[0]}}</strong><br/>
-					{{/if}}
-
-				{{/with}}
+				{{#if jconon_application_fascia_professionale_attribuita}}
+					Fascia professionale attribuita: {{jconon_application_fascia_professionale_attribuita}}
+				{{/if}}
 				<br>
 				{{{esclusioneRinuncia jconon_application_esclusione_rinuncia jconon_application_stato_domanda jconon_application_data_domanda ../../settings.isRdP}}}
 
