@@ -267,16 +267,16 @@ public class ApplicationOIVService extends ApplicationService{
 			LOGGER.warn("There is no major version for application id : {}", idApplication);
 		}
 		
-    	String nameRicevutaReportModel = printService.getNameRicevutaReportModel(session, application, req.getLocale());
+    	String nameRicevutaReportModel = printService.getNameRicevutaReportModel(session, application, Locale.ITALIAN);
     	Map<String, Object> objectPrintModel = new HashMap<String, Object>();    	
 		objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
 		objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
 		objectPrintModel.put(PropertyIds.NAME, nameRicevutaReportModel);    	
     	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, objectPrintModel, file.getInputStream(), nameRicevutaReportModel, true);
     	
-    	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(req.getLocale()), getContextURL(req));  
+    	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));  
     	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
-    	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), req.getLocale(), userId, applicationModel.getProperties(), applicationModel.getProperties());
+    	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
     	
     	Map<String, Object> mailModel = new HashMap<String, Object>();
 		List<String> emailList = new ArrayList<String>();
@@ -284,13 +284,13 @@ public class ApplicationOIVService extends ApplicationService{
 		mailModel.put("contextURL", getContextURL(req));
 		mailModel.put("folder", application);
 		mailModel.put("call", call);
-		mailModel.put("message", context.getBean("messageMethod", req.getLocale()));
+		mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
 		mailModel.put("email_comunicazione", user.getEmail());
 		EmailMessage message = new EmailMessage();
 		message.setRecipients(emailList);		
 		message.setBccRecipients(Arrays.asList(mailFromDefault));
 		String body = Util.processTemplate(mailModel, "/pages/application/application.registration.html.ftl");
-		message.setSubject(i18nService.getLabel("subject-info", req.getLocale()) + i18nService.getLabel("subject-confirm-domanda", req.getLocale(), 
+		message.setSubject(i18nService.getLabel("subject-info", Locale.ITALIAN) + i18nService.getLabel("subject-confirm-domanda", Locale.ITALIAN, 
 				call.getProperty(JCONONPropertyIds.CALL_CODICE.value()).getValueAsString()));
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put(JCONONPropertyIds.APPLICATION_DUMMY.value(), "{\"stampa_archiviata\" : true}");
