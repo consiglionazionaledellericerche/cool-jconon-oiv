@@ -85,7 +85,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         type: 'cvpeople:commonMetadata',
         join: 'cvpeople:selectedProduct',
         isAspect: true,
-        filter: true,
+        filter: false,
         includeAspectOnQuery: true,
         label: 'label.count.no.prodotti',
         displayRow: function (el, refreshFn) {
@@ -156,7 +156,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           }
         },
         maxItems: 5,
-        filter: true,
+        filter: false,
         includeAspectOnQuery: true,
         label: 'label.count.no.prodotti',
         mapping: function (mapping) {
@@ -205,7 +205,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         },
         fetchCmisObject: true,
         maxItems: 5,
-        filter: true,
+        filter: false,
         filterOnType: true,
         includeAspectOnQuery: true,
         label: 'label.count.no.curriculum',
@@ -247,7 +247,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         },
         fetchCmisObject: true,
         maxItems: 5,
-        filter: true,
+        filter: false,
         filterOnType: true,
         includeAspectOnQuery: true,
         label: 'label.count.no.curriculum',

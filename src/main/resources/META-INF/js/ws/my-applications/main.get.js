@@ -584,10 +584,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                 duplicate: 'icon-copy',
                 scheda_valutazione: 'icon-table',
                 operations: 'icon-list'
-              }).appendTo(target);
-              target.find('.btn-actions-folder').find('a').first().replaceWith(
-                $('<a data-name="action" class="btn btn-mini" data-toggle="dropdown"><i class="icon-th-list"></i> Azioni...</a>')
-              );
+              }, undefined, true).appendTo(target);
             }
           });
         });
