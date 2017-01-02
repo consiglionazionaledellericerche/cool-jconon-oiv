@@ -1,7 +1,7 @@
 <div class="container">
   <div class="container-fluid">
     <div class="row-fluid">
-      <div class="list-main-call span12">
+      <div class="list-main-call span12 table-responsive">
         <table class="table table-striped" id="items">
           <caption><h2 class="jumbotron header well">Le mie domande</h2></caption>
         </table>
