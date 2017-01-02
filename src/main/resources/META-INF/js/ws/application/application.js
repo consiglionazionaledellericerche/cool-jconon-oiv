@@ -74,6 +74,12 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
       }
     });
   }
+  function displayTotalNumItems(affix, documents) {
+    var label = documents.totalNumItems < 0 ? 
+      i18n.prop('label.righe.has.more.items', documents.maxItemsPerPage) :
+      i18n.prop('label.righe.visualizzate', documents.totalNumItems);  
+    affix.find('h1').after('<sub class="total pull-right">' + label + '</sub>');
+  }
 
   function createProdottiScelti(affix, isMoveable) {
     return new Attachments({
@@ -95,7 +101,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         displayAfter: function (documents, refreshFn, resultSet, isFilter) {
           if (!isFilter) {
             affix.find('sub.total').remove();
-            affix.find('h1').after('<sub class="total pull-right">' + i18n.prop('label.prodotti.visualizzati', documents.totalNumItems) + '</sub>');
+            displayTotalNumItems(affix, documents);
           }
         },
         maxItems: 5,
@@ -152,7 +158,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         displayAfter: function (documents, refreshFn, resultSet, isFilter) {
           if (!isFilter) {
             affix.find('sub.total').remove();
-            affix.find('h1').after('<sub class="total pull-right">' + i18n.prop('label.prodotti.visualizzati', documents.totalNumItems) + '</sub>');
+            displayTotalNumItems(affix, documents);
           }
         },
         maxItems: 5,
@@ -200,7 +206,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         displayAfter: function (documents, refreshFn, resultSet, isFilter) {
           if (!isFilter) {
             affix.find('sub.total').remove();
-            affix.find('h1').after('<sub class="total pull-right">' + i18n.prop('label.righe.visualizzate', documents.totalNumItems) + '</sub>');
+            displayTotalNumItems(affix, documents);
           }
         },
         fetchCmisObject: true,
@@ -242,7 +248,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         displayAfter: function (documents, refreshFn, resultSet, isFilter) {
           if (!isFilter) {
             affix.find('sub.total').remove();
-            affix.find('h1').after('<sub class="total pull-right">' + i18n.prop('label.righe.visualizzate', documents.totalNumItems) + '</sub>');
+            displayTotalNumItems(affix, documents);
           }
         },
         fetchCmisObject: true,
