@@ -18,7 +18,8 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     },
     bulkInfo,
     criteria = $('#criteria'),
-    callId = URL.querystring.from['cmis:objectId'];
+    callId = URL.querystring.from['cmis:objectId'],
+    callCodice = URL.querystring.from['callCodice'];
 
 
   function displayAttachments(nodeRef, type, displayFn, i18nModal) {
@@ -28,24 +29,38 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
   }
 
   function manageUrlParams() {
-
     if (callId) {
-
       URL.Data.node.node({
         data: {
           nodeRef : callId
         },
         success: function (data) {
           $('#items caption h2').text('DOMANDE RELATIVE AL BANDO ' + data['jconon_call:codice'] + ' - ' + data['jconon_call:sede']);
+          bulkInfo.render();
         },
         error: function (jqXHR, textStatus, errorThrown) {
           CNR.log(jqXHR, textStatus, errorThrown);
         }
       });
+    } else if (callCodice) {
+      URL.Data.search.query({
+        data: {
+          q: "select cmis:objectId " +
+            "from jconon_call:folder where jconon_call:codice = '" + callCodice + "'"
+        },
+        success: function (data) {
+          callId = data.items[0]['cmis:objectId'];
+          $('#items caption h2').text('DOMANDE RELATIVE AL BANDO ' + callCodice);
+          bulkInfo.render();
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          CNR.log(jqXHR, textStatus, errorThrown);
+        }
+      });
+    } else {
+      bulkInfo.render();
     }
   }
-
-  manageUrlParams();
 
   // filter ajax resultSet according to the Criteria form
   function filterFn(data) {
@@ -647,5 +662,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       }
     }
   });
-  bulkInfo.render();
+
+  manageUrlParams();
+  
 });
