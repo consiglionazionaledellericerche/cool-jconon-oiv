@@ -254,7 +254,7 @@ public class ApplicationOIVService extends ApplicationService{
     	Folder application = loadApplicationById(cmisService.createAdminSession(), idApplication, null); 
     	Folder call = loadCallById(session, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
 
-		String docId = printService.findRicevutaApplicationId(session, application);
+    	String docId = printService.findRicevutaApplicationId(session, application);
 		try {
 			Document latestDocumentVersion = (Document) session.getObject(session.getLatestDocumentVersion(docId, true, session.getDefaultContext()));
 	    	Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
@@ -266,17 +266,17 @@ public class ApplicationOIVService extends ApplicationService{
 		} catch (CmisObjectNotFoundException _ex) {
 			LOGGER.warn("There is no major version for application id : {}", idApplication);
 		}
-		
+		    	
+    	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));  
+    	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
+    	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
+    	
     	String nameRicevutaReportModel = printService.getNameRicevutaReportModel(session, application, Locale.ITALIAN);
     	Map<String, Object> objectPrintModel = new HashMap<String, Object>();    	
 		objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
 		objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
 		objectPrintModel.put(PropertyIds.NAME, nameRicevutaReportModel);    	
     	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, objectPrintModel, file.getInputStream(), nameRicevutaReportModel, true);
-    	
-    	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));  
-    	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
-    	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
     	
     	Map<String, Object> mailModel = new HashMap<String, Object>();
 		List<String> emailList = new ArrayList<String>();
