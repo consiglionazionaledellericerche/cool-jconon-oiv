@@ -244,6 +244,24 @@ public class ApplicationOIVService extends ApplicationService{
 		return result;
 	}
 
+	@Override
+	public void delete(Session cmisSession, String contextURL, String objectId) {
+    	Folder application = loadApplicationById(cmisService.createAdminSession(), objectId, null); 
+    	String docId = printService.findRicevutaApplicationId(cmisSession, application);
+		try {
+			if (docId != null) {
+				Document latestDocumentVersion = (Document) cmisSession.getObject(cmisSession.getLatestDocumentVersion(docId, true, cmisSession.getDefaultContext()));
+		    	Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
+	    			throw new ClientMessageException(
+	    					i18nService.getLabel("message.error.domanda.cannot.deleted", Locale.ITALIAN, fascia));
+		    	});			
+			}
+		} catch (CmisObjectNotFoundException _ex) {
+			LOGGER.warn("There is no major version for application id : {}", objectId);
+		}
+		super.delete(cmisSession, contextURL, objectId);
+	}
+	
 	public Map<String, Object> sendApplicationOIV(Session session, HttpServletRequest req, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
 		final String userId = user.getId();
     	MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
@@ -264,7 +282,6 @@ public class ApplicationOIVService extends ApplicationService{
     					i18nService.getLabel("message.error.domanda.print.not.found", Locale.ITALIAN));				
 			}			
 			Document latestDocumentVersion = (Document) session.getObject(session.getLatestDocumentVersion(docId, true, session.getDefaultContext()));
-			latestDocumentVersion.getSecondaryTypes().stream();
 	    	Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
 	    		if (fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA))) {
 	    			throw new ClientMessageException(
