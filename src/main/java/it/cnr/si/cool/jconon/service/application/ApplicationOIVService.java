@@ -256,7 +256,15 @@ public class ApplicationOIVService extends ApplicationService{
 
     	String docId = printService.findRicevutaApplicationId(session, application);
 		try {
+			Optional.ofNullable(docId).orElseThrow(() -> new ClientMessageException(
+					i18nService.getLabel("message.error.domanda.print.not.found", Locale.ITALIAN)));
+			if (!session.getObject(docId).getSecondaryTypes().stream().
+				filter(x -> x.getId().equals(PrintOIVService.P_JCONON_APPLICATION_ASPECT_FASCIA_PROFESSIONALE_ATTRIBUITA)).findAny().isPresent()){
+    			throw new ClientMessageException(
+    					i18nService.getLabel("message.error.domanda.print.not.found", Locale.ITALIAN));				
+			}			
 			Document latestDocumentVersion = (Document) session.getObject(session.getLatestDocumentVersion(docId, true, session.getDefaultContext()));
+			latestDocumentVersion.getSecondaryTypes().stream();
 	    	Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
 	    		if (fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA))) {
 	    			throw new ClientMessageException(
