@@ -4,7 +4,11 @@
 
 	<rule>
 		<from>/</from>
-		<to>/rest/page/home</to>
+		<to>/rest/page/my-applications</to>
+	</rule>
+	<rule>
+		<from>/home</from>
+		<to>/rest/page/manage-application?callCodice=OIV</to>
 	</rule>
 
 	<rule>

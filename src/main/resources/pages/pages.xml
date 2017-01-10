@@ -1,12 +1,5 @@
 <pages>
   <page>
-    <id>home</id>
-    <path>/pages/home/main.get.html.ftl</path>
-    <format-id>navbar</format-id>
-    <order-id>0</order-id>
-    <authentication>guest</authentication>
-  </page>
-  <page>
     <id>my-applications</id>
     <path>/pages/my-applications/main.get.html.ftl</path>
     <format-id>navbar</format-id>
