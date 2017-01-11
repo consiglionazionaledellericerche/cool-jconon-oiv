@@ -10,11 +10,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       pagination: $('#itemsPagination'),
       orderBy: $('#orderBy'),
       label: $('#emptyResultset'),
-      total: $('#total'),
-      //icone per l'export dei dati
-      exportPanel:  $('<th><div id="export-div">' +
-                      '<a id="export-xls" title="Esporta dati in Excel" class="btn btn-mini"><i class="icon-table"></i> </a>' +
-                      '</div> </th> <th><div id="download-div"> </div> </th>').appendTo($('#orderBy'))
+      total: $('#total')
     },
     bulkInfo,
     criteria = $('#criteria'),
@@ -52,6 +48,9 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
           callId = data.items[0]['cmis:objectId'];
           $('#items caption h2').text('DOMANDE RELATIVE AL BANDO ' + callCodice);
           bulkInfo.render();
+          $('#items caption h2').after($('<div id="export-div" class="pull-right">' +
+            '<a id="export-xls" class="btn btn-primary"><i class="icon-table"></i> Esporta dati in Excel</a>' +
+            '</div> </th> <th><div id="download-div"> </div>'));
         },
         error: function (jqXHR, textStatus, errorThrown) {
           CNR.log(jqXHR, textStatus, errorThrown);
@@ -200,7 +199,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       asc: true
     },
     type: myType,
-    maxItems: callId ? undefined : 100,
+    maxItems: callId||callCodice ? undefined : 100,
     dataSource: function (page, settings, getUrlParams) {
       var deferred,
         baseCriteria = new Criteria().not(new Criteria().equals('jconon_application:stato_domanda', 'I').build()),
