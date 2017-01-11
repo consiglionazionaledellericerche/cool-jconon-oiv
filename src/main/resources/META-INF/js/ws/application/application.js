@@ -740,6 +740,16 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
               userId: common.User.id,
               preview: preview
             },
+            error: function (jqXHR, textStatus, errorThrown) {
+              var jsonMessage = JSON.parse(jqXHR.responseText);
+              if (jsonMessage && jsonMessage.message === 'message.error.domanda.inviata.accesso') {
+                UI.alert(i18n['message.application.alredy.send'], undefined, function () {
+                  window.location.href = '/my-applications';
+                });
+              } else {
+                URL.errorFn(jqXHR, textStatus, errorThrown, this);
+              }
+            },
             callbackErrorFn: jconon.callbackErrorFn
           }).done(function (dataApplication) {
             var message = $('#surferror').text() || 'Errore durante il recupero della domanda';
