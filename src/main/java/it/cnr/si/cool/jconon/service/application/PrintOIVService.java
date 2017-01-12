@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
@@ -54,6 +57,7 @@ public class PrintOIVService extends PrintService {
 			"Comune di Reperibilita'","Indirizzo di Reperibilita'",
 			"CAP di Reperibilita'","Telefono","Data Invio Domanda",
 			"Laurea", "Università",
+			"Fascia Professionale",
 			"Tipologia esperienza (Professionale/OIV)",
 			"Data inizio(Tipologia esperienza)",
 			"Data fine(Tipologia esperienza)"
@@ -108,19 +112,29 @@ public class PrintOIVService extends PrintService {
     	int index = 1;
         Folder callObject = null;
         ItemIterable<QueryResult> applications = session.query(query, false);
+        List<Folder> applicationList = new ArrayList<Folder>();
         for (QueryResult application : applications.getPage(Integer.MAX_VALUE)) {
         	Folder applicationObject = (Folder) session.getObject(String.valueOf(application.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
+        	applicationList.add(applicationObject);
         	callObject = (Folder) session.getObject(applicationObject.getParentId());
+		}
+        
+        Stream<Folder> sorted = applicationList.stream().sorted((app1, app2) -> 
+        	Optional.ofNullable(app1.<Calendar>getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value())).orElse(Calendar.getInstance()).compareTo(
+        			Optional.ofNullable(app2.<Calendar>getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value())).orElse(Calendar.getInstance())));
+        int applicationNumber = 0;
+        for (Folder applicationObject : sorted.collect(Collectors.toList())) {
         	CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue("jconon_application:user"));
-
+        	applicationNumber++;
         	Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_DOCUMENT);
     		criteriaOIV.add(Restrictions.inFolder(applicationObject.getId()));
     		ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(session, false, session.getDefaultContext());
     		for (QueryResult oiv : iterableOIV.getPage(Integer.MAX_VALUE)) {
             	Document oivObject = (Document) session.getObject(String.valueOf(oiv.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));            	
-            	getRecordCSV(session, callObject, applicationObject, oivObject, user, contexURL, sheet, index++);    			
-    		}
+            	getRecordCSV(session, callObject, applicationObject, oivObject, applicationNumber, user, contexURL, sheet, index++);    			
+    		}			
 		}
+        //ORDER BT DATA DOMANDA
         autoSizeColumns(wb);
         Document doc = createXLSDocument(session, wb, userId);
         model.put("objectId", doc.getId());
@@ -128,10 +142,10 @@ public class PrintOIVService extends PrintService {
 		return model;
 	}
 	
-    private void getRecordCSV(Session session, Folder callObject, Folder applicationObject, Document oivObject, CMISUser user, String contexURL, HSSFSheet sheet, int index) {
+    private void getRecordCSV(Session session, Folder callObject, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, String contexURL, HSSFSheet sheet, int index) {
     	int column = 0;
     	HSSFRow row = sheet.createRow(index);
-    	row.createCell(column++).setCellValue(user.getId());
+    	row.createCell(column++).setCellValue(applicationNumber);
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cognome").toUpperCase());
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nome").toUpperCase());    	
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:data_nascita").getValue()).map(
@@ -160,6 +174,7 @@ public class PrintOIVService extends PrintService {
     			dateTimeFormat.format(((Calendar)applicationObject.getPropertyValue("jconon_application:data_domanda")).getTime())).orElse(""));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:tipo_laurea"));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:istituto_laurea"));
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita")).orElse(""));    	
     	row.createCell(column++).setCellValue(oivObject.getType().getDisplayName());
     	if (oivObject.getType().getId().equalsIgnoreCase("D:jconon_scheda_anonima:precedente_incarico_oiv")) {
         	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_da")).map(map -> 
