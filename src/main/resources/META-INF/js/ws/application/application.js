@@ -252,6 +252,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           }
         },
         fetchCmisObject: true,
+        calculateTotalNumItems: true,
         maxItems: 5,
         filter: false,
         filterOnType: true,
