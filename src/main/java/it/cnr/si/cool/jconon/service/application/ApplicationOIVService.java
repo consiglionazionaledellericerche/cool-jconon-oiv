@@ -296,12 +296,11 @@ public class ApplicationOIVService extends ApplicationService{
     	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
     	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
     	
-    	String nameRicevutaReportModel = printService.getNameRicevutaReportModel(session, application, Locale.ITALIAN);
     	Map<String, Object> objectPrintModel = new HashMap<String, Object>();    	
 		objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
 		objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
-		objectPrintModel.put(PropertyIds.NAME, nameRicevutaReportModel);    	
-    	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, objectPrintModel, file.getInputStream(), nameRicevutaReportModel, true);
+		objectPrintModel.put(PropertyIds.NAME, file.getOriginalFilename());
+    	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, objectPrintModel, file.getInputStream(), file.getOriginalFilename(), true);
     	
     	Map<String, Object> mailModel = new HashMap<String, Object>();
 		List<String> emailList = new ArrayList<String>();
@@ -321,7 +320,7 @@ public class ApplicationOIVService extends ApplicationService{
 		properties.put(JCONONPropertyIds.APPLICATION_DUMMY.value(), "{\"stampa_archiviata\" : true}");
 		application.updateProperties(properties);					
 		message.setBody(body);
-		message.setAttachments(Arrays.asList(new AttachmentBean(nameRicevutaReportModel, file.getBytes())));
+		message.setAttachments(Arrays.asList(new AttachmentBean(file.getOriginalFilename(), file.getBytes())));
 		mailService.send(message);
     	
 		return Collections.singletonMap("email_comunicazione", user.getEmail());

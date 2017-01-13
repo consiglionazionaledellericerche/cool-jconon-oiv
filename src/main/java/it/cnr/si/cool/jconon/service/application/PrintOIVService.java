@@ -1,6 +1,7 @@
 package it.cnr.si.cool.jconon.service.application;
 
 import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.cool.cmis.service.NodeVersionService;
 import it.cnr.cool.security.service.UserService;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.util.Pair;
@@ -14,6 +15,8 @@ import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -32,19 +35,29 @@ import java.util.stream.Stream;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisStreamNotSupportedException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class PrintOIVService extends PrintService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(PrintService.class);
+	
 	private static final String JCONON_SCHEDA_ANONIMA_DOCUMENT = "jconon_scheda_anonima:document";
 	public static final String P_JCONON_APPLICATION_ASPECT_FASCIA_PROFESSIONALE_ATTRIBUITA = "P:jconon_application:aspect_fascia_professionale_attribuita";
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"), 
@@ -70,6 +83,8 @@ public class PrintOIVService extends PrintService {
 	private UserService userService;
 	@Autowired
 	private CompetitionFolderService competitionService;
+	@Autowired
+	private NodeVersionService nodeVersionService;	
 	
 	@Override
 	public Pair<String, byte[]> printApplicationImmediate(Session cmisSession,
@@ -142,6 +157,50 @@ public class PrintOIVService extends PrintService {
 		return model;
 	}
 	
+	public String archiviaRicevutaReportModel(Session cmisSession, Folder application,Map<String, Object> properties,
+			InputStream is, String nameRicevutaReportModel, boolean confermata) throws CMISApplicationException {
+		try {
+			ContentStream contentStream = new ContentStreamImpl(nameRicevutaReportModel,
+					BigInteger.valueOf(is.available()),
+					"application/pdf",
+					is);
+			String docId = findRicevutaApplicationId(cmisSession, application);
+			if (docId!=null) {
+				try{
+					Document doc = (Document) cmisSession.getObject(docId);
+					if (confermata) {					
+						ObjectId pwcId = doc.checkOut();
+						Document pwc = (Document) cmisSession.getObject(pwcId);
+						docId = pwc.checkIn(true, properties, contentStream, "Domanda confermata").getId();
+					} else {
+						doc = cmisSession.getLatestDocumentVersion(doc.updateProperties(properties, true));
+						doc.setContentStream(contentStream, true, true);
+						doc = doc.getObjectOfLatestVersion(false);
+						docId = doc.getId();						
+					}
+				}catch (CmisObjectNotFoundException e) {
+					LOGGER.warn("cmis object not found {}", nameRicevutaReportModel, e);
+					docId = createApplicationDocument(application, contentStream, properties);
+				}catch(CmisStreamNotSupportedException ex) {
+					LOGGER.error("Cannot set Content Stream on id:"+ docId + " ------" + ex.getErrorContent(), ex);
+					throw ex;
+				}
+			} else {
+				docId = createApplicationDocument(application, contentStream, properties);
+			}
+			return docId;
+		} catch (Exception e) {
+			throw new CMISApplicationException("Error in JASPER", e);
+		}
+	}
+
+	private String createApplicationDocument(Folder application, ContentStream contentStream, Map<String, Object> properties){
+		Document doc = application.createDocument(properties, contentStream, VersioningState.MINOR);
+		nodeVersionService.addAutoVersion(doc, false);
+		return doc.getId();
+	}	
+
+
     private void getRecordCSV(Session session, Folder callObject, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, String contexURL, HSSFSheet sheet, int index) {
     	int column = 0;
     	HSSFRow row = sheet.createRow(index);
