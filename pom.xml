@@ -21,7 +21,7 @@
   <packaging>war</packaging>
 
   <artifactId>cool-jconon-funzione-pubblica</artifactId>
-  <version>1.0.57-SNAPSHOT</version>
+  <version>1.0.58-SNAPSHOT</version>
   <name>Concorsi On-Line Funzione Pubblica</name>
 
   <dependencies>
