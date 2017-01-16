@@ -1,5 +1,6 @@
 package it.cnr.si.cool.jconon.service.application;
 
+import it.cnr.cool.cmis.model.CoolPropertyIds;
 import it.cnr.cool.cmis.service.CMISService;
 import it.cnr.cool.cmis.service.NodeVersionService;
 import it.cnr.cool.security.service.UserService;
@@ -35,7 +36,6 @@ import java.util.stream.Stream;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
-import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
@@ -149,7 +149,6 @@ public class PrintOIVService extends PrintService {
             	getRecordCSV(session, callObject, applicationObject, oivObject, applicationNumber, user, contexURL, sheet, index++);    			
     		}			
 		}
-        //ORDER BT DATA DOMANDA
         autoSizeColumns(wb);
         Document doc = createXLSDocument(session, wb, userId);
         model.put("objectId", doc.getId());
@@ -168,10 +167,10 @@ public class PrintOIVService extends PrintService {
 			if (docId!=null) {
 				try{
 					Document doc = (Document) cmisSession.getObject(docId);
-					if (confermata) {					
-						ObjectId pwcId = doc.checkOut();
-						Document pwc = (Document) cmisSession.getObject(pwcId);
-						docId = pwc.checkIn(true, properties, contentStream, "Domanda confermata").getId();
+					if (confermata) {
+						doc.setContentStream(contentStream, true, true);
+						doc = doc.getObjectOfLatestVersion(false);
+						docId = checkInPrint(cmisService.getAdminSession(), doc.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), is, nameRicevutaReportModel);
 					} else {
 						doc = cmisSession.getLatestDocumentVersion(doc.updateProperties(properties, true));
 						doc.setContentStream(contentStream, true, true);
