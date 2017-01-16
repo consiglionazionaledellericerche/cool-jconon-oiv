@@ -170,7 +170,9 @@ public class PrintOIVService extends PrintService {
 					if (confermata) {
 						doc.setContentStream(contentStream, true, true);
 						doc = doc.getObjectOfLatestVersion(false);
+						LOGGER.info("Start checkin application:{} with name {}", doc.getId(), nameRicevutaReportModel);
 						docId = checkInPrint(cmisService.getAdminSession(), doc.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), is, nameRicevutaReportModel);
+						LOGGER.info("End checkin application:{} with name {}", doc.getId(), nameRicevutaReportModel);
 					} else {
 						doc = cmisSession.getLatestDocumentVersion(doc.updateProperties(properties, true));
 						doc.setContentStream(contentStream, true, true);
@@ -203,7 +205,8 @@ public class PrintOIVService extends PrintService {
     private void getRecordCSV(Session session, Folder callObject, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, String contexURL, HSSFSheet sheet, int index) {
     	int column = 0;
     	HSSFRow row = sheet.createRow(index);
-    	row.createCell(column++).setCellValue(applicationNumber);
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:data_domanda")).
+    			map(map -> String.valueOf(applicationNumber)).orElse(""));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cognome").toUpperCase());
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nome").toUpperCase());    	
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:data_nascita").getValue()).map(

@@ -3,10 +3,15 @@ function main() {
   "use strict";
   var applicationPrintId = search.findNode(args.applicationPrintId),
     name = args.name,
-    workingCopy;
+    workingCopy,
+    newNode;
 
+  applicationPrintId.parent.pro
   workingCopy = applicationPrintId.checkout();
   workingCopy.name = name;
-  model.newNode = workingCopy.checkin("Domanda Confermata", true);
+  newNode = workingCopy.checkin("Domanda Confermata", true);
+  newNode.properties['jconon_application:fascia_professionale_attribuita'] = newNode.parent.properties['jconon_application:fascia_professionale_attribuita'];
+  newNode.save();
+  model.newNode = newNode;
 }
 main();
