@@ -18,13 +18,21 @@ public class Interval implements Comparable<Interval>{
 	public Interval(Instant startDate, Instant endDate) {
 		super();
 		this.startDate = startDate;
-		this.endDate = endDate;
+		if (endDate.isAfter(Calendar.getInstance().toInstant())) {
+			this.endDate = Calendar.getInstance().toInstant();
+		} else {
+			this.endDate = endDate;			
+		}
 	}
 
 	public Interval(Calendar startDate, Calendar endDate) {
 		super();
 		this.startDate = startDate.toInstant();
-		this.endDate = endDate.toInstant();
+		if (endDate.after(Calendar.getInstance())) {
+			this.endDate = Calendar.getInstance().toInstant();
+		} else {
+			this.endDate = endDate.toInstant();			
+		}
 	}
 
 
