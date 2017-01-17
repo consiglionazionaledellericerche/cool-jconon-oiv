@@ -8,9 +8,9 @@ function main() {
 
   applicationPrintId.parent.pro
   workingCopy = applicationPrintId.checkout();
-  workingCopy.name = name;
   newNode = workingCopy.checkin("Domanda Confermata", true);
   newNode.properties['jconon_application:fascia_professionale_attribuita'] = newNode.parent.properties['jconon_application:fascia_professionale_attribuita'];
+  newNode.name = name;
   newNode.save();
   model.newNode = newNode;
 }
