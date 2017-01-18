@@ -398,7 +398,6 @@ public class ApplicationOIVService extends ApplicationService{
 		
 	}
 	
-	@Override
 	public void reject(Session currentCMISSession, String nodeRef, String nodeRefDocumento) {
 		super.reject(currentCMISSession, nodeRef, nodeRefDocumento);
     	Folder application = loadApplicationById(currentCMISSession, nodeRef, null); 
