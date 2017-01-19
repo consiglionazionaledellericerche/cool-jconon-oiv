@@ -828,6 +828,17 @@
 					<type>d:text</type>
 					<mandatory>false</mandatory>
 				</property>
+				<property name="jconon_application:progressivo_iscrizione_elenco">
+					<title>Progressivo iscrizione in elenco</title>
+					<description>Progressivo iscrizione in elenco</description>
+					<type>d:int</type>
+					<mandatory>false</mandatory>
+				</property>
+				<property name="jconon_application:data_ultimo_invio">
+					<title>Data ultimo invio</title>
+					<description>Data ultimo invio</description>
+					<type>d:datetime</type>
+				</property>				
 			</properties>
 			<associations>
 				<association name="jconon_application:ass_curriculum">
@@ -2475,8 +2486,24 @@
 					<type>d:text</type>
 					<mandatory>false</mandatory>
 				</property>
+				<property name="jconon_application:fascia_professionale_esegui_calcolo">
+					<title></title>
+					<description>2] inputType:HIDDEN</description>
+					<type>d:text</type>
+					<mandatory>false</mandatory>
+				</property>
 			</properties>
 		</aspect>
-
+		<aspect name="jconon_application:aspect_invia_notifica_email">
+			<title>Invia Notifica per Email</title>
+			<properties>
+				<property name="jconon_application:fl_invia_notifica_email">
+					<title>Invia notifica</title>
+					<description>Flag fl_invia_notifica_email ui.checkbox</description>
+					<type>d:boolean</type>
+					<mandatory>false</mandatory>
+				</property>
+			</properties>
+		</aspect>
 	</aspects>
 </model>
