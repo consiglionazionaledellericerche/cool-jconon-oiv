@@ -135,9 +135,9 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
         }
       ],
       modalTitle: i18n[type],
-      success: function () {
+      success: function (attachmentsData, data) {
         if (successCallback) {
-          successCallback();
+          successCallback(attachmentsData, data);
         } else {
           $('#applyFilter').click();
         }
@@ -214,7 +214,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
 
       if (applicationStatus && applicationStatus === 'attive') {
         baseCriteria.and(new Criteria().equals('jconon_application:stato_domanda', 'C').build());
-        baseCriteria.and(new Criteria().isNull('jconon_application:esclusione_rinuncia').build());
+        baseCriteria.and(new Criteria().isNotNull('jconon_application:progressivo_iscrizione_elenco').build());
       }
 
       if (applicationStatus && applicationStatus === 'escluse') {
@@ -223,7 +223,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       }
 
       if (callId) {
-        criteria.inTree(callId);
+        criteria.inFolder(callId);
 
         if (user) {
           criteria.and(new Criteria().equals('jconon_application:user', user).build());
@@ -398,6 +398,98 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                     });
                   };
                 }
+                if (common.User.isAdmin || Call.isRdP(callData['jconon_call:rdp'])) {
+                  if (el['jconon_application:esclusione_rinuncia'] !== 'E' && el['jconon_application:progressivo_iscrizione_elenco'] == '') {
+                    customButtons.escludi = function () {
+                      allegaDocumentoAllaDomanda('D_jconon_esclusione_attachment_fp',
+                        el['cmis:objectId'],
+                        function (attachmentsData, data) {
+                          jconon.Data.application.reject({
+                            type: 'POST',
+                            data: {
+                              nodeRef : el['cmis:objectId'],
+                              nodeRefDocumento : data['alfcmis:nodeRef']
+                            },
+                            success: function () {
+                              $('#applyFilter').click();
+                            },
+                            error: jconon.error
+                          });
+                        }
+                      );
+                    };
+                    customButtons.inserisci = function () {
+                      UI.confirm(i18n.prop('message.confirm.iscrizione.elenco', el['jconon_application:nome'], el['jconon_application:cognome']), function () {
+                        var close = UI.progress();
+                        jconon.Data.application.readmission({
+                          type: 'POST',
+                          data: {
+                            nodeRef : el['cmis:objectId']
+                          },
+                          success: function () {
+                            URL.Data.proxy.childrenGroup({
+                              type: 'POST',
+                              data: JSON.stringify({
+                                'parent_group_name': 'GROUP_ELENCO_OIV',
+                                'child_name': el['jconon_application:user']
+                              }),
+                              contentType: 'application/json'
+                            });
+                            UI.success('Iscrizione avvenuta correttamente.');
+                            $('#applyFilter').click();
+                          },
+                          complete: close,
+                          error: jconon.error
+                        });                      
+                      });  
+                    }
+                  }
+                  customButtons.assegna_fascia = function () {
+                    var content = $("<div></div>"),
+                      bulkinfo = new BulkInfo({
+                      target: content,
+                      path: "P:jconon_application:aspect_fascia_professionale_attribuita",
+                      objectId: el['cmis:objectId'],
+                      formclass: 'form-inline',
+                      name: 'default',
+                      callback : {
+                        afterCreateForm: function (form) {
+                          form.find('.control-group').not('.widget').addClass('widget');
+                          form.find('#fascia_professionale_attribuita').removeAttr('disabled');
+                        }
+                      }
+                    });
+                    bulkinfo.render();
+                    UI.modal('<i class="icon-edit"></i> Assegna Fascia', content, function () {
+                      var close = UI.progress(), d = bulkinfo.getData();
+                      d.push(
+                        {
+                          id: 'cmis:objectId',
+                          name: 'cmis:objectId',
+                          value: el['cmis:objectId']
+                        },
+                        {
+                          name: 'aspect', 
+                          value: 'P:jconon_application:aspect_fascia_professionale_attribuita'
+                        },
+                        {
+                          name: 'jconon_application:fascia_professionale_esegui_calcolo',
+                          value: false
+                        }                        
+                      );
+                      jconon.Data.application.main({
+                        type: 'PUT',
+                        data: d,
+                        success: function (data) {
+                          UI.success(i18n['message.aggiornamento.fascia.eseguito']);
+                          $('#applyFilter').click();
+                        },
+                        complete: close,
+                        error: URL.errorFn
+                      });
+                    });
+                  };
+                }                
               } else {
                 if (el['jconon_application:esclusione_rinuncia'] !== 'E' && 
                     el['jconon_application:esclusione_rinuncia'] !== 'N' && 
@@ -597,7 +689,10 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                 reopen: 'icon-share',
                 duplicate: 'icon-copy',
                 scheda_valutazione: 'icon-table',
-                operations: 'icon-list'
+                operations: 'icon-list',
+                escludi: 'icon-arrow-down',
+                inserisci: 'icon-arrow-up',
+                assegna_fascia: 'icon-edit'
               }, undefined, true).appendTo(target);
             }
           });

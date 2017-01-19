@@ -2,6 +2,7 @@ package it.cnr.si.cool.jconon.service.application;
 
 import java.time.Instant;
 import java.util.Calendar;
+import java.util.Optional;
 
 public class Interval implements Comparable<Interval>{
 	@Override
@@ -18,23 +19,28 @@ public class Interval implements Comparable<Interval>{
 	public Interval(Instant startDate, Instant endDate) {
 		super();
 		this.startDate = startDate;
-		if (endDate.isAfter(Calendar.getInstance().toInstant())) {
-			this.endDate = Calendar.getInstance().toInstant();
-		} else {
-			this.endDate = endDate;			
-		}
+		final Instant now = Calendar.getInstance().toInstant();
+		this.endDate = Optional.ofNullable(endDate).map(data -> {
+			if (data.isAfter(now)) {
+				return now;
+			} else {
+				return data;
+			}
+		}).orElse(now);
 	}
 
 	public Interval(Calendar startDate, Calendar endDate) {
 		super();
 		this.startDate = startDate.toInstant();
-		if (endDate.after(Calendar.getInstance())) {
-			this.endDate = Calendar.getInstance().toInstant();
-		} else {
-			this.endDate = endDate.toInstant();			
-		}
+		final Calendar now = Calendar.getInstance();
+		this.endDate = Optional.ofNullable(endDate).map(data -> {
+			if (data.after(now)) {
+				return now;
+			} else {
+				return data;
+			}
+		}).orElse(now).toInstant();
 	}
-
 
 	@Override
 	public int compareTo(Interval o) {

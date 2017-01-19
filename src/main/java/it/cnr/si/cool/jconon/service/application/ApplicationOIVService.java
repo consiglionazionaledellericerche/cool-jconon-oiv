@@ -2,15 +2,18 @@ package it.cnr.si.cool.jconon.service.application;
 
 import freemarker.template.TemplateException;
 import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.cool.exception.CoolUserFactoryException;
 import it.cnr.cool.mail.MailService;
 import it.cnr.cool.mail.model.AttachmentBean;
 import it.cnr.cool.mail.model.EmailMessage;
 import it.cnr.cool.rest.util.Util;
+import it.cnr.cool.security.service.UserService;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.service.I18nService;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.cmis.model.JCONONDocumentType;
+import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
@@ -22,6 +25,7 @@ import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -46,6 +50,7 @@ import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +65,12 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @Component
 @Primary
 public class ApplicationOIVService extends ApplicationService{
+
+	private static final String JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO = "jconon_application:fascia_professionale_esegui_calcolo";
+
+	private static final String JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO = "jconon_application:progressivo_iscrizione_elenco";
+
+	private static final String JCONON_APPLICATION_FL_INVIA_NOTIFICA_EMAIL = "jconon_application:fl_invia_notifica_email";
 
 	private static final String INF250 = "<250", SUP250=">=250";
 
@@ -93,7 +104,8 @@ public class ApplicationOIVService extends ApplicationService{
 	private ApplicationContext context;
 	@Autowired
 	private MailService mailService;
-
+	@Autowired
+	private UserService userService;
 
 	@Value("${mail.from.default}")
 	private String mailFromDefault;
@@ -104,8 +116,28 @@ public class ApplicationOIVService extends ApplicationService{
 			String userId, Map<String, Object> properties,
 			Map<String, Object> aspectProperties) {
 		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
-		eseguiCalcolo(objectId, aspectProperties);
-		return super.save(currentCMISSession, contextURL, locale, userId, properties, aspectProperties);
+		if (properties.containsKey(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO) && properties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO).equals("false")) {
+	    	Folder application = loadApplicationById(cmisService.createAdminSession(), objectId, null);
+			String docId = printService.findRicevutaApplicationId(cmisService.createAdminSession(), application);
+			try {
+				if (docId != null) {
+					Document latestDocumentVersion = (Document) cmisService.createAdminSession().getObject(cmisService.createAdminSession().
+							getLatestDocumentVersion(docId, true, cmisService.createAdminSession().getDefaultContext()));
+					
+					Map<String, Object> prop = new HashMap<String, Object>();
+					prop.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, properties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
+					latestDocumentVersion.updateProperties(prop);
+				}
+			} catch (CmisObjectNotFoundException _ex) {
+				LOGGER.warn("There is no major version for application id : {}", objectId);
+			}
+			properties.remove(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO);
+			aspectProperties.remove(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO);
+			return super.save(currentCMISSession, contextURL, locale, userId, properties, aspectProperties);						
+		} else {
+			eseguiCalcolo(objectId, aspectProperties);
+			return super.save(currentCMISSession, contextURL, locale, userId, properties, aspectProperties);			
+		}
 	}
 	
 	@Override
@@ -336,5 +368,94 @@ public class ApplicationOIVService extends ApplicationService{
 	@Override
 	protected void addToQueueForSend(String id, String contextURL, boolean email) {
 		queueService.queueAddContentToApplication().add(new PrintParameterModel(id, contextURL, email));
+	}
+	
+	@Override
+	public void readmission(Session currentCMISSession, String nodeRef) {
+		Session session = cmisService.createAdminSession();
+    	Folder application = loadApplicationById(session, nodeRef, null); 
+    	Folder call = loadCallById(session, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
+
+    	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());
+		criteria.addColumn(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO);
+		criteria.add(Restrictions.inFolder(call.getId()));
+		criteria.add(Restrictions.isNotNull(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO));
+		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
+		BigInteger maxValue = BigInteger.ZERO; 
+    	for (QueryResult queryResult : iterable) {
+    		BigInteger currentValue = queryResult.<BigInteger>getPropertyValueById(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO);
+			if (currentValue.compareTo(maxValue) > 0) {
+				maxValue = currentValue;
+			}
+		}
+    	maxValue = maxValue.add(BigInteger.ONE);
+    	Map<String, Object> properties = new HashMap<String, Object>();
+    	properties.put(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO, maxValue);
+    	application = (Folder) application.updateProperties(properties);    	
+    	LOGGER.info("Assegnato progressivo {} alla domanda {}", maxValue, nodeRef);
+		CMISUser user;
+		try {
+			user = userService.loadUserForConfirm(
+					application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
+		} catch (CoolUserFactoryException e) {
+			throw new ClientMessageException("User not found of application " + nodeRef, e);
+		}
+    	String email = Optional.ofNullable(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_EMAIL_COMUNICAZIONI.value())).orElse(user.getEmail());		
+		try {
+			Map<String, Object> mailModel = new HashMap<String, Object>();
+			List<String> emailList = new ArrayList<String>();
+			emailList.add(email);
+			mailModel.put("folder", application);
+			mailModel.put("call", call);
+			mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
+			mailModel.put("email_comunicazione", email);
+			EmailMessage message = new EmailMessage();
+			message.setRecipients(emailList);
+			message.setBccRecipients(Arrays.asList(mailFromDefault));
+			String body = Util.processTemplate(mailModel, "/pages/application/application.iscrizione.html.ftl");
+			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + i18nService.getLabel("mail.subject.iscrizione", Locale.ITALIAN, maxValue));
+			message.setBody(body);
+			mailService.send(message);
+		} catch (TemplateException | IOException e) {
+			LOGGER.error("Cannot send email for readmission applicationId: {}", nodeRef, e);
+		}    		
+		
+	}
+	
+	@Override
+	public void reject(Session currentCMISSession, String nodeRef, String nodeRefDocumento) {
+		super.reject(currentCMISSession, nodeRef, nodeRefDocumento);
+    	Folder application = loadApplicationById(currentCMISSession, nodeRef, null); 
+    	Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
+    	Document doc = (Document) currentCMISSession.getObject(nodeRefDocumento);
+    	if (doc.<Boolean>getPropertyValue(JCONON_APPLICATION_FL_INVIA_NOTIFICA_EMAIL)) {
+    		CMISUser user;
+    		try {
+    			user = userService.loadUserForConfirm(
+    					application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
+    		} catch (CoolUserFactoryException e) {
+    			throw new ClientMessageException("User not found of application " + nodeRef, e);
+    		}		
+        	String email = Optional.ofNullable(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_EMAIL_COMUNICAZIONI.value())).orElse(user.getEmail());		
+    		try {
+    			Map<String, Object> mailModel = new HashMap<String, Object>();
+    			List<String> emailList = new ArrayList<String>();
+    			emailList.add(email);
+    			mailModel.put("folder", application);
+    			mailModel.put("call", call);
+    			mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
+    			mailModel.put("email_comunicazione", email);
+    			EmailMessage message = new EmailMessage();
+    			message.setRecipients(emailList);
+    			message.setBccRecipients(Arrays.asList(mailFromDefault));
+    			String body = Util.processTemplate(mailModel, "/pages/application/application.esclusione.html.ftl");
+    			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + i18nService.getLabel("mail.subject.esclusione", Locale.ITALIAN));
+    			message.setBody(body);
+    			message.setAttachments(Arrays.asList(new AttachmentBean(doc.getName(), IOUtils.toByteArray(doc.getContentStream().getStream()))));
+    			mailService.send(message);
+    		} catch (TemplateException | IOException e) {
+    			LOGGER.error("Cannot send email for reject applicationId: {}", nodeRef, e);
+    		}    		
+    	}
 	}
 }
