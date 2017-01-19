@@ -68,7 +68,7 @@
 			<properties>
 				<property name="jconon_attachment:esperienza_professionale_da">
 					<title>Da</title>
-					<description>2]</description>
+					<description>a]</description>
 					<type>d:datetime</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -79,7 +79,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_incorso">
 					<title>In corso</title>
-					<description>3] ui.radio</description>
+					<description>b] ui.radio</description>
 					<type>d:boolean</type>
 					<mandatory>true</mandatory>
 					<default>false</default>
@@ -91,7 +91,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_a">
 					<title>A</title>
-					<description>4] class:esperienza_professionale_incorso_false</description>
+					<description>c] class:esperienza_professionale_incorso_false</description>
 					<type>d:datetime</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -102,7 +102,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_area_specializzazione">
 					<title>Area di specializzazione</title>
-					<description>5]</description>
+					<description>d]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -116,7 +116,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_datore_lavoro">
 					<title>Datore di Lavoro/Committente</title>
-					<description>6]</description>
+					<description>e]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -127,7 +127,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_ruolo">
 					<title>Ruolo</title>
-					<description>7]</description>
+					<description>f]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -138,7 +138,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_attivita_svolta">
 					<title>Attività svolta nell’area di specializzazione indicata</title>
-					<description>8] inputType:TEXTAREA</description>
+					<description>g] inputType:TEXTAREA</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -149,7 +149,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_citta">
 					<title>Comune</title>
-					<description>9]</description>
+					<description>h]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -160,7 +160,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_stato_estero">
 					<title>Nazione</title>
-					<description>10]</description>
+					<description>i]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
