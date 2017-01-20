@@ -114,9 +114,20 @@
 						<constraint ref="jconon_attachment:elenco_area_specializzazione_values" />
 					</constraints>
 				</property>
+				<property name="jconon_attachment:esperienza_professionale_attivita_svolta">
+					<title>Attività svolta nell’area di specializzazione indicata</title>
+					<description>e] inputType:TEXTAREA</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
 				<property name="jconon_attachment:esperienza_professionale_datore_lavoro">
 					<title>Datore di Lavoro/Committente</title>
-					<description>e]</description>
+					<description>f]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -127,18 +138,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_ruolo">
 					<title>Ruolo</title>
-					<description>f]</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_attivita_svolta">
-					<title>Attività svolta nell’area di specializzazione indicata</title>
-					<description>g] inputType:TEXTAREA</description>
+					<description>g]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">

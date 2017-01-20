@@ -66,6 +66,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @Primary
 public class ApplicationOIVService extends ApplicationService{
 
+	private static final String JCONON_APPLICATION_ESEGUI_CONTROLLO_FASCIA = "jconon_application:esegui_controllo_fascia";
+
 	private static final String JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO = "jconon_application:fascia_professionale_esegui_calcolo";
 
 	private static final String JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO = "jconon_application:progressivo_iscrizione_elenco";
@@ -117,20 +119,7 @@ public class ApplicationOIVService extends ApplicationService{
 			Map<String, Object> aspectProperties) {
 		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
 		if (properties.containsKey(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO) && properties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO).equals("false")) {
-	    	Folder application = loadApplicationById(cmisService.createAdminSession(), objectId, null);
-			String docId = printService.findRicevutaApplicationId(cmisService.createAdminSession(), application);
-			try {
-				if (docId != null) {
-					Document latestDocumentVersion = (Document) cmisService.createAdminSession().getObject(cmisService.createAdminSession().
-							getLatestDocumentVersion(docId, true, cmisService.createAdminSession().getDefaultContext()));
-					
-					Map<String, Object> prop = new HashMap<String, Object>();
-					prop.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, properties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
-					latestDocumentVersion.updateProperties(prop);
-				}
-			} catch (CmisObjectNotFoundException _ex) {
-				LOGGER.warn("There is no major version for application id : {}", objectId);
-			}
+			properties.put(JCONON_APPLICATION_ESEGUI_CONTROLLO_FASCIA, false);
 			properties.remove(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO);
 			aspectProperties.remove(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO);
 			return super.save(currentCMISSession, contextURL, locale, userId, properties, aspectProperties);						
@@ -305,7 +294,7 @@ public class ApplicationOIVService extends ApplicationService{
     	Optional.ofNullable(file).orElseThrow(() -> new ClientMessageException("Allegare la domanda firmata!"));    	
     	Folder application = loadApplicationById(cmisService.createAdminSession(), idApplication, null); 
     	Folder call = loadCallById(session, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
-
+    	Boolean eseguiControlloFascia = Optional.ofNullable(application.<Boolean>getPropertyValue(JCONON_APPLICATION_ESEGUI_CONTROLLO_FASCIA)).orElse(true);
     	String docId = printService.findRicevutaApplicationId(session, application);
 		try {
 			Optional.ofNullable(docId).orElseThrow(() -> new ClientMessageException(
@@ -317,7 +306,7 @@ public class ApplicationOIVService extends ApplicationService{
 			}			
 			Document latestDocumentVersion = (Document) session.getObject(session.getLatestDocumentVersion(docId, true, session.getDefaultContext()));
 	    	Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
-	    		if (fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA))) {
+	    		if (eseguiControlloFascia && fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA))) {
 	    			throw new ClientMessageException(
 	    					i18nService.getLabel("message.error.domanda.fascia.equals", Locale.ITALIAN, fascia));
 	    		}
@@ -325,7 +314,11 @@ public class ApplicationOIVService extends ApplicationService{
 		} catch (CmisObjectNotFoundException _ex) {
 			LOGGER.warn("There is no major version for application id : {}", idApplication);
 		}
-		    	
+		if (!eseguiControlloFascia) {			
+			Map<String, Object> propertiesFascia = new HashMap<String, Object>();
+			propertiesFascia.put(JCONON_APPLICATION_ESEGUI_CONTROLLO_FASCIA, true);
+			application.updateProperties(propertiesFascia);
+		}		
     	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));  
     	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
     	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());

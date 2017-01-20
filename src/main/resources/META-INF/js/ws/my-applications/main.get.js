@@ -363,6 +363,53 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
             customButtons.edit = function () {
               window.location = jconon.URL.application.manage + '?callId=' + callData['cmis:objectId'] + '&applicationId=' + el['cmis:objectId'];
             };
+            if (common.User.isAdmin || Call.isRdP(callData['jconon_call:rdp'])) {
+              customButtons.assegna_fascia = function () {
+                var content = $("<div></div>"),
+                  bulkinfo = new BulkInfo({
+                  target: content,
+                  path: "P:jconon_application:aspect_fascia_professionale_attribuita",
+                  objectId: el['cmis:objectId'],
+                  formclass: 'form-inline',
+                  name: 'default',
+                  callback : {
+                    afterCreateForm: function (form) {
+                      form.find('.control-group').not('.widget').addClass('widget');
+                      form.find('#fascia_professionale_attribuita').removeAttr('disabled');
+                    }
+                  }
+                });
+                bulkinfo.render();
+                UI.modal('<i class="icon-edit"></i> Assegna Fascia', content, function () {
+                  var close = UI.progress(), d = bulkinfo.getData();
+                  d.push(
+                    {
+                      id: 'cmis:objectId',
+                      name: 'cmis:objectId',
+                      value: el['cmis:objectId']
+                    },
+                    {
+                      name: 'aspect', 
+                      value: 'P:jconon_application:aspect_fascia_professionale_attribuita'
+                    },
+                    {
+                      name: 'jconon_application:fascia_professionale_esegui_calcolo',
+                      value: false
+                    }                        
+                  );
+                  jconon.Data.application.main({
+                    type: 'PUT',
+                    data: d,
+                    success: function (data) {
+                      UI.success(i18n['message.aggiornamento.fascia.eseguito']);
+                      $('#applyFilter').click();
+                    },
+                    complete: close,
+                    error: URL.errorFn
+                  });
+                });
+              };
+            }
             if (el['jconon_application:stato_domanda'] === 'P') {
               // provvisoria
               if (bandoInCorso) {
@@ -443,51 +490,6 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                       });  
                     }
                   }
-                  customButtons.assegna_fascia = function () {
-                    var content = $("<div></div>"),
-                      bulkinfo = new BulkInfo({
-                      target: content,
-                      path: "P:jconon_application:aspect_fascia_professionale_attribuita",
-                      objectId: el['cmis:objectId'],
-                      formclass: 'form-inline',
-                      name: 'default',
-                      callback : {
-                        afterCreateForm: function (form) {
-                          form.find('.control-group').not('.widget').addClass('widget');
-                          form.find('#fascia_professionale_attribuita').removeAttr('disabled');
-                        }
-                      }
-                    });
-                    bulkinfo.render();
-                    UI.modal('<i class="icon-edit"></i> Assegna Fascia', content, function () {
-                      var close = UI.progress(), d = bulkinfo.getData();
-                      d.push(
-                        {
-                          id: 'cmis:objectId',
-                          name: 'cmis:objectId',
-                          value: el['cmis:objectId']
-                        },
-                        {
-                          name: 'aspect', 
-                          value: 'P:jconon_application:aspect_fascia_professionale_attribuita'
-                        },
-                        {
-                          name: 'jconon_application:fascia_professionale_esegui_calcolo',
-                          value: false
-                        }                        
-                      );
-                      jconon.Data.application.main({
-                        type: 'PUT',
-                        data: d,
-                        success: function (data) {
-                          UI.success(i18n['message.aggiornamento.fascia.eseguito']);
-                          $('#applyFilter').click();
-                        },
-                        complete: close,
-                        error: URL.errorFn
-                      });
-                    });
-                  };
                 }                
               } else {
                 if (el['jconon_application:esclusione_rinuncia'] !== 'E' && 

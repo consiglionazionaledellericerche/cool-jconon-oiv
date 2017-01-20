@@ -838,7 +838,12 @@
 					<title>Data ultimo invio</title>
 					<description>Data ultimo invio</description>
 					<type>d:datetime</type>
-				</property>				
+				</property>	
+				<property name="jconon_application:esegui_controllo_fascia">
+					<title>Flag Esegui controllo fascia</title>
+					<description>Flag Esegui controllo fascia</description>
+					<type>d:boolean</type>
+				</property>
 			</properties>
 			<associations>
 				<association name="jconon_application:ass_curriculum">
