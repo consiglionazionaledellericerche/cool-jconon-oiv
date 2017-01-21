@@ -56,6 +56,29 @@ public class OIVScoreServiceTest {
 			SEDICI_INIZIO 		= new GregorianCalendar(2016,Calendar.JANUARY,1),
 			SEDICI_FINE 		= new GregorianCalendar(2016,Calendar.DECEMBER,31);
 
+
+	@Test
+	public void testAssegnaFasciaCHIRICO()  {
+		assertEquals(ApplicationOIVService.FASCIA1, 
+				applicationOIVService.assegnaFascia(
+						Collections.emptyList(), 
+						Collections.emptyList(),
+						Arrays.asList(new Interval(new GregorianCalendar(2012,Calendar.JULY,1), new GregorianCalendar(2017,Calendar.JANUARY,18)))
+				)
+		);
+	}
+
+	@Test
+	public void testAssegnaFasciaRUGGIERO()  {
+		assertEquals(ApplicationOIVService.FASCIA2, 
+				applicationOIVService.assegnaFascia(
+						Arrays.asList(new Interval(QUATTRO_INIZIO, SEDICI_FINE)), 
+						Arrays.asList(new Interval(new GregorianCalendar(2010,Calendar.APRIL,30), new GregorianCalendar(2012,Calendar.DECEMBER,17))),
+						Arrays.asList(new Interval(new GregorianCalendar(2014,Calendar.JUNE,1), new GregorianCalendar(2017,Calendar.JANUARY,16)))
+				)
+		);
+	}
+	
 	@Test
 	public void testAssegnaFasciaCANITANO()  {
 		assertEquals(ApplicationOIVService.FASCIA1, 

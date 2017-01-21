@@ -37,10 +37,10 @@
           </#if>
         </div>
         <ul class="nav highnav hidden-important">
+          <#if !context.user.guest >
+            <#assign currentUser = context.user>
+          </#if>
           <#list pages as page>
-            <#if !context.user.guest >
-              <#assign currentUser = context.user>
-            </#if>
             <#if permission.isAuthorizedCMIS(page.id, "GET", currentUser) >
               <#assign submenu = page['format-id']?string?split("/")>
               <li class="page<#if (context.page.id = page.id||mainPage(context.page) = page.id)> active</#if>" <#if (submenu?size > 1)>data-submenu="${submenu[1]}"</#if>>
@@ -48,6 +48,11 @@
               </li>
             </#if>
           </#list>
+          <#if permission.isAuthorizedCMIS("application-oiv", "GET", currentUser) >
+            <li class="page<#if (context.page.id = 'applications'||mainPage(context.page) = 'applications')> active</#if>">
+              <a id="application-oiv" href="${url.context}/applications?callCodice=OIV">${message('page.application-oiv')}</a>
+            </li>
+          </#if>
           <#if !context.user.guest>
           <li class="hide dropdown page<#if context.page.id = "manage-call" > active</#if>" id="manage-call">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">${message("link.call.create.min")} <b class="caret"></b></a>
