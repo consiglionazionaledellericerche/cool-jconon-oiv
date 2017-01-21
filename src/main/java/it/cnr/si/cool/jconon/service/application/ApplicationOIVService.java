@@ -451,4 +451,34 @@ public class ApplicationOIVService extends ApplicationService{
     		}    		
     	}
 	}
+
+	public Map<String, Object> checkApplicationOIV(Session session,
+			String userId, CMISUser cmisUserFromSession) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		try {
+			CMISUser user = userService.loadUserForConfirm(userId);
+			if (!user.isAdmin())
+				throw new ClientMessageException("Only Admin");
+		} catch (CoolUserFactoryException e) {
+			throw new ClientMessageException("User not found " + userId, e);
+		}		
+    	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());
+		criteria.addColumn(PropertyIds.OBJECT_ID);
+		criteria.add(Restrictions.eq(JCONONPropertyIds.APPLICATION_STATO_DOMANDA.value(), StatoDomanda.CONFERMATA.getValue()));
+		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
+    	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
+        	Folder application = loadApplicationById(session, queryResult.<String>getPropertyValueById(PropertyIds.OBJECT_ID), null); 
+        	Map<String, Object> aspectProperties = new HashMap<String, Object>();
+			eseguiCalcolo(application.getId(), aspectProperties);
+			if (!application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA).equals(aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA))) {
+				result.put(application.getName(), "Fascia attribuita:" + application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA) +
+						" Fascia calcolata:" + aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
+			}
+			String docId = printService.findRicevutaApplicationId(session, application);
+			if (!docId.endsWith("1.0")) {
+				result.put(application.getName(), "DocId:" + docId);				
+			}
+    	}		
+		return result;
+	}
 }

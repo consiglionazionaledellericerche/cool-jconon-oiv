@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -52,4 +53,22 @@ public class ApplicationOIV {
 		}
 		return rb.build();
 	}
+	
+	@GET
+	@Path("check-application")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response checkApplication(@Context HttpServletRequest req) throws IOException{
+		ResponseBuilder rb;
+		try {
+			Session session = cmisService.getCurrentCMISSession(req);		
+			String userId = cmisService.getCMISUserFromSession(req).getId();			
+			Map<String, Object> model = applicationOIVService.checkApplicationOIV(session, userId, cmisService.getCMISUserFromSession(req));
+			rb = Response.ok(model);			
+		} catch (ClientMessageException | CMISApplicationException  e) {
+			LOGGER.warn("check error", e);
+			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+		}
+		return rb.build();
+	}
+	
 }
