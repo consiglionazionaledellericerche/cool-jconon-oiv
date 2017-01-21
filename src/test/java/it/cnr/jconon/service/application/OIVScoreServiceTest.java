@@ -59,8 +59,7 @@ public class OIVScoreServiceTest {
 
 	@Test
 	public void testAssegnaFasciaCHIRICO()  {
-		assertEquals(ApplicationOIVService.FASCIA1, 
-				applicationOIVService.assegnaFascia(
+		assertNull(applicationOIVService.assegnaFascia(
 						Collections.emptyList(), 
 						Collections.emptyList(),
 						Arrays.asList(new Interval(new GregorianCalendar(2012,Calendar.JULY,1), new GregorianCalendar(2017,Calendar.JANUARY,18)))
