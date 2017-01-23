@@ -193,6 +193,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       'Cognome': 'jconon_application:cognome',
       'Nome': 'jconon_application:nome',
       'Data domanda': 'jconon_application:data_domanda',
+      'Data ultimo salvataggio': 'cmis:lastModificationDate',      
       'Stato domanda': 'jconon_application:stato_domanda',
       'Numero di iscrizione in elenco':  'jconon_application:progressivo_iscrizione_elenco'
     },
