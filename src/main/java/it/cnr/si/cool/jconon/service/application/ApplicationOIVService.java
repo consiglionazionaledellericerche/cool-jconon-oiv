@@ -17,6 +17,7 @@ import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
+import it.cnr.si.cool.jconon.repository.ProtocolRepository;
 import it.cnr.si.cool.jconon.service.PrintService;
 import it.cnr.si.cool.jconon.service.QueueService;
 import it.spasia.opencmis.criteria.Criteria;
@@ -25,7 +26,6 @@ import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -50,6 +50,7 @@ import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,10 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 @Component
 @Primary
 public class ApplicationOIVService extends ApplicationService{
+
+	private static final String OIV = "OIV";
+
+	private static final String ISCRIZIONE_ELENCO = "ISCRIZIONE_ELENCO";
 
 	private static final String JCONON_APPLICATION_ESEGUI_CONTROLLO_FASCIA = "jconon_application:esegui_controllo_fascia";
 
@@ -108,7 +113,9 @@ public class ApplicationOIVService extends ApplicationService{
 	private MailService mailService;
 	@Autowired
 	private UserService userService;
-
+    @Autowired
+    private ProtocolRepository protocolRepository;
+    
 	@Value("${mail.from.default}")
 	private String mailFromDefault;
 	
@@ -367,51 +374,47 @@ public class ApplicationOIVService extends ApplicationService{
 	public void readmission(Session currentCMISSession, String nodeRef) {
 		Session session = cmisService.createAdminSession();
     	Folder application = loadApplicationById(session, nodeRef, null); 
-    	Folder call = loadCallById(session, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
-
-    	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());
-		criteria.addColumn(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO);
-		criteria.add(Restrictions.inFolder(call.getId()));
-		criteria.add(Restrictions.isNotNull(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO));
-		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
-		BigInteger maxValue = BigInteger.ZERO; 
-    	for (QueryResult queryResult : iterable) {
-    		BigInteger currentValue = queryResult.<BigInteger>getPropertyValueById(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO);
-			if (currentValue.compareTo(maxValue) > 0) {
-				maxValue = currentValue;
-			}
-		}
-    	maxValue = maxValue.add(BigInteger.ONE);
-    	Map<String, Object> properties = new HashMap<String, Object>();
-    	properties.put(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO, maxValue);
-    	application = (Folder) application.updateProperties(properties);    	
-    	LOGGER.info("Assegnato progressivo {} alla domanda {}", maxValue, nodeRef);
-		CMISUser user;
-		try {
-			user = userService.loadUserForConfirm(
-					application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
-		} catch (CoolUserFactoryException e) {
-			throw new ClientMessageException("User not found of application " + nodeRef, e);
-		}
-    	String email = Optional.ofNullable(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_EMAIL_COMUNICAZIONI.value())).orElse(user.getEmail());		
-		try {
-			Map<String, Object> mailModel = new HashMap<String, Object>();
-			List<String> emailList = new ArrayList<String>();
-			emailList.add(email);
-			mailModel.put("folder", application);
-			mailModel.put("call", call);
-			mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
-			mailModel.put("email_comunicazione", email);
-			EmailMessage message = new EmailMessage();
-			message.setRecipients(emailList);
-			message.setBccRecipients(Arrays.asList(mailFromDefault));
-			String body = Util.processTemplate(mailModel, "/pages/application/application.iscrizione.html.ftl");
-			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + i18nService.getLabel("mail.subject.iscrizione", Locale.ITALIAN, maxValue));
-			message.setBody(body);
-			mailService.send(message);
-		} catch (TemplateException | IOException e) {
-			LOGGER.error("Cannot send email for readmission applicationId: {}", nodeRef, e);
-		}    		
+    	Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
+    	try {
+        	Integer numProgressivo = protocolRepository.getNumProtocollo(ISCRIZIONE_ELENCO, OIV).intValue();
+	    	try {
+	    		numProgressivo++;
+	        	Map<String, Object> properties = new HashMap<String, Object>();
+	        	properties.put(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO, numProgressivo);
+	        	application = (Folder) application.updateProperties(properties);    	
+	        	LOGGER.info("Assegnato progressivo {} alla domanda {}", numProgressivo, nodeRef);
+	    		CMISUser user;
+	    		try {
+	    			user = userService.loadUserForConfirm(
+	    					application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
+	    		} catch (CoolUserFactoryException e) {
+	    			throw new ClientMessageException("User not found of application " + nodeRef, e);
+	    		}
+	        	String email = Optional.ofNullable(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_EMAIL_COMUNICAZIONI.value())).orElse(user.getEmail());		
+	    		try {
+	    			Map<String, Object> mailModel = new HashMap<String, Object>();
+	    			List<String> emailList = new ArrayList<String>();
+	    			emailList.add(email);
+	    			mailModel.put("folder", application);
+	    			mailModel.put("call", call);
+	    			mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
+	    			mailModel.put("email_comunicazione", email);
+	    			EmailMessage message = new EmailMessage();
+	    			message.setRecipients(emailList);
+	    			message.setBccRecipients(Arrays.asList(mailFromDefault));
+	    			String body = Util.processTemplate(mailModel, "/pages/application/application.iscrizione.html.ftl");
+	    			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + i18nService.getLabel("mail.subject.iscrizione", Locale.ITALIAN, numProgressivo));
+	    			message.setBody(body);
+	    			mailService.send(message);
+	    		} catch (TemplateException | IOException e) {
+	    			LOGGER.error("Cannot send email for readmission applicationId: {}", nodeRef, e);
+	    		}
+	    	} finally {
+	    		protocolRepository.putNumProtocollo(ISCRIZIONE_ELENCO, OIV, numProgressivo.longValue());
+	    	}
+    	} catch(CmisVersioningException _ex) {
+    		throw new ClientMessageException("Assegnazione progressivo in corso non è possibile procedere!");
+    	}
 		
 	}
 	
