@@ -157,6 +157,13 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     return $('<div>').append(item).html();
   });
 
+  Handlebars.registerHelper('iscrizioneElenco', function declare(numero, data) {
+    var dateFormat = "DD MMMM YYYY",
+      item = $('<label class="label label-info"></label>')
+        .append('Iscritto in Elenco il ' + CNR.Date.format(data, '-', dateFormat) + ' con progressivo n° '+ numero);
+    return $('<div>').append(item).html();
+  });
+
   Handlebars.registerHelper('esclusioneRinuncia', function esclusioneRinunciaFn(esclusioneRinuncia, statoDomanda, dataDomanda, isRdP) {
 
     var m = {
