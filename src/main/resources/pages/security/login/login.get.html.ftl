@@ -3,7 +3,8 @@
     <div class="row-fluid row-content">
       <div class="span7">
         <p>${message('label.selezione.oiv')}</p>
-        <p><strong>${message('label.selezione.altri')}</strong></p>        
+        <p><strong>${message('label.selezione.altri')}</strong></p>
+        <p><b>Per maggiori informazioni sulla procedura consultare il <a href="${url.context}/rest/content?nodeRef=33973577-2d06-4db7-ae6f-a419aa1f30e5">Manuale Utente</a>.</b></p> 
       </div>
       <div class="span4">
         <form class="form-signin" action="${url.context}/rest/security/login" method="post">
