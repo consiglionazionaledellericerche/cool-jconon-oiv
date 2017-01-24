@@ -75,12 +75,12 @@ public class ApplicationOIV {
 	@GET
 	@Path("applications-elenco.xls")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response extractionApplicationForSingleCall(@Context HttpServletRequest req, @QueryParam("q") String query) throws IOException{
+	public Response extractionApplicationForSingleCall(@Context HttpServletRequest req, @QueryParam("q") String query, @QueryParam("callId") String callId) throws IOException{
 		LOGGER.debug("Extraction application from query:" + query);
 		ResponseBuilder rb;
         Session session = cmisService.getCurrentCMISSession(req);
 		try {
-			Map<String, Object> model = applicationOIVService.extractionApplicationForElenco(session, query, cmisService.getCMISUserFromSession(req).getId());
+			Map<String, Object> model = applicationOIVService.extractionApplicationForElenco(session, query, cmisService.getCMISUserFromSession(req).getId(), callId);
 			model.put("fileName", "elenco-oiv");
 			rb = Response.ok(model);
 		} catch (Exception e) {

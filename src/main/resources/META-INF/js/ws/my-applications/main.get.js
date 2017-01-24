@@ -223,7 +223,6 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       }
 
       if (applicationStatus && applicationStatus === 'attive') {
-        baseCriteria.and(new Criteria().equals('jconon_application:stato_domanda', 'C').build());
         baseCriteria.and(new Criteria().isNotNull('jconon_application:progressivo_iscrizione_elenco').build());
       }
 
@@ -261,11 +260,12 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
         });
       });
       $('#export-elenco').off('click').on('click', function () {
-        var close = UI.progress();
+        var close = UI.progress(), data = getUrlParams(page);
+        data.callId = callId;
         $.ajax({
           url: cache.baseUrl + "/rest/application-fp/applications-elenco.xls",
           type: 'GET',
-          data:  getUrlParams(page),
+          data:  data,
           success: function (data) {
             var url = URL.template(jconon.URL.call.downloadXLS, {
               objectId: data.objectId,

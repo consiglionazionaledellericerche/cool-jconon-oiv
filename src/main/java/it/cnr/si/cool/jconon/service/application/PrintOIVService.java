@@ -10,7 +10,6 @@ import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.service.PrintService;
-import it.cnr.si.cool.jconon.service.application.ApplicationService.StatoDomanda;
 import it.cnr.si.cool.jconon.service.cache.CompetitionFolderService;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
@@ -166,13 +165,12 @@ public class PrintOIVService extends PrintService {
 		return model;
 	}
 
-	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId) throws IOException{
-		Map<String, Object> model = new HashMap<String, Object>();
+	public HSSFWorkbook getWorkbookForElenco(Session session, String query, String userId, String callId) throws IOException{
     	HSSFWorkbook wb = createHSSFWorkbook(headCSVElenco);
     	HSSFSheet sheet = wb.getSheet(SHEET_DOMANDE);
-    	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());
+    	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());    	
 		criteria.addColumn(PropertyIds.OBJECT_ID);
-		criteria.add(Restrictions.eq(JCONONPropertyIds.APPLICATION_STATO_DOMANDA.value(), StatoDomanda.CONFERMATA.getValue()));
+		criteria.add(Restrictions.inTree(callId));
 		criteria.add(Restrictions.isNotNull("jconon_application:progressivo_iscrizione_elenco"));	
 		criteria.addOrder(Order.asc("jconon_application:progressivo_iscrizione_elenco"));
 		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
@@ -182,6 +180,12 @@ public class PrintOIVService extends PrintService {
         	getRecordElencoCSV(session, application, sheet, index++);    			    		
     	}
     	autoSizeColumns(wb);
+    	return wb;
+	}
+	
+	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId, String callId) throws IOException{
+		Map<String, Object> model = new HashMap<String, Object>();
+    	HSSFWorkbook wb = getWorkbookForElenco(session, query, userId, callId);
         Document doc = createXLSDocument(session, wb, userId);
         model.put("objectId", doc.getId());
 		return model;

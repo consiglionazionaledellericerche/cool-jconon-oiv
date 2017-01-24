@@ -2,6 +2,7 @@ package it.cnr.si.cool.jconon.service.application;
 
 import freemarker.template.TemplateException;
 import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.cool.cmis.service.NodeVersionService;
 import it.cnr.cool.exception.CoolUserFactoryException;
 import it.cnr.cool.mail.MailService;
 import it.cnr.cool.mail.model.AttachmentBean;
@@ -19,10 +20,13 @@ import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
 import it.cnr.si.cool.jconon.repository.ProtocolRepository;
 import it.cnr.si.cool.jconon.service.QueueService;
+import it.cnr.si.cool.jconon.service.call.CallService;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -39,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -48,23 +53,32 @@ import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+import com.hazelcast.core.Cluster;
+
 @Component
 @Primary
 public class ApplicationOIVService extends ApplicationService{
+
+	private static final String ELENCO_OIV_XLS = "elenco-oiv.xls";
 
 	private static final String OIV = "OIV";
 
@@ -115,6 +129,12 @@ public class ApplicationOIVService extends ApplicationService{
 	private UserService userService;
     @Autowired
     private ProtocolRepository protocolRepository;
+    @Autowired
+    private Cluster cluster;
+	@Autowired
+	private CallService callService;
+	@Autowired
+	private NodeVersionService nodeVersionService;
     
 	@Value("${mail.from.default}")
 	private String mailFromDefault;
@@ -456,10 +476,58 @@ public class ApplicationOIVService extends ApplicationService{
     	}
 	}
 
-	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId) throws IOException {
-		return printService.extractionApplicationForElenco(session, query, userId);
+	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId, String callId) throws IOException {
+		return printService.extractionApplicationForElenco(session, query, userId, callId);
 	}
 
+    @Scheduled(cron="0 0 21 * * *")
+    public void estraiElencoOIV() {
+        List<String> members = cluster
+                .getMembers()
+                .stream()
+                .map(member -> member.getUuid())
+                .sorted()
+                .collect(Collectors.toList());
+
+        String uuid = cluster.getLocalMember().getUuid();
+
+        if( 0 == members.indexOf(uuid)) {
+            try {
+            	Session session = cmisService.createAdminSession();
+            	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_CALL.queryName());    	
+        		criteria.addColumn(PropertyIds.OBJECT_ID);
+        		criteria.add(Restrictions.eq(JCONONPropertyIds.CALL_CODICE.value(), "OIV"));
+        		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
+            	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
+            		Folder call = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
+                	HSSFWorkbook wb = printService.getWorkbookForElenco(cmisService.createAdminSession(), null, null, call.getId());
+
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            		wb.write(stream);			
+            		ContentStreamImpl contentStream = new ContentStreamImpl();
+            		contentStream.setMimeType("application/vnd.ms-excel");
+            		contentStream.setStream(new ByteArrayInputStream(stream.toByteArray()));
+            		String docId = callService.findAttachmentName(session, call.getId(), ELENCO_OIV_XLS);
+            		if (docId == null) {
+                		Map<String, Object> properties = new HashMap<String, Object>();
+                		properties.put(PropertyIds.NAME, ELENCO_OIV_XLS);
+                		properties.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
+                		Document createDocument = call.createDocument(properties, contentStream, VersioningState.MAJOR);
+                		nodeVersionService.addAutoVersion(createDocument, false);
+            		} else {
+            			((Document)session.getObject(docId)).setContentStream(contentStream, true);
+            		}
+            	}            	
+			} catch (Exception e) {
+	            LOGGER.error("Estrazione elenco OIV XLS failed", e);
+			}
+            LOGGER.info("{} is the chosen one for Estrazione elenco OIV XLS", uuid);
+        } else {
+            LOGGER.info("{} is NOT the chosen one for Estrazione elenco OIV XLS", uuid);
+        }
+
+    }	
+	
 	public Map<String, Object> checkApplicationOIV(Session session,
 			String userId, CMISUser cmisUserFromSession) {
 		Map<String, Object> result = new HashMap<String, Object>();
