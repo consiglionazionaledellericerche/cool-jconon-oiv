@@ -54,7 +54,7 @@
             </li>
           </#if>
             <li class="page">
-              <a id="manuale" href="${url.context}/rest/content?nodeRef=33973577-2d06-4db7-ae6f-a419aa1f30e5">Manuale Utente</a>
+              <a id="manuale" href="${url.context}/rest/content?path=/Funzione Pubblica/Manuale Elenco Nazionale.pdf">Manuale Utente</a>
             </li>
           <#if !context.user.guest>
           <li class="hide dropdown page<#if context.page.id = "manage-call" > active</#if>" id="manage-call">
