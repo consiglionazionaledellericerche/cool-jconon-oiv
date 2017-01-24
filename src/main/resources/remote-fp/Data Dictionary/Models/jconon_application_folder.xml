@@ -834,6 +834,12 @@
 					<type>d:int</type>
 					<mandatory>false</mandatory>
 				</property>
+				<property name="jconon_application:data_iscrizione_elenco">
+					<title>Data iscrizione in elenco</title>
+					<description>Data iscrizione in elenco</description>
+					<type>d:datetime</type>
+					<mandatory>false</mandatory>
+				</property>
 				<property name="jconon_application:data_ultimo_invio">
 					<title>Data ultimo invio</title>
 					<description>Data ultimo invio</description>

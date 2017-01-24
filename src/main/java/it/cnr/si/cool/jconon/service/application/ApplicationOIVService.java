@@ -76,6 +76,7 @@ public class ApplicationOIVService extends ApplicationService{
 	private static final String JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO = "jconon_application:fascia_professionale_esegui_calcolo";
 
 	private static final String JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO = "jconon_application:progressivo_iscrizione_elenco";
+	private static final String JCONON_APPLICATION_DATA_ISCRIZIONE_ELENCO = "jconon_application:data_iscrizione_elenco";
 
 	private static final String JCONON_APPLICATION_FL_INVIA_NOTIFICA_EMAIL = "jconon_application:fl_invia_notifica_email";
 
@@ -381,6 +382,7 @@ public class ApplicationOIVService extends ApplicationService{
 	    		numProgressivo++;
 	        	Map<String, Object> properties = new HashMap<String, Object>();
 	        	properties.put(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO, numProgressivo);
+	        	properties.put(JCONON_APPLICATION_DATA_ISCRIZIONE_ELENCO, Calendar.getInstance());	        	
 	        	application = (Folder) application.updateProperties(properties);    	
 	        	LOGGER.info("Assegnato progressivo {} alla domanda {}", numProgressivo, nodeRef);
 	    		CMISUser user;
@@ -477,10 +479,7 @@ public class ApplicationOIVService extends ApplicationService{
 				result.put(application.getName(), "Fascia attribuita:" + application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA) +
 						" Fascia calcolata:" + aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
 			}
-			String docId = printService.findRicevutaApplicationId(session, application);
-			if (!docId.endsWith("1.0")) {
-				result.put(application.getName(), "DocId:" + docId);				
-			}
+			Optional.ofNullable(printService.findRicevutaApplicationId(session, application)).filter(docId -> !docId.endsWith("1.0")).ifPresent(x -> result.put(application.getName(), "DocId:" + x));
     	}		
 		return result;
 	}
