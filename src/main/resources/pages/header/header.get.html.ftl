@@ -53,6 +53,9 @@
               <a id="application-oiv" href="${url.context}/applications?callCodice=OIV">${message('page.application-oiv')}</a>
             </li>
           </#if>
+            <li class="page">
+              <a id="manuale" href="${url.context}/rest/content?nodeRef=33973577-2d06-4db7-ae6f-a419aa1f30e5">Manuale Utente</a>
+            </li>
           <#if !context.user.guest>
           <li class="hide dropdown page<#if context.page.id = "manage-call" > active</#if>" id="manage-call">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">${message("link.call.create.min")} <b class="caret"></b></a>

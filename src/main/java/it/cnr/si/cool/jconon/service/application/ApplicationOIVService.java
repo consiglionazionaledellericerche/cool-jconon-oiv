@@ -18,7 +18,6 @@ import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
 import it.cnr.si.cool.jconon.repository.ProtocolRepository;
-import it.cnr.si.cool.jconon.service.PrintService;
 import it.cnr.si.cool.jconon.service.QueueService;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
@@ -107,7 +106,7 @@ public class ApplicationOIVService extends ApplicationService{
     @Autowired
     private QueueService queueService;
     @Autowired
-    private PrintService printService;
+    private PrintOIVService printService;
     @Autowired	
 	private ApplicationContext context;
 	@Autowired
@@ -455,6 +454,10 @@ public class ApplicationOIVService extends ApplicationService{
     			LOGGER.error("Cannot send email for reject applicationId: {}", nodeRef, e);
     		}    		
     	}
+	}
+
+	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId) throws IOException {
+		return printService.extractionApplicationForElenco(session, query, userId);
 	}
 
 	public Map<String, Object> checkApplicationOIV(Session session,

@@ -16,6 +16,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -70,5 +71,23 @@ public class ApplicationOIV {
 		}
 		return rb.build();
 	}
+
+	@GET
+	@Path("applications-elenco.xls")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response extractionApplicationForSingleCall(@Context HttpServletRequest req, @QueryParam("q") String query) throws IOException{
+		LOGGER.debug("Extraction application from query:" + query);
+		ResponseBuilder rb;
+        Session session = cmisService.getCurrentCMISSession(req);
+		try {
+			Map<String, Object> model = applicationOIVService.extractionApplicationForElenco(session, query, cmisService.getCMISUserFromSession(req).getId());
+			model.put("fileName", "elenco-oiv");
+			rb = Response.ok(model);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			rb = Response.status(Status.INTERNAL_SERVER_ERROR);
+		}
+		return rb.build();
+	}	
 	
 }

@@ -1,4 +1,4 @@
-define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search', 'cnr/cnr.url', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.actionbutton', 'cnr/cnr.jconon', 'handlebars', 'cnr/cnr', 'moment', 'cnr/cnr.application', 'cnr/cnr.criteria', 'cnr/cnr.ace', 'cnr/cnr.call', 'cnr/cnr.node'], function ($, header, common, BulkInfo, Search, URL, i18n, UI, ActionButton, jconon, Handlebars, CNR, moment, Application, Criteria, Ace, Call, Node) {
+define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search', 'cnr/cnr.url', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.actionbutton', 'cnr/cnr.jconon', 'handlebars', 'cnr/cnr', 'moment', 'cnr/cnr.application', 'cnr/cnr.criteria', 'cnr/cnr.ace', 'cnr/cnr.call', 'cnr/cnr.node', 'json!cache'], function ($, header, common, BulkInfo, Search, URL, i18n, UI, ActionButton, jconon, Handlebars, CNR, moment, Application, Criteria, Ace, Call, Node, cache) {
   "use strict";
 
   var search,
@@ -48,9 +48,9 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
           callId = data.items[0]['cmis:objectId'];
           $('#items caption h2').text('DOMANDE RELATIVE AL BANDO ' + callCodice);
           bulkInfo.render();
-          $('#items caption h2').after($('<div id="export-div" class="pull-right">' +
-            '<a id="export-xls" class="btn btn-primary"><i class="icon-table"></i> Esporta dati in Excel</a>' +
-            '</div> </th> <th><div id="download-div"> </div>'));
+          $('#items caption h2').after($('<div class="btn-group pull-right">').append(
+              $('<a id="export-elenco" class="btn btn-success"><i class="icon-table"></i> Esporta Elenco</a>')).append(
+              $('<a id="export-xls" class="btn btn-primary"><i class="icon-table"></i> Esporta dati in Excel</a>')));
         },
         error: function (jqXHR, textStatus, errorThrown) {
           CNR.log(jqXHR, textStatus, errorThrown);
@@ -245,6 +245,25 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       $('#export-xls').off('click').on('click', function () {
         var close = UI.progress();
         jconon.Data.call.applications_single_call({
+          type: 'GET',
+          data:  getUrlParams(page),
+          success: function (data) {
+            var url = URL.template(jconon.URL.call.downloadXLS, {
+              objectId: data.objectId,
+              fileName: data.fileName,
+              exportData: true,
+              mimeType: 'application/vnd.ms-excel;charset=UTF-8'
+            });     
+            window.location = url;
+          },
+          complete: close,
+          error: URL.errorFn
+        });
+      });
+      $('#export-elenco').off('click').on('click', function () {
+        var close = UI.progress();
+        $.ajax({
+          url: cache.baseUrl + "/rest/application-fp/applications-elenco.xls",
           type: 'GET',
           data:  getUrlParams(page),
           success: function (data) {

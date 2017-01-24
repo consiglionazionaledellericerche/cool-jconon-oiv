@@ -159,7 +159,7 @@
 					</index>
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_stato_estero">
-					<title>Nazione</title>
+					<title>Stato</title>
 					<description>i]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>

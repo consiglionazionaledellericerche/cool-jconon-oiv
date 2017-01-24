@@ -7,11 +7,14 @@ import it.cnr.cool.security.service.UserService;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.util.Pair;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
+import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.service.PrintService;
+import it.cnr.si.cool.jconon.service.application.ApplicationService.StatoDomanda;
 import it.cnr.si.cool.jconon.service.cache.CompetitionFolderService;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
+import it.spasia.opencmis.criteria.Order;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
 import java.io.ByteArrayInputStream;
@@ -63,7 +66,7 @@ public class PrintOIVService extends PrintService {
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"), 
 			dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");	
 	private List<String> headCSVApplication = Arrays.asList(
-			"Id","Cognome","Nome","Data di nascita","Sesso","Nazione di nascita",
+			"Id","Data Iscrizione in Elenco", "Cognome","Nome","Data di nascita","Sesso","Nazione di nascita",
 			"Luogo di nascita","Prov. di nascita","Nazione di Residenza","Provincia di Residenza",
 			"Comune di Residenza","Indirizzo di Residenza","CAP di Residenza","Codice Fiscale",
 			"Email","Email PEC","Nazione Reperibilita'","Provincia di Reperibilita'",
@@ -79,7 +82,10 @@ public class PrintOIVService extends PrintService {
 			"Data inizio(Tipologia esperienza)",
 			"Data fine(Tipologia esperienza)"
 			);
-    private static final String SHEET_DOMANDE = "domande";
+	private List<String> headCSVElenco = Arrays.asList(
+			"Id","Nome", "Cognome","Data iscrizione");
+
+	private static final String SHEET_DOMANDE = "domande";
 	
 	@Autowired
 	private CMISService cmisService;
@@ -159,7 +165,39 @@ public class PrintOIVService extends PrintService {
         model.put("nameBando", competitionService.getCallName(callObject));        
 		return model;
 	}
+
+	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId) throws IOException{
+		Map<String, Object> model = new HashMap<String, Object>();
+    	HSSFWorkbook wb = createHSSFWorkbook(headCSVElenco);
+    	HSSFSheet sheet = wb.getSheet(SHEET_DOMANDE);
+    	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());
+		criteria.addColumn(PropertyIds.OBJECT_ID);
+		criteria.add(Restrictions.eq(JCONONPropertyIds.APPLICATION_STATO_DOMANDA.value(), StatoDomanda.CONFERMATA.getValue()));
+		criteria.add(Restrictions.isNotNull("jconon_application:progressivo_iscrizione_elenco"));	
+		criteria.addOrder(Order.asc("jconon_application:progressivo_iscrizione_elenco"));
+		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
+		int index = 1;
+    	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
+    		Folder application = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
+        	getRecordElencoCSV(session, application, sheet, index++);    			    		
+    	}
+    	autoSizeColumns(wb);
+        Document doc = createXLSDocument(session, wb, userId);
+        model.put("objectId", doc.getId());
+		return model;
+	}
 	
+	private void getRecordElencoCSV(Session session, Folder application, HSSFSheet sheet, int index) {
+    	int column = 0;
+    	HSSFRow row = sheet.createRow(index);
+    	row.createCell(column++).setCellValue(Optional.ofNullable(application.getPropertyValue("jconon_application:progressivo_iscrizione_elenco")).
+    			map(numero -> String.valueOf(numero)).orElse(""));
+    	row.createCell(column++).setCellValue(application.<String>getPropertyValue("jconon_application:nome").toUpperCase());    	
+    	row.createCell(column++).setCellValue(application.<String>getPropertyValue("jconon_application:cognome").toUpperCase());
+    	row.createCell(column++).setCellValue(Optional.ofNullable(application.getPropertyValue("jconon_application:data_iscrizione_elenco")).map(map -> 
+			dateFormat.format(((Calendar)application.getPropertyValue("jconon_application:data_iscrizione_elenco")).getTime())).orElse(""));
+	}
+
 	public String archiviaRicevutaReportModel(Session cmisSession, Folder application,Map<String, Object> properties,
 			InputStream is, String nameRicevutaReportModel, boolean confermata) throws CMISApplicationException {
 		try {
@@ -211,6 +249,8 @@ public class PrintOIVService extends PrintService {
     	HSSFRow row = sheet.createRow(index);
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:progressivo_iscrizione_elenco")).
     			map(numero -> String.valueOf(numero)).orElse(""));
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:data_iscrizione_elenco")).map(map -> 
+			dateFormat.format(((Calendar)applicationObject.getPropertyValue("jconon_application:data_iscrizione_elenco")).getTime())).orElse(""));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cognome").toUpperCase());
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nome").toUpperCase());    	
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:data_nascita").getValue()).map(
