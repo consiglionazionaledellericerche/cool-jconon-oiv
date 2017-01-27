@@ -482,7 +482,7 @@ public class ApplicationOIVService extends ApplicationService{
 		return printService.extractionApplicationForElenco(session, query, userId, callId);
 	}
 
-    @Scheduled(cron="0 05 16 * * *")
+    @Scheduled(cron="0 0 21 * * *")
     public void estraiElencoOIV() {
         List<String> members = cluster
                 .getMembers()
@@ -504,21 +504,21 @@ public class ApplicationOIVService extends ApplicationService{
             		Folder call = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
                 	HSSFWorkbook wb = printService.getWorkbookForElenco(cmisService.createAdminSession(), null, null, call.getId());
 
-//                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//            		wb.write(stream);			
-//            		ContentStreamImpl contentStream = new ContentStreamImpl();
-//            		contentStream.setMimeType("application/vnd.ms-excel");
-//            		contentStream.setStream(new ByteArrayInputStream(stream.toByteArray()));
-//            		String docId = callService.findAttachmentName(session, call.getId(), ELENCO_OIV_XLS);
-//            		if (docId == null) {
-//                		Map<String, Object> properties = new HashMap<String, Object>();
-//                		properties.put(PropertyIds.NAME, ELENCO_OIV_XLS);
-//                		properties.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
-//                		Document createDocument = call.createDocument(properties, contentStream, VersioningState.MAJOR);
-//                		nodeVersionService.addAutoVersion(createDocument, false);
-//            		} else {
-//            			((Document)session.getObject(docId)).setContentStream(contentStream, true);
-//            		}
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            		wb.write(stream);			
+            		ContentStreamImpl contentStream = new ContentStreamImpl();
+            		contentStream.setMimeType("application/vnd.ms-excel");
+            		contentStream.setStream(new ByteArrayInputStream(stream.toByteArray()));
+            		String docId = callService.findAttachmentName(session, call.getId(), ELENCO_OIV_XLS);
+            		if (docId == null) {
+                		Map<String, Object> properties = new HashMap<String, Object>();
+                		properties.put(PropertyIds.NAME, ELENCO_OIV_XLS);
+                		properties.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
+                		Document createDocument = call.createDocument(properties, contentStream, VersioningState.MAJOR);
+                		nodeVersionService.addAutoVersion(createDocument, false);
+            		} else {
+            			((Document)session.getObject(docId)).setContentStream(contentStream, true);
+            		}
             		int numberOfRows = wb.getSheet(PrintOIVService.SHEET_DOMANDE).getLastRowNum();
             		ContentStreamImpl contentStreamCount = new ContentStreamImpl();
             		contentStreamCount.setMimeType("application/json");            		
