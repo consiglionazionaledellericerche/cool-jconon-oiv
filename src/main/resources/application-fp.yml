@@ -1,4 +1,4 @@
-repository.base.url: http://alfresco-community.test.si.cnr.it/alfresco
+repository.base.url: http://alfresco-community.test.si.cnr.it/alfresco/
 user.admin.password: admin
 rrd.path: remote-shared,remote-fp
 server.context-path: /
