@@ -84,7 +84,7 @@ public class PrintOIVService extends PrintService {
 	private List<String> headCSVElenco = Arrays.asList(
 			"Id","Nome", "Cognome","Data iscrizione");
 
-	private static final String SHEET_DOMANDE = "domande";
+	public static final String SHEET_DOMANDE = "domande";
 	
 	@Autowired
 	private CMISService cmisService;
