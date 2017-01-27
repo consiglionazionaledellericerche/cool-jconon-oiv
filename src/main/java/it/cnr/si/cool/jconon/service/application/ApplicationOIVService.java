@@ -72,6 +72,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.Cluster;
 
 @Component
@@ -79,6 +80,7 @@ import com.hazelcast.core.Cluster;
 public class ApplicationOIVService extends ApplicationService{
 
 	private static final String ELENCO_OIV_XLS = "elenco-oiv.xls";
+	private static final String NUMERO_OIV_JSON = "elenco-oiv.json";
 
 	private static final String OIV = "OIV";
 
@@ -480,7 +482,7 @@ public class ApplicationOIVService extends ApplicationService{
 		return printService.extractionApplicationForElenco(session, query, userId, callId);
 	}
 
-    @Scheduled(cron="0 0 21 * * *")
+    @Scheduled(cron="0 05 16 * * *")
     public void estraiElencoOIV() {
         List<String> members = cluster
                 .getMembers()
@@ -502,20 +504,34 @@ public class ApplicationOIVService extends ApplicationService{
             		Folder call = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
                 	HSSFWorkbook wb = printService.getWorkbookForElenco(cmisService.createAdminSession(), null, null, call.getId());
 
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            		wb.write(stream);			
-            		ContentStreamImpl contentStream = new ContentStreamImpl();
-            		contentStream.setMimeType("application/vnd.ms-excel");
-            		contentStream.setStream(new ByteArrayInputStream(stream.toByteArray()));
-            		String docId = callService.findAttachmentName(session, call.getId(), ELENCO_OIV_XLS);
-            		if (docId == null) {
+//                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//            		wb.write(stream);			
+//            		ContentStreamImpl contentStream = new ContentStreamImpl();
+//            		contentStream.setMimeType("application/vnd.ms-excel");
+//            		contentStream.setStream(new ByteArrayInputStream(stream.toByteArray()));
+//            		String docId = callService.findAttachmentName(session, call.getId(), ELENCO_OIV_XLS);
+//            		if (docId == null) {
+//                		Map<String, Object> properties = new HashMap<String, Object>();
+//                		properties.put(PropertyIds.NAME, ELENCO_OIV_XLS);
+//                		properties.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
+//                		Document createDocument = call.createDocument(properties, contentStream, VersioningState.MAJOR);
+//                		nodeVersionService.addAutoVersion(createDocument, false);
+//            		} else {
+//            			((Document)session.getObject(docId)).setContentStream(contentStream, true);
+//            		}
+            		int numberOfRows = wb.getSheet(PrintOIVService.SHEET_DOMANDE).getLastRowNum();
+            		ContentStreamImpl contentStreamCount = new ContentStreamImpl();
+            		contentStreamCount.setMimeType("application/json");            		
+            		contentStreamCount.setStream(new ByteArrayInputStream(new ObjectMapper().writeValueAsBytes(Collections.singletonMap("totalNumItems", numberOfRows))));
+            		String docIdConta = callService.findAttachmentName(session, call.getId(), NUMERO_OIV_JSON);
+            		if (docIdConta == null) {
                 		Map<String, Object> properties = new HashMap<String, Object>();
-                		properties.put(PropertyIds.NAME, ELENCO_OIV_XLS);
+                		properties.put(PropertyIds.NAME, NUMERO_OIV_JSON);
                 		properties.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
-                		Document createDocument = call.createDocument(properties, contentStream, VersioningState.MAJOR);
+                		Document createDocument = call.createDocument(properties, contentStreamCount, VersioningState.MAJOR);
                 		nodeVersionService.addAutoVersion(createDocument, false);
             		} else {
-            			((Document)session.getObject(docId)).setContentStream(contentStream, true);
+            			((Document)session.getObject(docIdConta)).setContentStream(contentStreamCount, true);
             		}
             	}            	
 			} catch (Exception e) {
