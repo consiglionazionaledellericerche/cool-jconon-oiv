@@ -1,4 +1,4 @@
-define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search', 'cnr/cnr.url', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.actionbutton', 'cnr/cnr.jconon', 'handlebars', 'cnr/cnr', 'moment', 'cnr/cnr.application', 'cnr/cnr.criteria', 'cnr/cnr.ace', 'cnr/cnr.call', 'cnr/cnr.node', 'json!cache'], function ($, header, common, BulkInfo, Search, URL, i18n, UI, ActionButton, jconon, Handlebars, CNR, moment, Application, Criteria, Ace, Call, Node, cache) {
+define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search', 'cnr/cnr.url', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.actionbutton', 'cnr/cnr.jconon', 'handlebars', 'cnr/cnr', 'moment', 'cnr/cnr.application', 'cnr/cnr.criteria', 'cnr/cnr.ace', 'cnr/cnr.call', 'cnr/cnr.node', 'json!cache', 'fp/fp.application'], function ($, header, common, BulkInfo, Search, URL, i18n, UI, ActionButton, jconon, Handlebars, CNR, moment, Application, Criteria, Ace, Call, Node, cache, ApplicationFp) {
   "use strict";
 
   var search,
@@ -18,9 +18,9 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     callCodice = URL.querystring.from['callCodice'];
 
 
-  function displayAttachments(nodeRef, type, displayFn, i18nModal) {
+  function displayAttachments(el, type, displayFn, i18nModal) {
     var content = $('<div></div>').addClass('modal-inner-fix');
-    jconon.findAllegati(nodeRef, content, type, true, displayFn);
+    jconon.findAllegati(el.id, content, type, true, displayFn, true, el);
     UI.modal(i18n[i18nModal || 'actions.attachments'], content, undefined, undefined, true);
   }
 
@@ -235,7 +235,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
         if (common.profile === 'prod') {
           criteria.inTree(callId);
         } else {
-          criteria.inFolder(callId);          
+          criteria.inFolder(callId);
         }
         if (user) {
           criteria.and(new Criteria().equals('jconon_application:user', user).build());
@@ -365,31 +365,31 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
 
             if (callData['jconon_call:elenco_sezioni_domanda'].indexOf('affix_tabTitoli') >= 0) {
               customButtons.attachments = function () {
-                displayAttachments(el.id, 'jconon_attachment:generic_document', Application.displayTitoli);
+                displayAttachments(el, 'jconon_attachment:generic_document', Application.displayTitoli);
               };
             }
             if (callData['jconon_call:elenco_sezioni_domanda'].indexOf('affix_tabCurriculum') >= 0) {
               customButtons.curriculum = function () {
                 //Curriculum
-                displayAttachments(el.id, 'jconon_attachment:cv_element', Application.displayCurriculum, 'actions.curriculum');
+                displayAttachments(el, 'jconon_attachment:cv_element', Application.displayCurriculum, 'actions.curriculum');
               };
             }
             if (callData['jconon_call:elenco_sezioni_domanda'].indexOf('affix_tabSchedaAnonima') >= 0) {
               customButtons.schedaAnonima = function () {
                 //Scheda Anonima
-                displayAttachments(el.id, 'jconon_scheda_anonima:document', Application.displaySchedaAnonima, 'actions.schedaAnonima');
+                displayAttachments(el, 'jconon_scheda_anonima:document', ApplicationFp.displayEsperienzeOIV, 'actions.schedaAnonima');
               };
             }
             if (callData['jconon_call:elenco_sezioni_domanda'].indexOf('affix_tabElencoProdotti') >= 0) {
               customButtons.productList = function () {
                 //Elenco Prodotti
-                displayAttachments(el.id, 'cvpeople:noSelectedProduct', Application.displayProdotti, 'actions.productList');
+                displayAttachments(el, 'cvpeople:noSelectedProduct', Application.displayProdotti, 'actions.productList');
               };
             }
             if (callData['jconon_call:elenco_sezioni_domanda'].indexOf('affix_tabProdottiScelti') >= 0) {
               customButtons.productSelected = function () {
                 //Prodotti Scelti
-                displayAttachments(el.id, 'cvpeople:selectedProduct', Application.displayProdottiScelti, 'actions.productSelected');
+                displayAttachments(el, 'cvpeople:selectedProduct', Application.displayProdottiScelti, 'actions.productSelected');
               };
             }
             //  Modifica
@@ -471,11 +471,19 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
 
               if (bandoInCorso) {
                 if (common.User.isAdmin || common.User.id === el['jconon_application:user']) {
-                  customButtons.reopen = function () {
-                    Application.reopen(el, function () {
-                      window.location = jconon.URL.application.manage + '?callId=' + el.relationships.parent[0]['cmis:objectId'] + '&applicationId=' + el['cmis:objectId'];
-                    });
-                  };
+                  if (el.allowableActions.indexOf('CAN_CREATE_DOCUMENT') !== -1) {
+                    customButtons.reopen = false;
+                    customButtons.modificaProfilo = function () {
+                      window.location = jconon.URL.application.manage + '?callId=' + el.relationships.parent[0]['cmis:objectId'] + '&applicationId=' + el['cmis:objectId'];                      
+                    };
+                  } else {
+                    customButtons.reopen = function () {
+                      Application.reopen(el, function () {
+                        window.location = jconon.URL.application.manage + '?callId=' + el.relationships.parent[0]['cmis:objectId'] + '&applicationId=' + el['cmis:objectId'];
+                      });
+                    };
+                    customButtons.modificaProfilo = false;
+                  }
                 }
                 if (common.User.isAdmin || Call.isRdP(callData['jconon_call:rdp'])) {
                   if (el['jconon_application:esclusione_rinuncia'] !== 'E' && el['jconon_application:progressivo_iscrizione_elenco'] == '') {
@@ -721,6 +729,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                 productList: 'icon-list',
                 productSelected: 'icon-list-ol',
                 reopen: 'icon-share',
+                modificaProfilo : 'icon-share',
                 duplicate: 'icon-copy',
                 scheda_valutazione: 'icon-table',
                 operations: 'icon-list',

@@ -1,6 +1,8 @@
 package it.cnr.si.cool.jconon.service.application;
 
 import freemarker.template.TemplateException;
+import it.cnr.cool.cmis.model.CoolPropertyIds;
+import it.cnr.cool.cmis.service.ACLService;
 import it.cnr.cool.cmis.service.CMISService;
 import it.cnr.cool.cmis.service.NodeVersionService;
 import it.cnr.cool.exception.CoolUserFactoryException;
@@ -8,7 +10,9 @@ import it.cnr.cool.mail.MailService;
 import it.cnr.cool.mail.model.AttachmentBean;
 import it.cnr.cool.mail.model.EmailMessage;
 import it.cnr.cool.rest.util.Util;
+import it.cnr.cool.security.service.GroupService;
 import it.cnr.cool.security.service.UserService;
+import it.cnr.cool.security.service.impl.alfresco.CMISAuthority;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.service.I18nService;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
@@ -47,12 +51,14 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.enums.Action;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
@@ -79,6 +85,7 @@ import com.hazelcast.core.Cluster;
 @Primary
 public class ApplicationOIVService extends ApplicationService{
 
+	public static final String P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE = "P:jconon_scheda_anonima:esperienza_non_coerente";
 	private static final String ELENCO_OIV_XLS = "elenco-oiv.xls";
 	private static final String NUMERO_OIV_JSON = "elenco-oiv.json";
 
@@ -137,9 +144,16 @@ public class ApplicationOIVService extends ApplicationService{
 	private CallService callService;
 	@Autowired
 	private NodeVersionService nodeVersionService;
+	@Autowired
+	private ACLService aclService;	
+	@Autowired	
+	private GroupService groupService;
     
 	@Value("${mail.from.default}")
 	private String mailFromDefault;
+	
+	@Value("${user.admin.username}")
+	private String adminUserName;
 	
 	@Override
 	public Folder save(Session currentCMISSession,
@@ -175,6 +189,8 @@ public class ApplicationOIVService extends ApplicationService{
 		List<Interval> esperienzePeriod =  esperienzePeriod(getQueryResultEsperienza(adminSession, application));
 		ItemIterable<QueryResult> queryResultsOiv = getQueryResultsOiv(adminSession, application);
 		for (QueryResult oiv : queryResultsOiv) {
+			if (oiv.getPropertyMultivalueById(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).stream().anyMatch(x -> x.equals(P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE)))
+				continue;			
 			Calendar da = oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_DA),
 				a = oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_A);
 			if (oiv.getPropertyValueById(JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI).equals(INF250)) {
@@ -191,6 +207,8 @@ public class ApplicationOIVService extends ApplicationService{
 	private List<Interval> esperienzePeriod(ItemIterable<QueryResult> queryResultEsperienza) {
 		List<Interval> esperienzePeriod = new ArrayList<>();
 		for (QueryResult esperienza : queryResultEsperienza) {
+			if (esperienza.getPropertyMultivalueById(PropertyIds.SECONDARY_OBJECT_TYPE_IDS).stream().anyMatch(x -> x.equals(P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE)))
+				continue;
 			Calendar da = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DA),
 				a = esperienza.getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A);
 			esperienzePeriod.add(new Interval(da, a));
@@ -481,7 +499,48 @@ public class ApplicationOIVService extends ApplicationService{
 	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId, String callId) throws IOException {
 		return printService.extractionApplicationForElenco(session, query, userId, callId);
 	}
+    @Scheduled(cron="0 0 22 * * *")
+    public void estraiExcelOIV() {
+        List<String> members = cluster
+                .getMembers()
+                .stream()
+                .map(member -> member.getUuid())
+                .sorted()
+                .collect(Collectors.toList());
 
+        String uuid = cluster.getLocalMember().getUuid();
+        if( 0 == members.indexOf(uuid)) {
+        	Session session = cmisService.createAdminSession();
+        	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_CALL.queryName());    	
+    		criteria.addColumn(PropertyIds.OBJECT_ID);
+    		criteria.add(Restrictions.eq(JCONONPropertyIds.CALL_CODICE.value(), "OIV"));
+    		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
+        	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
+        		try {
+            		Folder call = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));        		
+            		List<String> emailList = groupService.children(call.getPropertyValue(JCONONPropertyIds.CALL_RDP.value()), cmisService.getAdminSession())
+            				.stream()
+            				.filter(x -> !x.getShortName().equals("app.performance"))
+            				.map(CMISAuthority::getShortName)
+            				.collect(Collectors.toList())
+            				.stream()
+            				.map(user -> userService.loadUserForConfirm(user).getEmail())
+            				.collect(Collectors.toList());        		
+            		HSSFWorkbook wb = printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder where IN_FOLDER('" + call.getId() +"')" , true);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            		wb.write(stream);			        		
+        			EmailMessage message = new EmailMessage();
+        			message.setRecipients(emailList);
+        			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + "Estrazione domande");
+        			message.setBody("In allegato l'estrazione delle domande");
+        			message.setAttachments(Arrays.asList(new AttachmentBean("DOMANDE_OIV.xls", stream.toByteArray())));
+        			mailService.send(message);        			
+        		}catch (IOException e) {
+        			LOGGER.error("Cannot estraiExcelOIV", e);
+        		}    	
+        	}        	        	
+        }
+    }
     @Scheduled(cron="0 0 21 * * *")
     public void estraiElencoOIV() {
         List<String> members = cluster
@@ -569,5 +628,29 @@ public class ApplicationOIVService extends ApplicationService{
 			Optional.ofNullable(printService.findRicevutaApplicationId(session, application)).filter(docId -> !docId.endsWith("1.0")).ifPresent(x -> result.put(application.getName(), "DocId:" + x));
     	}		
 		return result;
+	}
+
+	public void esperienzaNonCoerente(String userId, String objectId, String callId, String aspect, String motivazione) {
+		Session session = cmisService.createAdminSession();
+		Folder call = loadCallById(session, callId);
+		try {
+			CMISUser user = userService.loadUserForConfirm(userId);
+			if (!(user.isAdmin() || callService.isMemeberOfRDPGroup(user, call)))
+				throw new ClientMessageException("Only Admin or RdP");
+		} catch (CoolUserFactoryException e) {
+			throw new ClientMessageException("User not found " + userId, e);
+		}		
+		CmisObject object = session.getObject(objectId);		
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("jconon_attachment:esperienza_non_coerente_motivazione", motivazione);
+		object.updateProperties(properties, Collections.singletonList(aspect), Collections.emptyList());
+		aclService.changeOwnership(cmisService.getAdminSession(), object.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), 
+				adminUserName, false, Collections.emptyList());
+	}
+	
+	@Override
+	protected boolean isDomandaInviata(Folder application, CMISUser loginUser) {		
+		return super.isDomandaInviata(application, loginUser) && 
+				!application.getAllowableActions().getAllowableActions().stream().anyMatch(x -> x.equals(Action.CAN_CREATE_DOCUMENT));
 	}
 }
