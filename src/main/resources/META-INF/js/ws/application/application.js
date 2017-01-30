@@ -1,7 +1,7 @@
 /*global params*/
 define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url',
-  'cnr/cnr.application', 'cnr/cnr.attachments', 'json!cache', 'cnr/cnr.call', 'cnr/cnr', 'cnr/cnr.ui.wysiwyg', 'cnr/cnr.ui.country',
-  'cnr/cnr.ui.city'], function ($, header, i18n, UI, BulkInfo, common, jconon, URL, Application, Attachments, cache, Call, CNR) {
+  'cnr/cnr.application', 'cnr/cnr.attachments', 'json!cache', 'cnr/cnr.call', 'cnr/cnr', 'fp/fp.application', 'cnr/cnr.ui.wysiwyg', 'cnr/cnr.ui.country',
+  'cnr/cnr.ui.city'], function ($, header, i18n, UI, BulkInfo, common, jconon, URL, Application, Attachments, cache, Call, CNR, ApplicationFp) {
   "use strict";
 
   var content = $('#field'), bulkinfo, forms = [], aspects = [],
@@ -244,7 +244,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
       cmisObjectId: cmisObjectId,
       search: {
         type: 'jconon_scheda_anonima:document',
-        displayRow: Application.displayCurriculum,
+        displayRow: ApplicationFp.displayEsperienzeOIV,
         displayAfter: function (documents, refreshFn, resultSet, isFilter) {
           if (!isFilter) {
             affix.find('sub.total').remove();
@@ -564,7 +564,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     });
     /*jslint unparam: false*/
     metadata = $.extend({}, call, application);
-    saved = metadata['jconon_application:stato_domanda'] === 'P';
+    saved = metadata['jconon_application:stato_domanda'] !== 'I';
     bulkInfoRender(call);
   }
 
@@ -698,7 +698,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     });
   });
   $('#print').click(function () {
-    Application.print(cmisObjectId, metadata['jconon_application:stato_domanda'], true);
+    Application.print(cmisObjectId, metadata.allowableActions.indexOf('CAN_CREATE_DOCUMENT') !== -1 ? 'P' : metadata['jconon_application:stato_domanda'], true);
   });
   $('#delete').click(function () {
     Application.remove(cmisObjectId, function () {

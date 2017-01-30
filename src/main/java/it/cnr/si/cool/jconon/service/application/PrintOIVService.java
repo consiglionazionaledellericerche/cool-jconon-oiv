@@ -79,7 +79,8 @@ public class PrintOIVService extends PrintService {
 			"Attività svolta nell’area di specializzazione indicata",
 			"Ruolo",
 			"Data inizio(Tipologia esperienza)",
-			"Data fine(Tipologia esperienza)"
+			"Data fine(Tipologia esperienza)",
+			"Non coerente", "Motivazione"
 			);
 	private List<String> headCSVElenco = Arrays.asList(
 			"Id","Nome", "Cognome","Data iscrizione");
@@ -126,21 +127,15 @@ public class PrintOIVService extends PrintService {
 				".pdf";
 	}
 	
-	@Override
-	public Map<String, Object> extractionApplicationForSingleCall(
-			Session session, String query, String contexURL, String userId)
-			throws IOException {
-    	Map<String, Object> model = new HashMap<String, Object>();
+	public HSSFWorkbook generateXLS(Session session, String query, boolean detail) {
     	HSSFWorkbook wb = createHSSFWorkbook(headCSVApplication);
     	HSSFSheet sheet = wb.getSheet(SHEET_DOMANDE);
     	int index = 1;
-        Folder callObject = null;
         ItemIterable<QueryResult> applications = session.query(query, false);
         List<Folder> applicationList = new ArrayList<Folder>();
         for (QueryResult application : applications.getPage(Integer.MAX_VALUE)) {
         	Folder applicationObject = (Folder) session.getObject(String.valueOf(application.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
         	applicationList.add(applicationObject);
-        	callObject = (Folder) session.getObject(applicationObject.getParentId());
 		}
         
         Stream<Folder> sorted = applicationList.stream().sorted((app1, app2) -> 
@@ -150,18 +145,32 @@ public class PrintOIVService extends PrintService {
         for (Folder applicationObject : sorted.collect(Collectors.toList())) {
         	CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue("jconon_application:user"));
         	applicationNumber++;
-        	Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_DOCUMENT);
-    		criteriaOIV.add(Restrictions.inFolder(applicationObject.getId()));
-    		ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(session, false, session.getDefaultContext());
-    		for (QueryResult oiv : iterableOIV.getPage(Integer.MAX_VALUE)) {
-            	Document oivObject = (Document) session.getObject(String.valueOf(oiv.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));            	
-            	getRecordCSV(session, callObject, applicationObject, oivObject, applicationNumber, user, contexURL, sheet, index++);    			
-    		}			
+        	if (detail) {
+            	Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_DOCUMENT);
+        		criteriaOIV.add(Restrictions.inFolder(applicationObject.getId()));
+        		ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(session, false, session.getDefaultContext());
+        		for (QueryResult oiv : iterableOIV.getPage(Integer.MAX_VALUE)) {
+                	Document oivObject = (Document) session.getObject(String.valueOf(oiv.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));            	
+                	getRecordCSV(session, applicationObject, oivObject, applicationNumber, user, sheet, index++);    			
+        		}
+        	} else {
+            	getRecordCSV(session, applicationObject, null, applicationNumber, user, sheet, index++);
+        	}
+        	
 		}
         autoSizeColumns(wb);
+        return wb;
+	}
+	
+	@Override
+	public Map<String, Object> extractionApplicationForSingleCall(
+			Session session, String query, String contexURL, String userId)
+			throws IOException {
+    	Map<String, Object> model = new HashMap<String, Object>();
+    	HSSFWorkbook wb = generateXLS(session, query, false);
         Document doc = createXLSDocument(session, wb, userId);
         model.put("objectId", doc.getId());
-        model.put("nameBando", competitionService.getCallName(callObject));        
+        model.put("nameBando", "OIV");        
 		return model;
 	}
 
@@ -170,7 +179,7 @@ public class PrintOIVService extends PrintService {
     	HSSFSheet sheet = wb.getSheet(SHEET_DOMANDE);
     	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());    	
 		criteria.addColumn(PropertyIds.OBJECT_ID);
-		criteria.add(Restrictions.inTree(callId));
+		criteria.add(Restrictions.inFolder(callId));
 		criteria.add(Restrictions.isNotNull("jconon_application:progressivo_iscrizione_elenco"));	
 		criteria.addOrder(Order.asc("jconon_application:progressivo_iscrizione_elenco"));
 		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
@@ -214,6 +223,7 @@ public class PrintOIVService extends PrintService {
 				try{
 					Document doc = (Document) cmisSession.getObject(docId);
 					if (confermata) {
+						doc.updateProperties(properties, true);
 						doc.setContentStream(contentStream, true, true);
 						doc = doc.getObjectOfLatestVersion(false);
 						LOGGER.info("Start checkin application:{} with name {}", doc.getId(), nameRicevutaReportModel);
@@ -241,14 +251,18 @@ public class PrintOIVService extends PrintService {
 		}
 	}
 
+	@Override
+	protected boolean isConfirmed(Folder application) {
+		return false;
+	}
+	
 	private String createApplicationDocument(Folder application, ContentStream contentStream, Map<String, Object> properties){
 		Document doc = application.createDocument(properties, contentStream, VersioningState.MINOR);
 		nodeVersionService.addAutoVersion(doc, false);
 		return doc.getId();
 	}	
 
-
-    private void getRecordCSV(Session session, Folder callObject, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, String contexURL, HSSFSheet sheet, int index) {
+    private void getRecordCSV(Session session, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, HSSFSheet sheet, int index) {
     	int column = 0;
     	HSSFRow row = sheet.createRow(index);
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:progressivo_iscrizione_elenco")).
@@ -289,24 +303,27 @@ public class PrintOIVService extends PrintService {
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:istituto_laurea"));
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita")).orElse("")); 
     	row.createCell(column++).setCellValue(ApplicationService.StatoDomanda.fromValue(applicationObject.getPropertyValue("jconon_application:stato_domanda")).displayValue());
-    	
-    	row.createCell(column++).setCellValue(oivObject.getType().getDisplayName());
-    	if (oivObject.getType().getId().equalsIgnoreCase("D:jconon_scheda_anonima:precedente_incarico_oiv")) {
-    		row.createCell(column++).setCellValue("");
-    		row.createCell(column++).setCellValue("");    		
-    		row.createCell(column++).setCellValue(oivObject.<String>getPropertyValue("jconon_attachment:precedente_incarico_oiv_ruolo"));
-        	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_da")).map(map -> 
-    			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_da")).getTime())).orElse(""));
-        	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_a")).map(map -> 
-    			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_a")).getTime())).orElse(""));    		
-    	} else if (oivObject.getType().getId().equalsIgnoreCase("D:jconon_scheda_anonima:esperienza_professionale")) {
-    		row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_professionale_area_specializzazione")).orElse(""));
-    		row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_professionale_attivita_svolta")).orElse(""));    		
-    		row.createCell(column++).setCellValue(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_professionale_ruolo"));
-    		row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_da")).map(map -> 
-    			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_da")).getTime())).orElse(""));
-        	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_a")).map(map -> 
-    			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_a")).getTime())).orElse(""));    		    		
+    	if (oivObject != null) {
+        	row.createCell(column++).setCellValue(oivObject.getType().getDisplayName());
+        	if (oivObject.getType().getId().equalsIgnoreCase("D:jconon_scheda_anonima:precedente_incarico_oiv")) {
+        		row.createCell(column++).setCellValue("");
+        		row.createCell(column++).setCellValue("");    		
+        		row.createCell(column++).setCellValue(oivObject.<String>getPropertyValue("jconon_attachment:precedente_incarico_oiv_ruolo"));
+            	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_da")).map(map -> 
+        			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_da")).getTime())).orElse(""));
+            	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_a")).map(map -> 
+        			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:precedente_incarico_oiv_a")).getTime())).orElse(""));    		
+        	} else if (oivObject.getType().getId().equalsIgnoreCase("D:jconon_scheda_anonima:esperienza_professionale")) {
+        		row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_professionale_area_specializzazione")).orElse(""));
+        		row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_professionale_attivita_svolta")).orElse(""));    		
+        		row.createCell(column++).setCellValue(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_professionale_ruolo"));
+        		row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_da")).map(map -> 
+        			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_da")).getTime())).orElse(""));
+            	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_a")).map(map -> 
+        			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_a")).getTime())).orElse(""));    		    		
+        	}
+        	row.createCell(column++).setCellValue(oivObject.getSecondaryTypes().stream().anyMatch(x -> x.getId().equals(ApplicationOIVService.P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE)));
+        	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_non_coerente_motivazione")).orElse(""));         		
     	}
-    }
+   }
 }

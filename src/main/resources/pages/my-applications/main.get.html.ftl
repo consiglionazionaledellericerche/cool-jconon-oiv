@@ -30,7 +30,7 @@
       </#if>
       <div class="list-main-call <#if args.callCodice?? || args['cmis:objectId']??>span9<#else>span12</#if> table-responsive">
         <table class="table table-striped" id="items">
-          <caption><h2 class="jumbotron header well">Le mie domande</h2></caption>
+          <caption><h2 class="jumbotron header well">Il mio profilo</h2></caption>
         </table>
         <div id="itemsPagination" class="pagination pagination-centered">
           <ul></ul>

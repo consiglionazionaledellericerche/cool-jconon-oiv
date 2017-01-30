@@ -2,6 +2,7 @@ package it.cnr.si.cool.jconon.rest;
 
 import freemarker.template.TemplateException;
 import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.cool.cmis.service.NodeMetadataService;
 import it.cnr.cool.security.SecurityChecked;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
@@ -19,11 +20,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,8 @@ public class ApplicationOIV {
 	private ApplicationOIVService applicationOIVService;
 	@Autowired
 	private CMISService cmisService;
+	@Autowired
+	private NodeMetadataService nodeMetadataService;
 
 	@POST
 	@Path("send-application")
@@ -89,5 +94,25 @@ public class ApplicationOIV {
 		}
 		return rb.build();
 	}	
+
+	@POST
+	@Path("esperienza-noncoerente")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response esperienzaNonCoerente(@Context HttpServletRequest req, MultivaluedMap<String, String> formParams) throws IOException{
+		ResponseBuilder rb;
+		try {
+			String userId = cmisService.getCMISUserFromSession(req).getId();
+			String objectId = formParams.getFirst(PropertyIds.OBJECT_ID),
+				callId = formParams.getFirst("callId"),
+				aspect = formParams.getFirst("aspect"),
+				motivazione = formParams.getFirst("jconon_attachment:esperienza_non_coerente_motivazione");			
+			applicationOIVService.esperienzaNonCoerente(userId, objectId, callId, aspect, motivazione);
+			rb = Response.ok();			
+		} catch (ClientMessageException | CMISApplicationException e) {
+			LOGGER.error("esperienzaNonCoerente error", e);
+			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+		}
+		return rb.build();
+	}
 	
 }

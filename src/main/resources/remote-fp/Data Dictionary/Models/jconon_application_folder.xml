@@ -549,8 +549,8 @@
 					</index>
 				</property>
 				<property name="jconon_application:nazione_nascita">
-					<title>Nazione di Nascita</title>
-					<description>Nazione di Nascita</description>
+					<title>Stato di Nascita</title>
+					<description>Stato di Nascita</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
