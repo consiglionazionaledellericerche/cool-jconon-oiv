@@ -114,5 +114,25 @@ public class ApplicationOIV {
 		}
 		return rb.build();
 	}
+
+	@POST
+	@Path("esperienza-coerente")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response esperienzaCoerente(@Context HttpServletRequest req, MultivaluedMap<String, String> formParams) throws IOException{
+		ResponseBuilder rb;
+		try {
+			String userId = cmisService.getCMISUserFromSession(req).getId();
+			String objectId = formParams.getFirst(PropertyIds.OBJECT_ID),
+				callId = formParams.getFirst("callId"),
+				aspect = formParams.getFirst("aspect"),
+				userName = formParams.getFirst("userName");			
+			applicationOIVService.esperienzaCoerente(userId, objectId, callId, aspect, userName);
+			rb = Response.ok();			
+		} catch (ClientMessageException | CMISApplicationException e) {
+			LOGGER.error("esperienzaNonCoerente error", e);
+			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+		}
+		return rb.build();
+	}
 	
 }

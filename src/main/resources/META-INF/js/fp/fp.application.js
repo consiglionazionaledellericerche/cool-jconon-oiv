@@ -10,6 +10,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       isNonCoerente = el['cmis:secondaryObjectTypeIds'].indexOf('P:jconon_scheda_anonima:esperienza_non_coerente') !== -1,
       isRdP = el.parentProp ? (Call.isRdP(el.parentProp.relationships.parent[0]['jconon_call:rdp']) || common.User.isAdmin) : false,
       callId = el.parentProp ? el.parentProp.relationships.parent[0]['cmis:objectId'] : undefined,
+      userName = el.parentProp ? el.parentProp['jconon_application:user'] : undefined,
       title = el['jconon_attachment:esperienza_professionale_datore_lavoro'] ||
         el['jconon_attachment:aspect_specializzazioni_universita'] ||
         el['jconon_attachment:precedente_incarico_oiv_amministrazione'],
@@ -84,7 +85,38 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       copy_curriculum: function () {
         Application.editProdotti(el, title, refreshFn, true);
       },
-      coerente: isRdP ? function () {
+      coerente: isRdP && isNonCoerente ? function () {
+          var d = [
+            {
+              id: 'cmis:objectId',
+              name: 'cmis:objectId',
+              value: el['cmis:objectId']
+            },
+            {
+              name: 'aspect', 
+              value: 'P:jconon_scheda_anonima:esperienza_non_coerente'
+            },
+            {
+              name: 'userName', 
+              value: userName
+            },            
+            {
+              name: 'callId', 
+              value: callId
+            }
+          ];
+          $.ajax({
+            url: cache.baseUrl + "/rest/application-fp/esperienza-coerente",
+            type: 'POST',
+            data:  d,
+            success: function (data) {
+              UI.success(i18n['message.esperienza.coerente.eseguito'], refreshFn);
+            },
+            complete: close,
+            error: URL.errorFn
+          });
+      } : false,
+      noncoerente: isRdP && !isNonCoerente ? function () {
          var content = $("<div></div>"),
             bulkinfo = new BulkInfo({
               target: content,
@@ -125,7 +157,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       } : false,
       paste: Application.getTypeForDropDown('jconon_call:elenco_sezioni_curriculum', el, title, refreshFn),
       move: Application.getTypeForDropDown('jconon_call:elenco_sezioni_curriculum', el, title, refreshFn, true)
-    }, {copy_curriculum: 'icon-copy', paste: 'icon-paste', move: 'icon-move', coerente: 'icon-minus'}, refreshFn, true));
+    }, {copy_curriculum: 'icon-copy', paste: 'icon-paste', move: 'icon-move', noncoerente: 'icon-minus', coerente: 'icon-plus'}, refreshFn, true));
     return $('<tr></tr>')
       .append(tdText)
       .append(tdNonCoerente)

@@ -1,7 +1,7 @@
 <html>
 <body>
 
-<p>${message('mail.confirm.application.1')} ${folder.getPropertyValue("jconon_application:nome")} ${folder.getPropertyValue("jconon_application:cognome")},</p>
+<p>${message('mail.confirm.application.1')} <b>${folder.getPropertyValue("jconon_application:nome")?cap_first} ${folder.getPropertyValue("jconon_application:cognome")?cap_first}</b>,</p>
 <p>${message('mail.esclusione.application.1')}</p>
 <p>${message('mail.iscrizione.application.6')}</p>
 <br>
