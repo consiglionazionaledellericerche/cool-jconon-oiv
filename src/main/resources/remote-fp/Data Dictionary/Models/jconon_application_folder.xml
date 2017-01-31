@@ -2503,6 +2503,12 @@
 					<type>d:text</type>
 					<mandatory>false</mandatory>
 				</property>
+				<property name="jconon_application:fascia_professionale_validata">
+					<title>Fascia professionale validata</title>
+					<description>3]</description>
+					<type>d:text</type>
+					<mandatory>false</mandatory>
+				</property>
 			</properties>
 		</aspect>
 		<aspect name="jconon_application:aspect_invia_notifica_email">
