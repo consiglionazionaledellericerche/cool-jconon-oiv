@@ -135,4 +135,20 @@ public class ApplicationOIV {
 		return rb.build();
 	}
 	
+	@GET
+	@Path("applications-ricalcola-fascia")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response ricalcolaFascia(@Context HttpServletRequest req, @QueryParam("applicationId") String applicationId) throws IOException{
+		ResponseBuilder rb;
+        Session session = cmisService.getCurrentCMISSession(req);
+		try {
+			Map<String, Object> model = applicationOIVService.ricalcolaFascia(session, applicationId);
+			rb = Response.ok(model);
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+			rb = Response.status(Status.INTERNAL_SERVER_ERROR);
+		}
+		return rb.build();
+	}	
+	
 }

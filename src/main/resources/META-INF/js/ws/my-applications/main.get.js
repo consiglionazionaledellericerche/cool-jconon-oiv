@@ -407,8 +407,20 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                   name: 'default',
                   callback : {
                     afterCreateForm: function (form) {
-                      form.find('.control-group').not('.widget').addClass('widget');
-                      form.find('#fascia_professionale_attribuita').removeAttr('disabled');
+                      form.find('#button_fascia_professionale_esegui_calcolo').off('click').on('click', function () {
+                        $.ajax({
+                          url: cache.baseUrl + "/rest/application-fp/applications-ricalcola-fascia",
+                          type: 'GET',
+                          data:  {
+                            'applicationId' : el['cmis:objectId']
+                          },
+                          success: function (data) {
+                            form.find('#fascia_professionale_validata').val(data['jconon_application:fascia_professionale_attribuita']);
+                            UI.success("La fascia ricalcolata è: " + data['jconon_application:fascia_professionale_attribuita']);
+                          },
+                          error: URL.errorFn
+                        });
+                      });
                     }
                   }
                 });

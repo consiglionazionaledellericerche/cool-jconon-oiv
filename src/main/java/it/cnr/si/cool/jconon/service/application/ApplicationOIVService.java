@@ -85,6 +85,7 @@ import com.hazelcast.core.Cluster;
 @Primary
 public class ApplicationOIVService extends ApplicationService{
 
+	private static final String JCONON_APPLICATION_FASCIA_PROFESSIONALE_VALIDATA = "jconon_application:fascia_professionale_validata";
 	public static final String P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE = "P:jconon_scheda_anonima:esperienza_non_coerente";
 	private static final String ELENCO_OIV_XLS = "elenco-oiv.xls";
 	private static final String NUMERO_OIV_JSON = "elenco-oiv.json";
@@ -180,6 +181,12 @@ public class ApplicationOIVService extends ApplicationService{
 		Optional.ofNullable(aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).orElseThrow(() -> new ClientMessageException(
 				i18nService.getLabel("message.error.domanda.fascia", Locale.ITALIAN)));		
 		return super.sendApplication(currentCMISSession, applicationSourceId, contextURL, locale, userId, properties, aspectProperties);
+	}
+
+	public Map<String, Object> ricalcolaFascia(Session session, String applicationId) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		eseguiCalcolo(applicationId,result);
+		return result;
 	}
 	
 	public void eseguiCalcolo(String objectId, Map<String, Object> aspectProperties) {
@@ -420,6 +427,8 @@ public class ApplicationOIVService extends ApplicationService{
 	    	try {
 	    		numProgressivo++;
 	        	Map<String, Object> properties = new HashMap<String, Object>();
+	        	properties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_VALIDATA, 
+	        			Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).orElse(null));	        	
 	        	properties.put(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO, numProgressivo);
 	        	properties.put(JCONON_APPLICATION_DATA_ISCRIZIONE_ELENCO, Calendar.getInstance());	        	
 	        	application = (Folder) application.updateProperties(properties);    	
@@ -669,4 +678,5 @@ public class ApplicationOIVService extends ApplicationService{
 		return super.isDomandaInviata(application, loginUser) && 
 				!application.getAllowableActions().getAllowableActions().stream().anyMatch(x -> x.equals(Action.CAN_CREATE_DOCUMENT));
 	}
+
 }

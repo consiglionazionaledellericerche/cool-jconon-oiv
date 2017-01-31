@@ -45,7 +45,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
     if (ruolo) {
       item.after(annotationRuolo);
     }
-    if (isNonCoerente) {
+    if (isNonCoerente && isRdP) {
       if (motivazione !== '') {
         $('<a href="#">').addClass('text-error').append(i18n.prop('label.esperienza.non.coerente')).off('click').on('click', function () {
           UI.alert(motivazione);
