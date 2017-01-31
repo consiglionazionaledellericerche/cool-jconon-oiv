@@ -647,6 +647,22 @@ public class ApplicationOIVService extends ApplicationService{
 		aclService.changeOwnership(cmisService.getAdminSession(), object.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), 
 				adminUserName, false, Collections.emptyList());
 	}
+
+	public void esperienzaCoerente(String userId, String objectId, String callId, String aspect, String userName) {
+		Session session = cmisService.createAdminSession();
+		Folder call = loadCallById(session, callId);
+		try {
+			CMISUser user = userService.loadUserForConfirm(userId);
+			if (!(user.isAdmin() || callService.isMemeberOfRDPGroup(user, call)))
+				throw new ClientMessageException("Only Admin or RdP");
+		} catch (CoolUserFactoryException e) {
+			throw new ClientMessageException("User not found " + userId, e);
+		}		
+		CmisObject object = session.getObject(objectId);
+		object.updateProperties(Collections.emptyMap(), Collections.emptyList(), Collections.singletonList(aspect));
+		aclService.changeOwnership(cmisService.getAdminSession(), object.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), 
+				userName, false, Collections.emptyList());
+	}
 	
 	@Override
 	protected boolean isDomandaInviata(Folder application, CMISUser loginUser) {		

@@ -150,10 +150,10 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       isTemp = (code === 'P' || code === 'I'),
       msg = i18n['label.application.stato.' + (code === 'I' ? 'P' : code)],
       item = $('<label class="label"></label>')
-        .addClass(isTemp ? 'label-warning' : 'label-success')
+        .addClass(isTemp ? 'label-info' : 'label-success')
         .addClass(dataScadenza !== "" && (moment().diff(dataScadenza, 'days') > -7) ? 'animated flash' : '')
         .append(msg)
-        .append(isTemp ? (' - modificata il ' + CNR.Date.format(dataUltimaModifica, '-', dateFormat)) : (' il ' + CNR.Date.format(dataInvioDomanda, '-', dateFormat)));
+        .append(isTemp ? (' - ultima modifica ' + CNR.Date.format(dataUltimaModifica, '-', dateFormat)) : (' il ' + CNR.Date.format(dataInvioDomanda, '-', dateFormat)));
     return $('<div>').append(item).html();
   });
 
