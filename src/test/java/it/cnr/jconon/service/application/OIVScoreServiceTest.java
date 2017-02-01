@@ -260,7 +260,7 @@ public class OIVScoreServiceTest {
 
 	@Test
 	public void testAssegnaFasciaNonConsegutiviCustom()  {
-		assertEquals(ApplicationOIVService.FASCIA1, 
+		assertEquals(ApplicationOIVService.FASCIA2, 
 			applicationOIVService.assegnaFascia(
 				Arrays.asList(
 					new Interval(SEI_INIZIO, SEI_FINE),
