@@ -535,7 +535,7 @@ public class ApplicationOIVService extends ApplicationService{
             				.stream()
             				.map(user -> userService.loadUserForConfirm(user).getEmail())
             				.collect(Collectors.toList());        		
-            		HSSFWorkbook wb = printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder where IN_FOLDER('" + call.getId() +"')" , true);
+            		HSSFWorkbook wb = printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder where NOT jconon_application:stato_domanda = 'I' AND IN_FOLDER('" + call.getId() +"')" , true);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
             		wb.write(stream);			        		
         			EmailMessage message = new EmailMessage();
@@ -543,7 +543,7 @@ public class ApplicationOIVService extends ApplicationService{
         			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + "Estrazione domande");
         			message.setBody("In allegato l'estrazione delle domande");
         			message.setAttachments(Arrays.asList(new AttachmentBean("DOMANDE_OIV.xls", stream.toByteArray())));
-        			mailService.send(message);        			
+        			mailService.send(message);
         		}catch (IOException e) {
         			LOGGER.error("Cannot estraiExcelOIV", e);
         		}    	
