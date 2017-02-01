@@ -254,15 +254,14 @@ public class ApplicationOIVService extends ApplicationService{
 		LOGGER.info("oivPeriodSup250: {}", oivPeriodSup250);
 		LOGGER.info("oivPeriodInf250: {}", oivPeriodInf250);
 		for (Interval interval : esperienzePeriod) {
-			daysEsperienza = daysEsperienza.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays()));
+			daysEsperienza = daysEsperienza.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays())).add(BigDecimal.ONE);
 		}
 		for (Interval interval : oivPeriodInf250) {
-			daysOIVInf250 = daysOIVInf250.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays()));
+			daysOIVInf250 = daysOIVInf250.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays())).add(BigDecimal.ONE);
 		}
 		for (Interval interval : oivPeriodSup250) {
-			daysOIVSup250 = daysOIVSup250.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays()));
+			daysOIVSup250 = daysOIVSup250.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays())).add(BigDecimal.ONE);
 		}
-
 		return getFascia(daysEsperienza, daysOIVInf250, daysOIVSup250);
 	}
 
@@ -272,15 +271,14 @@ public class ApplicationOIVService extends ApplicationService{
 		LOGGER.info("Days OIV Sup 250: {}", daysOIVSup250);
 
 		if (!Long.valueOf(0).equals(daysEsperienza) ) {
-			Long years = 
-					daysEsperienza.divide(DAYSINYEAR, RoundingMode.DOWN).longValue(),
-					yearsOIVINF250 = daysOIVInf250.divide(DAYSINYEAR, RoundingMode.DOWN).longValue(),
-					yearsOIVSUP250 = daysOIVSup250.divide(DAYSINYEAR, RoundingMode.DOWN).longValue();
+			Long years = daysEsperienza.divide(DAYSINYEAR, RoundingMode.DOWN).longValue(),
+					yearsOIVSUP250 = daysOIVSup250.divide(DAYSINYEAR, RoundingMode.DOWN).longValue(),
+					yearsOIV = daysOIVInf250.add(daysOIVSup250).divide(DAYSINYEAR, RoundingMode.DOWN).longValue();
 			LOGGER.info("YEARS: {}", years);
 			if (years >= 12 && yearsOIVSUP250 >= 3) {
 				return FASCIA3;
 			}
-			if (years.intValue() >= 8 && yearsOIVINF250 + yearsOIVSUP250 >= 3) {
+			if (years.intValue() >= 8 && yearsOIV >= 3) {
 				return FASCIA2;
 			}
 			if (years.intValue() >= 5) {
