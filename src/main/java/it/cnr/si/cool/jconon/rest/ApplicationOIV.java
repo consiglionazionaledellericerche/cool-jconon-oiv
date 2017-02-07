@@ -10,6 +10,7 @@ import it.cnr.si.cool.jconon.service.application.ApplicationOIVService;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +69,7 @@ public class ApplicationOIV {
 		try {
 			Session session = cmisService.getCurrentCMISSession(req);		
 			String userId = cmisService.getCMISUserFromSession(req).getId();			
-			Map<String, Object> model = applicationOIVService.checkApplicationOIV(session, userId, cmisService.getCMISUserFromSession(req));
+			List<String> model = applicationOIVService.checkApplicationOIV(session, userId, cmisService.getCMISUserFromSession(req));
 			rb = Response.ok(model);			
 		} catch (ClientMessageException | CMISApplicationException  e) {
 			LOGGER.warn("check error", e);

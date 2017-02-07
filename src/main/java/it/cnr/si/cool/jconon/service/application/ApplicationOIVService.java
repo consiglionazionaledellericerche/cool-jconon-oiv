@@ -33,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -189,7 +190,7 @@ public class ApplicationOIVService extends ApplicationService{
 		return result;
 	}
 	
-	public void eseguiCalcolo(String objectId, Map<String, Object> aspectProperties) {
+	private String eseguiCalcolo(String objectId) {
 		Session adminSession = cmisService.createAdminSession();
 		Folder application = (Folder) adminSession.getObject(objectId);
 		List<Interval> oivPeriodSup250 = new ArrayList<>(), oivPeriodInf250 = new ArrayList<>();
@@ -206,7 +207,11 @@ public class ApplicationOIVService extends ApplicationService{
 				oivPeriodSup250.add(new Interval(da, a));
 			}
 		}
-		String fascia = assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);
+		return assegnaFascia(esperienzePeriod, oivPeriodSup250, oivPeriodInf250);		
+	}
+	
+	public void eseguiCalcolo(String objectId, Map<String, Object> aspectProperties) {
+		String fascia = eseguiCalcolo(objectId);
 		LOGGER.info("fascia attribuita a {}: {}", objectId, fascia);
 		aspectProperties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, fascia);
 	}
@@ -236,9 +241,9 @@ public class ApplicationOIVService extends ApplicationService{
 		ItemIterable<QueryResult> iterable = criteria.executeQuery(adminSession, false, adminSession.getDefaultContext());
 		return iterable.getPage(Integer.MAX_VALUE);
 	}
-
+	
 	public String assegnaFascia(final List<Interval> esperienzePeriodList, final List<Interval> oivPeriodSup250List, final List<Interval> oivPeriodInf250List) {
-		BigDecimal daysEsperienza = BigDecimal.ZERO, daysOIVInf250 = BigDecimal.ZERO, daysOIVSup250 = BigDecimal.ZERO;
+		BigDecimal daysEsperienza = BigDecimal.ZERO, daysOIV = BigDecimal.ZERO, daysOIVSup250 = BigDecimal.ZERO;
 		/**
 		 * Per il calcolo dell'esperienza bisogna tener conto anche dell'esperienza OIV
 		 */
@@ -247,33 +252,39 @@ public class ApplicationOIVService extends ApplicationService{
 		periodo.addAll(oivPeriodSup250List);
 		periodo.addAll(oivPeriodInf250List);
 		
+		List<Interval> oivPeriod = new ArrayList<Interval>();
+		oivPeriod.addAll(oivPeriodSup250List);
+		oivPeriod.addAll(oivPeriodInf250List);
+		
 		List<Interval> esperienzePeriod = overlapping(periodo);
+		List<Interval> oivPeriodAll = overlapping(oivPeriod);
 		List<Interval> oivPeriodSup250 = overlapping(oivPeriodSup250List);
-		List<Interval> oivPeriodInf250 = overlapping(oivPeriodInf250List);
+
 		LOGGER.info("esperienzePeriod: {}", esperienzePeriod);
 		LOGGER.info("oivPeriodSup250: {}", oivPeriodSup250);
-		LOGGER.info("oivPeriodInf250: {}", oivPeriodInf250);
+		LOGGER.info("oivPeriodInf250: {}", oivPeriodAll);
 		for (Interval interval : esperienzePeriod) {
 			daysEsperienza = daysEsperienza.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays())).add(BigDecimal.ONE);
 		}
-		for (Interval interval : oivPeriodInf250) {
-			daysOIVInf250 = daysOIVInf250.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays())).add(BigDecimal.ONE);
+		for (Interval interval : oivPeriodAll) {
+			daysOIV = daysOIV.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays())).add(BigDecimal.ONE);
 		}
 		for (Interval interval : oivPeriodSup250) {
 			daysOIVSup250 = daysOIVSup250.add(BigDecimal.valueOf(Duration.between(interval.getStartDate(), interval.getEndDate()).toDays())).add(BigDecimal.ONE);
 		}
-		return getFascia(daysEsperienza, daysOIVInf250, daysOIVSup250);
+		return getFascia(daysEsperienza, daysOIV, daysOIVSup250);
 	}
 
-	private String getFascia(final BigDecimal daysEsperienza, final BigDecimal daysOIVInf250, final BigDecimal daysOIVSup250) {
+	private String getFascia(final BigDecimal daysEsperienza, final BigDecimal daysOIV, final BigDecimal daysOIVSup250) {
 		LOGGER.info("Days Esperienza: {}", daysEsperienza);
-		LOGGER.info("Days OIV Inf 250: {}", daysOIVInf250);
+		LOGGER.info("Days OIV: {}", daysOIV);
 		LOGGER.info("Days OIV Sup 250: {}", daysOIVSup250);
 
 		if (!Long.valueOf(0).equals(daysEsperienza) ) {
-			Long years = daysEsperienza.divide(DAYSINYEAR, RoundingMode.DOWN).longValue(),
-					yearsOIVSUP250 = daysOIVSup250.divide(DAYSINYEAR, RoundingMode.DOWN).longValue(),
-					yearsOIV = daysOIVInf250.add(daysOIVSup250).divide(DAYSINYEAR, RoundingMode.DOWN).longValue();
+			Long 
+				years = daysEsperienza.divide(DAYSINYEAR, RoundingMode.DOWN).longValue(),
+				yearsOIVSUP250 = daysOIVSup250.divide(DAYSINYEAR, RoundingMode.DOWN).longValue(),
+				yearsOIV = daysOIV.divide(DAYSINYEAR, RoundingMode.DOWN).longValue();
 			LOGGER.info("YEARS: {}", years);
 			if (years >= 12 && yearsOIVSUP250 >= 3) {
 				return FASCIA3;
@@ -610,9 +621,9 @@ public class ApplicationOIVService extends ApplicationService{
 
     }	
 	
-	public Map<String, Object> checkApplicationOIV(Session session,
+	public List<String> checkApplicationOIV(Session session,
 			String userId, CMISUser cmisUserFromSession) {
-		Map<String, Object> result = new HashMap<String, Object>();
+		List<String> result = new ArrayList<String>();
 		try {
 			CMISUser user = userService.loadUserForConfirm(userId);
 			if (!user.isAdmin())
@@ -624,15 +635,23 @@ public class ApplicationOIVService extends ApplicationService{
 		criteria.addColumn(PropertyIds.OBJECT_ID);
 		criteria.add(Restrictions.eq(JCONONPropertyIds.APPLICATION_STATO_DOMANDA.value(), StatoDomanda.CONFERMATA.getValue()));
 		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
-    	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
+		result.add("NOME,COGNOME,CODICE_FISCALE,NUMERO ELENCO,FASCIA ATTRIBUITA,FASCIA CALCOLATA");			
+		for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
         	Folder application = loadApplicationById(session, queryResult.<String>getPropertyValueById(PropertyIds.OBJECT_ID), null); 
-        	Map<String, Object> aspectProperties = new HashMap<String, Object>();
-			eseguiCalcolo(application.getId(), aspectProperties);
-			if (!application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA).equals(aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA))) {
-				result.put(application.getName(), "Fascia attribuita:" + application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA) +
-						" Fascia calcolata:" + aspectProperties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
-			}
-			Optional.ofNullable(printService.findRicevutaApplicationId(session, application)).filter(docId -> !docId.endsWith("1.0")).ifPresent(x -> result.put(application.getName(), "DocId:" + x));
+			Optional<String> fasciaAttribuita = Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
+			Optional<String> fasciaCalcolata = Optional.ofNullable(eseguiCalcolo(application.getId()));
+			result.add(
+					application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_NOME.value()).toUpperCase()
+				.concat(",")
+				.concat(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_COGNOME.value()).toUpperCase())
+				.concat(",")
+				.concat(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_CODICE_FISCALE.value()).toUpperCase())
+				.concat(",")
+				.concat(String.valueOf(Optional.ofNullable(application.<BigInteger>getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).orElse(BigInteger.ZERO)))				
+				.concat(",")
+				.concat(fasciaAttribuita.orElse(""))
+				.concat(",")
+				.concat(fasciaCalcolata.orElse("")));			
     	}		
 		return result;
 	}
