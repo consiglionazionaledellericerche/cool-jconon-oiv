@@ -58,6 +58,17 @@ public class OIVScoreServiceTest {
 
 
 	@Test
+	public void testAssegnaFasciaNASCA()  {
+		assertEquals(ApplicationOIVService.FASCIA1, 
+				applicationOIVService.assegnaFascia(
+						Arrays.asList(new Interval(new GregorianCalendar(1986,Calendar.OCTOBER,20), new GregorianCalendar(2017,Calendar.FEBRUARY,7))), 
+						Arrays.asList(new Interval(new GregorianCalendar(2014,Calendar.APRIL,16), new GregorianCalendar(2017,Calendar.FEBRUARY,7))),
+						Arrays.asList(new Interval(new GregorianCalendar(2016,Calendar.JANUARY,7), new GregorianCalendar(2017,Calendar.FEBRUARY,7)))
+				)
+		);
+	}
+	
+	@Test
 	public void testAssegnaFasciaCHIRICO()  {
 		assertNull(applicationOIVService.assegnaFascia(
 						Collections.emptyList(), 
