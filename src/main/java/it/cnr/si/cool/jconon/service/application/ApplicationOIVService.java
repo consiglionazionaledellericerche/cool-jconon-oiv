@@ -695,5 +695,23 @@ public class ApplicationOIVService extends ApplicationService{
 		return super.isDomandaInviata(application, loginUser) && 
 				!application.getAllowableActions().getAllowableActions().stream().anyMatch(x -> x.equals(Action.CAN_CREATE_DOCUMENT));
 	}
-
+	@Override
+	public void reopenApplication(Session currentCMISSession,
+			String applicationSourceId, String contextURL, Locale locale,
+			String userId) {
+		try {
+			OperationContext oc = new OperationContextImpl(currentCMISSession.getDefaultContext());
+			oc.setFilterString(PropertyIds.OBJECT_ID);			
+			currentCMISSession.getObject(applicationSourceId, oc);
+		}catch (CmisPermissionDeniedException _ex) {
+			throw new ClientMessageException("user.cannot.access.to.application", _ex);
+		}
+		final Folder newApplication = loadApplicationById(currentCMISSession, applicationSourceId, null);	
+		if (newApplication.getPropertyValue(JCONONPropertyIds.APPLICATION_ESCLUSIONE_RINUNCIA.value()) != null &&
+				newApplication.getPropertyValue(JCONONPropertyIds.APPLICATION_ESCLUSIONE_RINUNCIA.value()).equals(StatoDomanda.ESCLUSA.getValue())) {
+			throw new ClientMessageException("La domanda è stata esclusa, non è possibile modificarla nuovamente!");
+		}
+		super.reopenApplication(currentCMISSession, applicationSourceId, contextURL,
+				locale, userId);
+	}
 }
