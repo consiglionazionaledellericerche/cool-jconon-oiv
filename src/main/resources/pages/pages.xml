@@ -13,6 +13,13 @@
     <order-id>20</order-id>
     <authentication>guest</authentication>
   </page>
+  <page>    
+    <id>avvisi-pubblici-di-selezione-comparativa</id>
+    <path>/pages/call/selezione-comparativa.get.html.ftl</path>
+    <format-id>navbar</format-id>
+    <order-id>30</order-id>
+    <authentication>guest</authentication>
+  </page>
   <page>
     <id>login</id>
     <path>/pages/security/login/login.get.html.ftl</path>

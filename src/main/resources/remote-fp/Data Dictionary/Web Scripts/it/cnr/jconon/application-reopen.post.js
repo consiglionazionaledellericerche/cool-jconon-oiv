@@ -7,7 +7,6 @@ function main() {
     groupRdP = json.groupRdP,
     j = 0,
     child;
-
   applicationSource.properties["jconon_application:data_ultimo_invio"] = applicationSource.properties["jconon_application:data_domanda"];
   applicationSource.properties["jconon_application:esclusione_rinuncia"] = null;
   applicationSource.save();

@@ -109,6 +109,27 @@
 			</properties>
 		</type>
 
+		<type name="jconon_attachment:call_fp_abstract">
+			<title>Allegato astratto al Bando di concorso</title>
+			<description>Allegato astratto al Bando di concorso</description>
+			<parent>jconon_attachment:document</parent>
+		</type>
+		<type name="jconon_attachment:call_fp">
+			<title>Bando o avviso di selezione</title>
+			<description>Bando o avviso di selezione</description>
+			<parent>jconon_attachment:call_fp_abstract</parent>
+		</type>
+		<type name="jconon_attachment:call_fp_form_domanda">
+			<title>Form della domanda</title>
+			<description>Form della domanda</description>
+			<parent>jconon_attachment:call_fp_abstract</parent>
+		</type>
+		<type name="jconon_attachment:call_fp_altri_documenti">
+			<title>Altri documenti</title>
+			<description>Altri documenti</description>
+			<parent>jconon_attachment:call_fp_abstract</parent>
+		</type>
+		
 		<type name="jconon_attachment:call_abstract">
 			<title>Allegato astratto al Bando di concorso</title>
 			<description>Allegato astratto al Bando di concorso</description>
