@@ -35,11 +35,11 @@
         <div id="itemsPagination" class="pagination pagination-centered">
           <ul></ul>
         </div>
-        <small id="total" class="muted pull-right"></small>
         <p>
           <div id="emptyResultset" class="alert">
-            <strong>Non e' stata presentata nessuna domanda</strong>
+            <strong>Non e' stata presentata nessuna domanda nell'Elenco nazionale OIV, per presentarne una utilizzare il seguente <a href="manage-application?callCodice=OIV">link</a></strong>
           </div>
+        <small id="total" class="muted pull-right"></small>          
       </div><!--/span-->
     </div><!--/row-->
   </div>

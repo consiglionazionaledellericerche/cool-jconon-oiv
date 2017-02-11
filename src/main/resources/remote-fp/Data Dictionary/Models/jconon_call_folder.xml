@@ -15,6 +15,8 @@
 			prefix="jconon_call" />
 		<namespace uri="http://www.cnr.it/model/jconon_call/oiv/cmis"
 			prefix="jconon_call_oiv" />
+		<namespace uri="http://www.cnr.it/model/jconon_call/procedura_comparativa/cmis"
+			prefix="jconon_call_procedura_comparativa" />
 	</namespaces>
 	<constraints>
 		<constraint name="jconon_call:elenco_tipo_selezione_values" type="LIST">
@@ -126,6 +128,32 @@
 					<value>Giuridico - amministrativo</value>
 					<value>Supporto alla ricerca</value>
 					<value>Progettazione e/o gestione impianti, strumentazioni, servizi</value>
+				</list>
+			</parameter>
+		</constraint>
+		<constraint name="jconon_call_procedura_comparativa:tipologia_oiv_values" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>Monocratico</value>
+					<value>Collegiale</value>
+				</list>
+			</parameter>
+		</constraint>
+		<constraint name="jconon_call_procedura_comparativa:tipologia_selezione_values" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>Componente</value>
+					<value>Presidente</value>
+					<value>Intero Collegio</value>
+				</list>
+			</parameter>
+		</constraint>
+		<constraint name="jconon_call_procedura_comparativa:fascia_professionale_values" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>1</value>
+					<value>2</value>
+					<value>3</value>
 				</list>
 			</parameter>
 		</constraint>
@@ -508,7 +536,143 @@
 			<title>OIV - Organismi Indipendenti di Valutazione</title>
 			<description>Organismi Indipendenti di Valutazione</description>
 			<parent>jconon_call:folder</parent>
-		</type>		
+		</type>
+		<type name="jconon_call_procedura_comparativa:folder">
+			<title>Selezione Comparativa</title>
+			<description>Selezione Comparativa</description>
+			<parent>jconon_call:folder</parent>
+			<properties>
+				<property name="jconon_call_procedura_comparativa:amministrazione">
+					<title>Amministrazione procedente</title>
+					<description>Amministrazione procedente</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>	
+				<property name="jconon_call_procedura_comparativa:titolo">
+					<title>Titolo della selezione</title>
+					<description>Titolo della selezione</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>	
+				<property name="jconon_call_procedura_comparativa:breve_descrizione">
+					<title>Breve descrizione</title>
+					<description>Breve descrizione</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>	
+				<property name="jconon_call_procedura_comparativa:telefono">
+					<title>Telefono</title>
+					<description>Telefono</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>	
+				<property name="jconon_call_procedura_comparativa:email">
+					<title>Email</title>
+					<description>Email</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>	
+				<property name="jconon_call_procedura_comparativa:pec">
+					<title>Pec</title>
+					<description>Pec</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>	
+				<property name="jconon_call_procedura_comparativa:sito_web">
+					<title>Sito web</title>
+					<description>Pec</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>	
+				<property name="jconon_call_procedura_comparativa:tipologia_oiv">
+					<title>Tipologia OIV</title>
+					<description>Tipologia OIV</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_call_procedura_comparativa:tipologia_oiv_values" />
+					</constraints>					
+				</property>	
+				<property name="jconon_call_procedura_comparativa:tipologia_selezione">
+					<title>Tipologia selezione</title>
+					<description>Tipologia selezione</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_call_procedura_comparativa:tipologia_selezione_values" />
+					</constraints>					
+				</property>	
+				<property name="jconon_call_procedura_comparativa:rdp">
+					<title>Responsabile del procedimento</title>
+					<description>Responsabile del procedimento</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>					
+				</property>	
+				<property name="jconon_call_procedura_comparativa:fascia_professionale">
+					<title>Fascia Professionale</title>
+					<description>Fascia Professionale</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_call_procedura_comparativa:fascia_professionale_values" />
+					</constraints>
+				</property>
+				<property name="jconon_call_procedura_comparativa:compenso_annuo_componente">
+					<title>Compenso annuo Componente (lordo)</title>
+					<description>Compenso annuo Componente (lordo)</description>
+					<type>d:double</type>
+				</property>	
+				<property name="jconon_call_procedura_comparativa:compenso_annuo_presidente">
+					<title>Compenso annuo Presidente (lordo)</title>
+					<description>Compenso annuo Presidente (lordo)</description>
+					<type>d:double</type>
+				</property>	
+			</properties>	
+		</type>
 	</types>
 	<aspects>
 		<aspect name="jconon_call:can_submit_application">

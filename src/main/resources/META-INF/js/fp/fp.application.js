@@ -8,7 +8,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
     var tdText,
       tdButton,
       isNonCoerente = el['cmis:secondaryObjectTypeIds'].indexOf('P:jconon_scheda_anonima:esperienza_non_coerente') !== -1,
-      isRdP = el.parentProp ? (Call.isRdP(el.parentProp.relationships.parent[0]['jconon_call:rdp']) || common.User.isAdmin) : false,
+      isRdP = el.parentProp ? (Call.isRdP(el.parentProp.relationships.parent[0]['jconon_call:rdp']) || common.User.admin) : false,
       callId = el.parentProp ? el.parentProp.relationships.parent[0]['cmis:objectId'] : undefined,
       userName = el.parentProp ? el.parentProp['jconon_application:user'] : undefined,
       title = el['jconon_attachment:esperienza_professionale_datore_lavoro'] ||
