@@ -569,38 +569,38 @@
     "manage-call": {
         "GET": {
             "whitelist": {
-                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI", "GROUP_ALFRESCO_ADMINISTRATORS", "GROUP_procedureComparativeGroup"]
             }
         }
     },
     "manage-call/main": {
         "GET": {
             "whitelist": {
-                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI", "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         },
         "POST": {
             "whitelist": {
-                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI", "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         },
         "DELETE": {
             "whitelist": {
-                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI", "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
     },
     "manage-call/publish": {
         "POST": {
             "whitelist": {
-                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI", "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
     },
     "manage-call/child": {
         "POST": {
             "whitelist": {
-                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_BANDI", "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
     },
@@ -657,7 +657,7 @@
     "applications": {
         "GET": {
             "whitelist": {
-                "group": ["GROUP_CONCORSI", "GROUP_COMMISSIONI_CONCORSO", "GROUP_GESTORI_BANDI", "GROUP_APPLICATION_CONSUMER", "GROUP_RDP_CONCORSO","GROUP_ALFRESCO_ADMINISTRATORS"],
+                "group": ["GROUP_CONCORSI", "GROUP_COMMISSIONI_CONCORSO", "GROUP_GESTORI_BANDI", "GROUP_APPLICATION_CONSUMER", "GROUP_RDP_CONCORSO", "GROUP_ALFRESCO_ADMINISTRATORS"],
                 "user": []
             }
         }
@@ -710,14 +710,14 @@
     "scheda-valutazione": {
         "GET": {
             "whitelist": {
-                "group": ["GROUP_COMMISSIONI_CONCORSO","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_COMMISSIONI_CONCORSO", "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
     },
     "scheda-valutazione/main": {
         "GET": {
             "whitelist": {
-                "group": ["GROUP_COMMISSIONI_CONCORSO","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_COMMISSIONI_CONCORSO", "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
     },
@@ -938,8 +938,37 @@
         "PUT": {
             "whitelist": {
                 "user": [],
-                "group": ["GROUP_CONCORSI", "GROUP_GESTORI_F_JCONON_CALL_OIV_FOLDER","GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_GESTORI_F_JCONON_CALL_OIV_FOLDER", "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
-    }    
+    },
+    "application-oiv": {
+        "GET": {
+            "whitelist": {
+                "group": ["GROUP_RDP_OIV", "GROUP_CONCORSI", "GROUP_ALFRESCO_ADMINISTRATORS"]
+            }
+        }
+    },
+    "F:jconon_call_procedura_comparativa:folder": {
+        "PUT": {
+            "whitelist": {
+                "user": [],
+                "group": ["GROUP_procedureComparativeGroup", "GROUP_ALFRESCO_ADMINISTRATORS"]
+            }
+        }
+    },
+    "esito-call": {
+        "GET": {
+            "whitelist": {
+                "group": ["GROUP_procedureComparativeGroup", "GROUP_ALFRESCO_ADMINISTRATORS"]
+            }
+        }
+    },
+    "avvisi-pubblici-di-selezione-comparativa" : {
+        "GET": {
+            "whitelist": {
+                "all": true
+            }
+        }
+    }
 }
