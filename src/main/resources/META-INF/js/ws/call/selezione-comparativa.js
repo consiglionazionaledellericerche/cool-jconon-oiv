@@ -124,18 +124,41 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
         var secondaryObjectTypeIds = el['cmis:secondaryObjectTypeIds'] || el.aspect,
           isMacroCall = secondaryObjectTypeIds === null ? false : secondaryObjectTypeIds.indexOf('P:jconon_call:aspect_macro_call') >= 0,
           row,
-          azioni;
+          azioni,
+          isActive = Call.isActive(el.data_inizio_invio_domande, el.data_fine_invio_domande);
         customButtons.attachments = function () {
           Call.displayAttachments(el.id);
         };
-        customButtons.edit = function () {
-          window.location = jconon.URL.call.manage + '?call-type=' + el.objectTypeId + '&cmis:objectId=' + el.id;
-        };
-        customButtons.remove = function () {
-          Call.remove(el.codice, el.id, el.objectTypeId, function () {
-            filter(bulkInfo, search);
-          });
-        };
+        if (isActive) {
+          customButtons.edit = function () {
+            window.location = jconon.URL.call.manage + '?call-type=' + el.objectTypeId + '&cmis:objectId=' + el.id;
+          };
+          customButtons.remove = function () {
+            Call.remove(el.codice, el.id, el.objectTypeId, function () {
+              filter(bulkInfo, search);
+            });
+          };          
+          customButtons.publish = function (that) {
+            var published = el['jconon_call:pubblicato'],
+              message = published ? i18n['message.action.unpublish'] : i18n['message.action.publish'];
+            UI.confirm(message, function () {
+              Call.publish([
+                {name: 'cmis:objectId', value: el.id},
+                {name: 'cmis:objectTypeId', value: el.objectTypeId},
+                {name: 'skip:save', value: true}
+              ], !published, function (pubblicato, removeClass, addClass, title) {
+                el['jconon_call:pubblicato'] = pubblicato;
+                that.find('i')
+                  .removeClass(removeClass)
+                  .addClass(addClass);
+              });
+            });
+          };
+        } else {
+          customButtons.edit = false;
+          customButtons.remove = false;
+          customButtons.publish = false;
+        }
         if (common.User.admin) {
           customButtons.permissions = function () {
             Ace.panel(el['alfcmis:nodeRef'] || el['cmis:objectId'], el.name, null, false);
@@ -143,22 +166,13 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
         } else {
           customButtons.permissions = false;
         }
-        customButtons.publish = function (that) {
-          var published = el['jconon_call:pubblicato'],
-            message = published ? i18n['message.action.unpublish'] : i18n['message.action.publish'];
-          UI.confirm(message, function () {
-            Call.publish([
-              {name: 'cmis:objectId', value: el.id},
-              {name: 'cmis:objectTypeId', value: el.objectTypeId},
-              {name: 'skip:save', value: true}
-            ], !published, function (pubblicato, removeClass, addClass, title) {
-              el['jconon_call:pubblicato'] = pubblicato;
-              that.find('i')
-                .removeClass(removeClass)
-                .addClass(addClass);
-            });
-          });
-        };
+        if (!isActive) {
+          customButtons.esitoSelezione = function () {
+            window.location = 'esito-call?call-type=' + el.objectTypeId + '&cmis:objectId=' + el.id;
+          };          
+        } else {
+          customButtons.esitoSelezione = false;  
+        }
         azioni = new ActionButton.actionButton({
           name: el.name,
           nodeRef: el.id,
@@ -167,9 +181,10 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
           mimeType: el.contentType,
           allowableActions: el.allowableActions,
           defaultChoice: isMacroCall ? 'detail' : 'application'
-        }, {publish: 'CAN_APPLY_ACL'},
+        }, {publish: 'CAN_APPLY_ACL', esitoSelezione: 'CAN_APPLY_ACL' },
           customButtons, {
             attachments : 'icon-download-alt',
+            esitoSelezione : 'icon-share-alt',
             publish: el['jconon_call:pubblicato'] ? 'icon-eye-close' : 'icon-eye-open',
           }, undefined, true);
         row = $(rows.get(index));

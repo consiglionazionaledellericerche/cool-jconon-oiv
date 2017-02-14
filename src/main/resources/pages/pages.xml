@@ -56,6 +56,11 @@
     <authentication>user</authentication>
   </page>
   <page>
+    <id>esito-call</id>
+    <path>/pages/call/esito.get.html.ftl</path>
+    <authentication>user</authentication>
+  </page>  
+  <page>
     <id>manage-call-labels</id>
     <path>/pages/call/call-labels.get.html.ftl</path>
     <authentication>user</authentication>

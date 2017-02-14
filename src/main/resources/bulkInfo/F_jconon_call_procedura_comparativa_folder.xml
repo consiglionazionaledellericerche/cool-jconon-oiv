@@ -48,7 +48,7 @@
 		inputType="TEXT" 
 		label="label.jconon_call_procedura_comparativa_data_fine_invio_domande" 
 		name="data_fine_invio_domande" 
-		property="jconon_call:data_fine_invio_domande" 
+		property="jconon_call:data_fine_invio_domande"
 		widget="ui.datetimepicker">
 		<jsonvalidator requiredWidget="true"/>
 	</fieldProperty>
@@ -124,6 +124,15 @@
 		property="jconon_call_procedura_comparativa:compenso_annuo_presidente">
 		<jsonvalidator importo="true"/>
 	</fieldProperty>
+	<fieldProperty 
+		class="input-xxlarge" 
+		inputType="TEXTAREA" 
+		rows="5"
+		label="label.jconon_call_procedura_comparativa_descrizione_esito" 
+		name="descrizione_esito" 
+		property="jconon_call_procedura_comparativa:descrizione_esito">
+		<jsonvalidator required="true"/>
+	</fieldProperty>
 
 
 	<form name="affix_sezione_6">
@@ -147,6 +156,18 @@
 		<formFieldProperty name="sito_web"/>
 	</form>
 	<form name="affix_sezione_allegati"/>
+
+	<form name="esito_sezione_1">
+		<formFieldProperty 
+			name="amministrazione_hidden"
+			inputType="HIDDEN"
+			property="jconon_call_procedura_comparativa:amministrazione" 
+			label=""/>		
+		<formFieldProperty name="descrizione_esito"/>
+	</form>	
+	<form name="esito_sezione_cv"/>
+	<form name="esito_sezione_allegati"/>
+
 	<form name="all-filters">
 		<formFieldProperty 
 			class="btn-small" 

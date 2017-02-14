@@ -670,6 +670,28 @@
 					<title>Compenso annuo Presidente (lordo)</title>
 					<description>Compenso annuo Presidente (lordo)</description>
 					<type>d:double</type>
+				</property>
+
+				<property name="jconon_call_procedura_comparativa:pubblicato_esito">
+					<title>Indica se l'esito è stato pubblicato</title>
+					<description>Indica se l'esito è stato pubblicato</description>
+					<type>d:boolean</type>
+					<default>false</default>
+				</property>
+				<property name="jconon_call_procedura_comparativa:data_pubblicazione_esito">
+					<title>Data pubblicazione esito</title>
+					<description>Data pubblicazione esito</description>
+					<type>d:datetime</type>
+				</property>
+				<property name="jconon_call_procedura_comparativa:descrizione_esito">
+					<title>Descrizione esito</title>
+					<description>Descrizione esito</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
 				</property>	
 			</properties>	
 		</type>

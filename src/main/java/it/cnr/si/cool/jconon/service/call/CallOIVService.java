@@ -18,11 +18,9 @@ import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import org.apache.chemistry.opencmis.client.api.Folder;
@@ -42,8 +40,17 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class CallOIVService extends CallService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallOIVService.class);	
+    private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_PUBBLICAZIONE_ESITO = "jconon_call_procedura_comparativa:data_pubblicazione_esito";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_PUBBLICATO_ESITO = "jconon_call_procedura_comparativa:pubblicato_esito";
+	private static final String SELEZIONATO = "selezionato";
+	private static final String JCONON_ATTACHMENT_ESITO_PARTECIPANTI_ESITO = "jconon_attachment:esito_partecipanti_esito";
+	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_VERBALE = "D:jconon_attachment:call_fp_esito_verbale";
+	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_ALTRI_DOCUMENTI = "D:jconon_attachment:call_fp_esito_altri_documenti";
+	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_PARTECIPANTI = "D:jconon_attachment:call_fp_esito_partecipanti";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE = "jconon_call_procedura_comparativa:amministrazione";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER = "jconon_call_procedura_comparativa:folder";
+	private static final String JCONON_ATTACHMENT_CALL_FP = "jconon_attachment:call_fp";
+	private static final Logger LOGGER = LoggerFactory.getLogger(CallOIVService.class);	
 	private static final String F_JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER = "F:jconon_call_procedura_comparativa:folder";
     @Autowired
     private I18nService i18NService;
@@ -58,13 +65,41 @@ public class CallOIVService extends CallService {
 	@Autowired
     private CacheRepository cacheRepository;
 
+	public Folder publishEsito(Session cmisSession,
+			BindingSession currentBindingSession, String objectId, boolean publish, String userId) {
+        final Folder call = (Folder) cmisSession.getObject(objectId);
+        Calendar today = Calendar.getInstance();
+        CMISUser user = userService.loadUserForConfirm(userId);    	
+        if (!publish && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
+        	throw new ClientMessageException("message.error.call.cannnot.modify");
+        }
+        call.getChildren().forEach(cmisObject -> {
+        	if (Arrays.asList(
+        			D_JCONON_ATTACHMENT_CALL_FP_ESITO_VERBALE, 
+        			D_JCONON_ATTACHMENT_CALL_FP_ESITO_ALTRI_DOCUMENTI, 
+        			D_JCONON_ATTACHMENT_CALL_FP_ESITO_PARTECIPANTI
+        		).stream().anyMatch(x -> x.equals(cmisObject.getType().getId()))) {
+        		if (D_JCONON_ATTACHMENT_CALL_FP_ESITO_PARTECIPANTI.equals(cmisObject.getType().getId()) && 
+        				cmisObject.getPropertyValue(JCONON_ATTACHMENT_ESITO_PARTECIPANTI_ESITO).equals(SELEZIONATO) ) {
+        			aclService.setInheritedPermission(currentBindingSession, cmisObject.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), publish);
+        		} else if (!D_JCONON_ATTACHMENT_CALL_FP_ESITO_PARTECIPANTI.equals(cmisObject.getType().getId())){
+        			aclService.setInheritedPermission(currentBindingSession, cmisObject.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), publish);
+        		}
+        	}
+        });
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(JCONON_CALL_PROCEDURA_COMPARATIVA_PUBBLICATO_ESITO, publish);        
+        properties.put(JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_PUBBLICAZIONE_ESITO, publish ? today : null);
+        call.updateProperties(properties, true);
+        return call;
+	}
 	@Override
 	public Folder publish(Session cmisSession,
 			BindingSession currentBindingSession, String userId,
 			String objectId, boolean publish, String contextURL, Locale locale) {
         final Folder call = (Folder) cmisSession.getObject(objectId);
-        Calendar today = Calendar.getInstance(TimeZone.getDefault());
-        today = new GregorianCalendar(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_YEAR));
+        Calendar today = Calendar.getInstance();
+        today.add(Calendar.HOUR, -1);
         if (call.getType().getId().equalsIgnoreCase(F_JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER)) {
 	        Map<String, ACLType> aces = new HashMap<String, ACLType>();
 	        aces.put(GROUP_EVERYONE, ACLType.Consumer);
@@ -73,7 +108,7 @@ public class CallOIVService extends CallService {
 	        	throw new ClientMessageException("message.error.call.cannnot.modify");
 	        }
 
-	        Criteria criteria = CriteriaFactory.createCriteria("jconon_attachment:call_fp");
+	        Criteria criteria = CriteriaFactory.createCriteria(JCONON_ATTACHMENT_CALL_FP);
 	        criteria.add(Restrictions.inFolder(call.getId()));
             if (criteria.executeQuery(cmisSession, false, cmisSession.getDefaultContext()).getTotalNumItems() == 0)
                 throw new ClientMessageException("message.error.call.attachment.not.present");
@@ -81,7 +116,15 @@ public class CallOIVService extends CallService {
             Map<String, Object> properties = new HashMap<String, Object>();
 	        properties.put(JCONONPropertyIds.CALL_PUBBLICATO.value(), publish);        
 	        if (publish) {
-		        properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), today);
+		        Criteria criteriaProcedureComparative = CriteriaFactory.createCriteria(JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER);
+		        criteriaProcedureComparative.add(Restrictions.eq(JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE, call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE)));
+		        criteriaProcedureComparative.add(Restrictions.ne(PropertyIds.OBJECT_ID, call.getId()));
+		        criteriaProcedureComparative.add(Restrictions.eq(JCONONPropertyIds.CALL_PUBBLICATO.value(), true));
+		        criteriaProcedureComparative.add(Restrictions.ge(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), Calendar.getInstance().getTime()));
+	            if (criteriaProcedureComparative.executeQuery(cmisSession, false, cmisSession.getDefaultContext()).getTotalNumItems() > 0)
+	                throw new ClientMessageException("message.error.publish.call.alredy.active");
+
+	        	properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), today);
 	        	aclService.addAcl(currentBindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
 	        } else {
 		        properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), null);        
@@ -94,6 +137,7 @@ public class CallOIVService extends CallService {
 					publish, contextURL, locale);			
 		}
 	}
+	
     public String getCodiceBandoTruncated(Folder call) {
     	if (call.getType().getId().equalsIgnoreCase(F_JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER)) {
     		return call.getName();
@@ -155,10 +199,16 @@ public class CallOIVService extends CallService {
 	            aclService.addAcl(bindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);	            
 	        } else {
 	            call = (Folder) cmisSession.getObject((String) properties.get(PropertyIds.OBJECT_ID));
-	        	CMISUser user = userService.loadUserForConfirm(userId);    	
-	            if ((Boolean)call.getPropertyValue(JCONONPropertyIds.CALL_PUBBLICATO.value()) && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
-	            	throw new ClientMessageException("message.error.call.cannnot.modify");
-	            }            
+	        	CMISUser user = userService.loadUserForConfirm(userId); 
+	        	if (isBandoInCorso(call)) {
+		            if ((Boolean)call.getPropertyValue(JCONONPropertyIds.CALL_PUBBLICATO.value()) && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
+		            	throw new ClientMessageException("message.error.call.cannnot.modify");
+		            }            	        		
+	        	} else {
+		            if ((Boolean)call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_PUBBLICATO_ESITO) && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
+		            	throw new ClientMessageException("message.error.call.cannnot.modify");
+		            }            	        			        		
+	        	}
 	            call.updateProperties(properties, true);
 	        }
 			return call;
@@ -167,4 +217,5 @@ public class CallOIVService extends CallService {
 					properties, aspectProperties);			
 		}
 	}
+	
 }
