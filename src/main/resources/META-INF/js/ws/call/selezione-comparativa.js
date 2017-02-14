@@ -129,7 +129,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
         customButtons.attachments = function () {
           Call.displayAttachments(el.id);
         };
-        if (isActive) {
+        if (isActive || el.data_inizio_invio_domande === '') {
           customButtons.edit = function () {
             window.location = jconon.URL.call.manage + '?call-type=' + el.objectTypeId + '&cmis:objectId=' + el.id;
           };
