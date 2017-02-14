@@ -3,6 +3,7 @@ package it.cnr.si.cool.jconon.configuration;
 import it.cnr.cool.service.I18nServiceLocation;
 import it.cnr.cool.service.PageService;
 import it.cnr.si.cool.jconon.rest.ApplicationOIV;
+import it.cnr.si.cool.jconon.rest.CallOIV;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +34,7 @@ public class FunzionePubblicaConfiguration {
     public FunzionePubblicaConfiguration (PageService pageService, JerseyConfig jerseyConfig) {
         this.pageService = pageService;
         jerseyConfig.register(ApplicationOIV.class);
+        jerseyConfig.register(CallOIV.class);
     }
 
     @PostConstruct

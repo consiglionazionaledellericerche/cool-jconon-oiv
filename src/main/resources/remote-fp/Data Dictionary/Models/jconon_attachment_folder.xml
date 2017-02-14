@@ -78,6 +78,14 @@
 				</list>
 			</parameter>
 		</constraint>
+		<constraint name="jconon_attachment:esito_partecipanti_esito_values" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>selezionato</value>
+					<value>scartato</value>
+				</list>
+			</parameter>
+		</constraint>
 	</constraints>		
 	<types>
 		<type name="jconon_attachment:document">
@@ -129,7 +137,78 @@
 			<description>Altri documenti</description>
 			<parent>jconon_attachment:call_fp_abstract</parent>
 		</type>
-		
+
+		<type name="jconon_attachment:call_fp_esito_abstract">
+			<title>Allegato astratto all'esito del Bando di concorso</title>
+			<description>Allegato astratto all'esito del Bando di concorso</description>
+			<parent>jconon_attachment:document</parent>
+		</type>
+		<type name="jconon_attachment:call_fp_esito_verbale">
+			<title>Processo verbale esito selezione</title>
+			<description>Processo verbale esito selezione</description>
+			<parent>jconon_attachment:call_fp_esito_abstract</parent>
+		</type>		
+		<type name="jconon_attachment:call_fp_esito_altri_documenti">
+			<title>Altri documenti</title>
+			<description>Altri documenti</description>
+			<parent>jconon_attachment:call_fp_esito_abstract</parent>
+		</type>
+
+		<type name="jconon_attachment:call_fp_esito_partecipanti">
+			<title>Partecipanti</title>
+			<description>Partecipanti</description>
+			<parent>jconon_attachment:document</parent>
+			<properties>
+				<property name="jconon_attachment:esito_partecipanti_nome">
+					<title>Nome</title>
+					<description>a) Nome</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esito_partecipanti_cognome">
+					<title>Cognome</title>
+					<description>b) Cognome</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esito_partecipanti_cf">
+					<title>Codice Fiscale</title>
+					<description>c) Codice Fiscale</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_attachment:esito_partecipanti_esito">
+					<title>Esito</title>
+					<description>d) ui.radio</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_attachment:esito_partecipanti_esito_values" />
+					</constraints>					
+				</property>
+			</properties>
+		</type>
+
 		<type name="jconon_attachment:call_abstract">
 			<title>Allegato astratto al Bando di concorso</title>
 			<description>Allegato astratto al Bando di concorso</description>

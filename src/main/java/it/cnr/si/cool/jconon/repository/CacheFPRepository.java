@@ -1,7 +1,12 @@
-package it.cnr.si.cool.jcononrepository;
+package it.cnr.si.cool.jconon.repository;
+
+import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.si.cool.jconon.repository.dto.ObjectTypeCache;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.slf4j.Logger;
@@ -10,11 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
-
-import it.cnr.cool.cmis.service.CMISService;
-import it.cnr.si.cool.jconon.cmis.model.JCONONDocumentType;
-import it.cnr.si.cool.jconon.repository.CacheRepository;
-import it.cnr.si.cool.jconon.repository.dto.ObjectTypeCache;
 @Repository
 @Primary
 public class CacheFPRepository extends CacheRepository {
@@ -24,6 +24,8 @@ public class CacheFPRepository extends CacheRepository {
 
 	@Autowired
 	private CMISService cmisService;
+	@Autowired
+	private CacheFPEsitoRepository cacheFPEsitoRepository;
 	
 	@Cacheable(JSONLIST_CALL_ATTACHMENTS)
 	public List<ObjectTypeCache> getCallAttachments() {
@@ -37,5 +39,13 @@ public class CacheFPRepository extends CacheRepository {
 					JCONON_ATTACHMENT_CALL_FP_ABSTRACT, _ex);
 			return null;
 		}		
+	}
+	
+	@Override
+	public Map<? extends String, ? extends Object> getExtraModel() {
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put(CacheFPEsitoRepository.JSONLIST_CALL_ESITO_ATTACHMENTS, cacheFPEsitoRepository.getCallEsitoAttachments());
+		result.put(CacheFPEsitoRepository.JSONLIST_CALL_ESITO_PARTECIPANTI_ATTACHMENTS, cacheFPEsitoRepository.getCallEsitoPartecipantiAttachments());		
+		return result;
 	}
 }

@@ -3,6 +3,17 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
   'cnr/cnr.search', 'cnr/cnr.criteria', 'cnr/cnr.node', 'cnr/cnr.bulkinfo', 'json!cache', 'cnr/cnr.application', 'cnr/cnr.call'
   ], function ($, CNR, i18n, common, ActionButton, UI, jconon, URL, Search, Criteria, Node, BulkInfo, cache, Application, Call) {
   "use strict";
+  var urls = {
+    call : {
+      publish_esito: 'rest/call-fp/publish-esito'
+    }
+  },
+    defaults = {},
+    settings = defaults;
+
+  function init(options) {
+    settings = $.extend({}, defaults, options);
+  }
 
   function displayEsperienzeOIV(el, refreshFn) {
     var tdText,
@@ -165,6 +176,9 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
   }
   /* Revealing Module Pattern */
   return {
-    displayEsperienzeOIV: displayEsperienzeOIV
+    displayEsperienzeOIV: displayEsperienzeOIV,
+    URL: urls,
+    Data: URL.initURL(urls),
+    init: init    
   };
 });

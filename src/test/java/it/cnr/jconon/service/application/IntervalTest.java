@@ -82,13 +82,23 @@ public class IntervalTest {
         sessionParameters.put(SessionParameter.REPOSITORY_ID, "-default-");
         Session session = SessionFactoryImpl.newInstance().createSession(sessionParameters);
         return session;
-    }    
+    }
+
     public static void main(String[] args) {
 		Session session = getRepositorySession();
-		CmisObject utente = session.getObject("orkspace://SpacesStore/393e50a2-1a47-42f1-838a-fc0bee1a9bc5");
+		CmisObject utente = session.getObject("workspace://SpacesStore/8d7c11dc-c1ea-46f5-9b45-b9906e0e186e");
 	
 		session.bulkUpdateProperties(Collections.singletonList(utente), 
-				Collections.singletonMap("fpperson:amministrazione", Arrays.asList("COMUNE DI BRUINO","Unione dei Comuni delle Valli Joniche dei Peloritani","Consiglio per la ricerca in agricoltura e l’analisi dell’economia agraria (CREA)")), 
+				Collections.singletonMap("fpperson:amministrazione", 
+						Arrays.asList(
+								"Comune Di Bruino",
+								"Unione dei Comuni delle Valli Joniche dei Peloritani",
+								"Consiglio per la ricerca in agricoltura e l’analisi dell’economia agraria (CREA)",
+								"Comune di Sannicandro di Bari",
+								"Libero Consorzio Comunale di Trapani",
+								"Ministero Sviluppo Economico"
+						)
+				), 
 				Collections.singletonList("P:fpperson:metadati"), Collections.emptyList()
 		);		
 		
