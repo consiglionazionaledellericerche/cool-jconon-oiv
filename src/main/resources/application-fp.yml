@@ -1,6 +1,5 @@
 repository.base.url: http://alfresco-community.test.si.cnr.it/alfresco/
 org.apache.chemistry.opencmis.binding.spi.type: browser
-org.apache.chemistry.opencmis.binding.browser.url: ${repository.base.url}api/-default-/public/cmis/versions/1.1/browser
 
 user.admin.password: admin
 rrd.path: remote-shared,remote-fp
