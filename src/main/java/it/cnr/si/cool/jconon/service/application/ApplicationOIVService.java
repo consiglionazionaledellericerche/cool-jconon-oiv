@@ -24,7 +24,6 @@ import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
 import it.cnr.si.cool.jconon.repository.ProtocolRepository;
 import it.cnr.si.cool.jconon.service.QueueService;
-import it.cnr.si.cool.jconon.service.application.ApplicationService.StatoDomanda;
 import it.cnr.si.cool.jconon.service.call.CallService;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
