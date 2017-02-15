@@ -86,17 +86,12 @@ public class IntervalTest {
 
     public static void main(String[] args) {
 		Session session = getRepositorySession();
-		CmisObject utente = session.getObject("workspace://SpacesStore/8d7c11dc-c1ea-46f5-9b45-b9906e0e186e");
+		CmisObject utente = session.getObject("workspace://SpacesStore/a69b70c5-b283-47d1-acce-47f22d28ae1e");
 	
 		session.bulkUpdateProperties(Collections.singletonList(utente), 
 				Collections.singletonMap("fpperson:amministrazione", 
 						Arrays.asList(
-								"Comune Di Bruino",
-								"Unione dei Comuni delle Valli Joniche dei Peloritani",
-								"Consiglio per la ricerca in agricoltura e l’analisi dell’economia agraria (CREA)",
-								"Comune di Sannicandro di Bari",
-								"Libero Consorzio Comunale di Trapani",
-								"Ministero Sviluppo Economico"
+								"ASI - AGENZIA SPAZIALE ITALIANA"
 						)
 				), 
 				Collections.singletonList("P:fpperson:metadati"), Collections.emptyList()
