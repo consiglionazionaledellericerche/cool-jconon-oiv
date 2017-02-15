@@ -7,6 +7,7 @@ import it.cnr.cool.security.service.UserService;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.util.Pair;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
+import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.service.PrintService;
@@ -44,6 +45,7 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisStreamNotSupportedException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
@@ -246,6 +248,9 @@ public class PrintOIVService extends PrintService {
 				docId = createApplicationDocument(application, contentStream, properties);
 			}
 			return docId;
+		} catch(CmisContentAlreadyExistsException _ex) {
+			LOGGER.warn("File della domanda {} alredy exist", nameRicevutaReportModel, _ex);
+			throw new ClientMessageException("Il file " + nameRicevutaReportModel +" è già presente come allegato!");
 		} catch (Exception e) {
 			throw new CMISApplicationException("Error in JASPER", e);
 		}
