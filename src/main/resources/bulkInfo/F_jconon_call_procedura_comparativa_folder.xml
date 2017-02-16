@@ -204,6 +204,28 @@
 			widget="ui.datepicker"/>
 	</form>
 
+	<columnSet name="display">
+		<columnFieldProperty name="amministrazione"/>
+		<columnFieldProperty name="titolo"/>
+		<columnFieldProperty name="breve_descrizione"/>
+		<columnFieldProperty name="rdp"/>
+		<columnFieldProperty 
+			name="data_inizio_invio_domande"
+			property="jconon_call:data_inizio_invio_domande"
+			widget="ui.datepicker"/>
+		<columnFieldProperty 
+			name="data_fine_invio_domande"
+			widget="ui.datepicker"/>
+		<columnFieldProperty name="tipologia_oiv"/>
+		<columnFieldProperty name="tipologia_selezione"/>
+		<columnFieldProperty name="fascia_professionale"/>
+		<columnFieldProperty name="compenso_annuo_componente"/>
+		<columnFieldProperty name="compenso_annuo_presidente"/>
+		<columnFieldProperty name="telefono"/>
+		<columnFieldProperty name="email"/>
+		<columnFieldProperty name="pec"/>
+		<columnFieldProperty name="sito_web"/>
+	</columnSet>	
 	<columnFieldProperty 
 		property="cmis:objectId" 
 		name="objectId" 
