@@ -225,6 +225,7 @@
 		<columnFieldProperty name="email"/>
 		<columnFieldProperty name="pec"/>
 		<columnFieldProperty name="sito_web"/>
+		<columnFieldProperty name="descrizione_esito"/>
 	</columnSet>	
 	<columnFieldProperty 
 		property="cmis:objectId" 
