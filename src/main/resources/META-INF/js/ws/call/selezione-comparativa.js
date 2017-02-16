@@ -99,7 +99,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
   function displayRow(bulkInfo, search, typeId, rootTypeId, resultSet, target) {
     var xhr = new BulkInfo({
       target: $('<tbody>').appendTo(target),
-      handlebarsId: 'call-main-results',
+      handlebarsId: 'selezioni-comparative-results',
       path: typeId,
       metadata: resultSet,
       handlebarsSettings: {
@@ -108,9 +108,25 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
     }).handlebars();
 
     xhr.done(function () {
-      target.off('click').on('click', '.requirements', function (e) {
-        var data = $("<div></div>").addClass('modal-inner-fix').html($(this).data('content'));
-        UI.modal('<i class="icon-info-sign text-info animated flash"></i> ' + i18n['label.th.jconon_bando_elenco_titoli_studio'], data);
+      target.off('click').on('click', '.displayMetadata', function (e) {
+        var f = URL.Data.node.node;
+        f({
+          data: {
+            "nodeRef" : e.currentTarget.id,
+            "shortQNames" : true
+          }
+        }).done(function (metadata) {
+          new BulkInfo({
+            handlebarsId: 'zebra',
+            name: 'display',
+            path: rootTypeId,
+            metadata: metadata
+          }).handlebars().done(function (html) {
+            var content = $('<div></div>').addClass('modal-inner-fix').append(html),
+              title = i18n.prop("modal.title.view." + rootTypeId, 'Propriet&agrave;');
+            UI.bigmodal(title, content);
+          });
+        });    
         return e.preventDefault();
       });
 
