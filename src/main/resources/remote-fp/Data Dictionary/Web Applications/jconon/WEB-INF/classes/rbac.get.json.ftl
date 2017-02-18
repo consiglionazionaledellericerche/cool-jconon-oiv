@@ -666,6 +666,9 @@
         "GET": {
             "whitelist": {
                 "group": ["GROUP_EVERYONE"]
+            },
+            "blacklist": {
+                "group": ["GROUP_procedureComparativeGroup"]
             }
         }
     },
