@@ -81,6 +81,7 @@
     'cnr/cnr.ui.country': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.country',
     'cnr/cnr.ui.datepicker': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.datepicker',
     'cnr/cnr.ui.datetimepicker': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.datetimepicker',
+    'cnr/cnr.ui.timepicker': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.timepicker',
     'cnr/cnr.ui.duedate': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.duedate',
     'cnr/cnr.ui.group': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.group',
     'cnr/cnr.ui.priority': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.priority',
