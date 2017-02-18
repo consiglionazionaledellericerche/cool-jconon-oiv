@@ -142,18 +142,10 @@
 		<constraint name="jconon_call_procedura_comparativa:tipologia_selezione_values" type="LIST">
 			<parameter name="allowedValues">
 				<list>
-					<value>Componente</value>
 					<value>Presidente</value>
+					<value>OIV Monocratico</value>
+					<value>Componente/i</value>
 					<value>Intero Collegio</value>
-				</list>
-			</parameter>
-		</constraint>
-		<constraint name="jconon_call_procedura_comparativa:fascia_professionale_values" type="LIST">
-			<parameter name="allowedValues">
-				<list>
-					<value>1</value>
-					<value>2</value>
-					<value>3</value>
 				</list>
 			</parameter>
 		</constraint>
@@ -646,31 +638,76 @@
 						<atomic>true</atomic>
 						<stored>false</stored>
 						<tokenised>both</tokenised>
-					</index>					
-				</property>	
-				<property name="jconon_call_procedura_comparativa:fascia_professionale">
-					<title>Fascia Professionale</title>
-					<description>Fascia Professionale</description>
+					</index>
+				</property>
+				<property name="jconon_call_procedura_comparativa:numero_dipendenti">
+					<title>Numero dipendenti</title>
+					<description>Numero dipendenti</description>
 					<type>d:text</type>
 					<index enabled="true">
 						<atomic>true</atomic>
 						<stored>false</stored>
 						<tokenised>both</tokenised>
 					</index>
-					<constraints>
-						<constraint ref="jconon_call_procedura_comparativa:fascia_professionale_values" />
-					</constraints>
+				</property>
+				<property name="jconon_call_procedura_comparativa:ora_fine_invio_domande">
+					<title>Ora fine invio domande</title>
+					<description>Ora fine invio domande</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_call_procedura_comparativa:fascia_professionale">
+					<title>Fascia Professionale Presidente/Monocratico</title>
+					<description>Fascia Professionale Presidente/Monocratico</description>
+					<type>d:text</type>
+					<multiple>true</multiple>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_call_procedura_comparativa:fascia_professionale_comp2">
+					<title>Fascia Professionale Componente 2</title>
+					<description>Fascia Professionale Componente 2</description>
+					<type>d:text</type>
+					<multiple>true</multiple>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_call_procedura_comparativa:fascia_professionale_comp3">
+					<title>Fascia Professionale Componente 2</title>
+					<description>Fascia Professionale Componente 2</description>
+					<type>d:text</type>
+					<multiple>true</multiple>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_call_procedura_comparativa:compenso_annuo_presidente">
+					<title>Compenso annuo Presidente (lordo)</title>
+					<description>Compenso annuo Presidente (lordo)</description>
+					<type>d:double</type>
 				</property>
 				<property name="jconon_call_procedura_comparativa:compenso_annuo_componente">
 					<title>Compenso annuo Componente (lordo)</title>
 					<description>Compenso annuo Componente (lordo)</description>
 					<type>d:double</type>
 				</property>	
-				<property name="jconon_call_procedura_comparativa:compenso_annuo_presidente">
-					<title>Compenso annuo Presidente (lordo)</title>
-					<description>Compenso annuo Presidente (lordo)</description>
+				<property name="jconon_call_procedura_comparativa:compenso_annuo_altro_componente">
+					<title>Compenso annuo altro Componente (lordo)</title>
+					<description>Compenso annuo altro Componente (lordo)</description>
 					<type>d:double</type>
-				</property>
+				</property>	
 
 				<property name="jconon_call_procedura_comparativa:pubblicato_esito">
 					<title>Indica se l'esito è stato pubblicato</title>

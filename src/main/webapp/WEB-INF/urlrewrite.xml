@@ -8,7 +8,7 @@
 	</rule>
 	<rule>
 		<from>/home</from>
-		<to>/rest/page/my-applications</to>
+		<to>/rest/page/manage-application?callCodice=OIV</to>
 	</rule>
 	<rule>
 		<from>/res/**</from>

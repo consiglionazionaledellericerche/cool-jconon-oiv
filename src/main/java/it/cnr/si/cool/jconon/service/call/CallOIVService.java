@@ -19,8 +19,10 @@ import it.spasia.opencmis.criteria.restrictions.Restrictions;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.chemistry.opencmis.client.api.Folder;
@@ -164,6 +166,7 @@ public class CallOIVService extends CallService {
             LOGGER.debug("Try to delete :" + objectId);
         call.deleteTree(true, UnfileObject.DELETE, true);
     }
+	@SuppressWarnings("unchecked")
 	@Override
 	public Folder save(Session cmisSession, BindingSession bindingSession,
 			String contextURL, Locale locale, String userId,
@@ -181,6 +184,31 @@ public class CallOIVService extends CallService {
 	            throw new ClientMessageException("message.error.required.amministrazione");
 	        String name = amministrazione.concat("_").concat(UUID.randomUUID().toString());			
 	        properties.put(PropertyIds.NAME, folderService.integrityChecker(name));
+	        Optional<Calendar> dataFineInvioDomandeOpt = Optional.ofNullable((Calendar)properties.get(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value()));
+	        Optional<String> oraFineInvioDomande = Optional.ofNullable((String)properties.get("jconon_call_procedura_comparativa:ora_fine_invio_domande"));
+	        if (dataFineInvioDomandeOpt.isPresent()) {
+	        	Calendar dataFineInvioDomande = Calendar.getInstance();
+	        	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get().get(Calendar.YEAR));
+	        	dataFineInvioDomande.set(Calendar.MONTH, dataFineInvioDomandeOpt.get().get(Calendar.MONTH));
+	        	dataFineInvioDomande.set(Calendar.DAY_OF_MONTH, dataFineInvioDomandeOpt.get().get(Calendar.DAY_OF_MONTH));
+	        	dataFineInvioDomande.set(Calendar.SECOND, 59);
+	        	if (oraFineInvioDomande.isPresent()) {
+		        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, Integer.valueOf(oraFineInvioDomande.get().split(":")[0]));
+		        	dataFineInvioDomande.set(Calendar.MINUTE, Integer.valueOf(oraFineInvioDomande.get().split(":")[1]));	        		
+	        	} else {
+		        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 23);
+		        	dataFineInvioDomande.set(Calendar.MINUTE, 59);
+	        	}
+	        	properties.put(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), dataFineInvioDomande);
+	        }
+	        Optional<String> numeroDipendentiOptional = Optional.ofNullable((String)properties.get("jconon_call_procedura_comparativa:numero_dipendenti"));
+	        Optional<List<String>> fasciaProfessionaleOptional = Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale"));
+	        if (numeroDipendentiOptional.isPresent() && fasciaProfessionaleOptional.isPresent()  && 
+	        	numeroDipendentiOptional.filter(x -> x.equals("Maggiore o uguale a 250")).isPresent() &&
+	        			fasciaProfessionaleOptional.get().stream().anyMatch(x -> x.equals("Fascia 2"))){
+	        		throw new ClientMessageException("message.error.fascia.presidente");
+	        }
+	        
 	        if (properties.get(PropertyIds.OBJECT_ID) == null) {
                 properties.put(PropertyIds.PARENT_ID, cacheRepository.getCompetitionFolder().getId());
                 properties.put(JCONONPropertyIds.CALL_CODICE.value(), "");
