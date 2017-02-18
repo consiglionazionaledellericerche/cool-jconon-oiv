@@ -239,11 +239,9 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
         });
         if (common.User.other.amministrazione) {
           $('#createNew').removeClass('hide');
-          /*
           if (common.User.other.amministrazione.length === 1) {
             $('#filters-amministrazione').val(common.User.other.amministrazione[0]);
           }
-          */
         }
         manageFilterClick();
         displayCall(rootTypeId, rootQueryTypeId);
