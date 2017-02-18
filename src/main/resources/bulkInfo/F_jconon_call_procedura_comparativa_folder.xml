@@ -21,11 +21,12 @@
 	<fieldProperty 
 		class="input-xxlarge" 
 		inputType="TEXTAREA" 
+		rows="3"
 		label="label.jconon_call_procedura_comparativa_titolo" 
 		name="titolo" 
 		property="jconon_call_procedura_comparativa:titolo" 
 		tooltip="tooltip.jconon_call_procedura_comparativa_titolo">
-		<jsonvalidator required="true"/>
+		<jsonvalidator required="true" minlengthAlfresco="50" maxlengthAlfresco="200"/>
 	</fieldProperty>
 	<fieldProperty 
 		class="input-xxlarge" 
@@ -35,7 +36,7 @@
 		name="breve_descrizione" 
 		property="jconon_call_procedura_comparativa:breve_descrizione" 
 		tooltip="tooltip.jconon_call_procedura_comparativa_breve_descrizione">
-		<jsonvalidator required="true"/>
+		<jsonvalidator required="true" minlengthAlfresco="100" maxlengthAlfresco="500"/>
 	</fieldProperty>
 	<fieldProperty 
 		class="input-xxlarge" 
@@ -43,14 +44,39 @@
 		label="label.jconon_call_procedura_comparativa_rdp" 
 		name="rdp" 
 		property="jconon_call_procedura_comparativa:rdp">
+		<jsonvalidator required="true"/>
 	</fieldProperty>
 	<fieldProperty 
+		class="btn-medium" 
+		inputType="SELECT" 
+		label="label.jconon_call_procedura_comparativa_numero_dipendenti" 
+		name="numero_dipendenti" 
+		property="jconon_call_procedura_comparativa:numero_dipendenti"
+		widget="ui.radio">
+		<jsonvalidator requiredWidget="true"/>
+		<jsonlist>
+			<listElement defaultLabel="Maggiore o uguale a 250" key="Maggiore o uguale a 250" label="label.maggiore.250"/>
+			<listElement defaultLabel="Minore di 250" key="Minore di 250" label="label.minore.250"/>
+		</jsonlist>
+	</fieldProperty>
+	<fieldProperty
+		parentGroupClass="span5"		
+		class="input-medium"  
 		inputType="TEXT" 
 		label="label.jconon_call_procedura_comparativa_data_fine_invio_domande" 
 		name="data_fine_invio_domande" 
 		property="jconon_call:data_fine_invio_domande"
-		widget="ui.datetimepicker">
+		widget="ui.datepicker">
 		<jsonvalidator requiredWidget="true"/>
+	</fieldProperty>
+	<fieldProperty 
+		parentGroupClass="offset5"
+		class="input-small" 
+		inputType="TEXT" 
+		label="label.jconon_call_procedura_comparativa_ora_fine_invio_domande" 
+		name="ora_fine_invio_domande" 
+		property="jconon_call_procedura_comparativa:ora_fine_invio_domande"
+		widget="ui.timepicker">
 	</fieldProperty>
 	<fieldProperty 
 		class="input-xlarge" 
@@ -65,7 +91,7 @@
 		label="label.jconon_call_procedura_comparativa_email" 
 		name="email" 
 		property="jconon_call_procedura_comparativa:email">
-		<jsonvalidator email="true"/>
+		<jsonvalidator email="true" required="true"/>
 	</fieldProperty>
 	<fieldProperty 
 		class="input-xxlarge" 
@@ -73,7 +99,7 @@
 		label="label.jconon_call_procedura_comparativa_pec" 
 		name="pec" 
 		property="jconon_call_procedura_comparativa:pec">
-		<jsonvalidator email="true"/>
+		<jsonvalidator email="true" required="true"/>
 	</fieldProperty>
 	<fieldProperty 
 		class="input-xxlarge" 
@@ -101,29 +127,72 @@
 		<jsonvalidator requiredWidget="true"/>
 	</fieldProperty>
 	<fieldProperty 
-		class="input-small" 
-		inputType="TEXT" 
+		parentGroupClass="span5"
+		class="input-xlarge" 
+		inputType="SELECT"
+		multiple="multiple" 
 		label="label.jconon_call_procedura_comparativa_fascia_professionale" 
 		name="fascia_professionale" 
 		property="jconon_call_procedura_comparativa:fascia_professionale"
-		widget="ui.radio">
+		widget="ui.select">
+		<jsonlist>
+			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
+			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+		</jsonlist>		
 	</fieldProperty>
 	<fieldProperty 
-		class="input-xlarge" 
-		inputType="TEXT" 
-		label="label.jconon_call_procedura_comparativa_compenso_annuo_componente" 
-		name="compenso_annuo_componente" 
-		property="jconon_call_procedura_comparativa:compenso_annuo_componente">
-		<jsonvalidator importo="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="input-xlarge" 
-		inputType="TEXT" 
-		label="label.jconon_call_procedura_comparativa_compenso_annuo_presidente" 
+		parentGroupClass="offset5"
+		class="input-medium currency" 
+		inputType="CURRENCY" 
 		name="compenso_annuo_presidente" 
 		property="jconon_call_procedura_comparativa:compenso_annuo_presidente">
-		<jsonvalidator importo="true"/>
 	</fieldProperty>
+	<fieldProperty 
+		parentGroupClass="span5"
+		class="input-xlarge" 
+		inputType="SELECT"
+		multiple="multiple" 
+		label="label.jconon_call_procedura_comparativa_fascia_professionale_comp2" 
+		name="fascia_professionale_comp2" 
+		property="jconon_call_procedura_comparativa:fascia_professionale_comp2"
+		widget="ui.select">
+		<jsonlist>
+			<listElement defaultLabel="Fascia 1" key="Fascia 1" label="label.fascia.1"/>
+			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
+			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+		</jsonlist>		
+	</fieldProperty>
+	<fieldProperty 
+		parentGroupClass="offset5"
+		class="input-medium currency" 
+		inputType="CURRENCY" 
+		name="compenso_annuo_componente" 
+		property="jconon_call_procedura_comparativa:compenso_annuo_componente">
+	</fieldProperty>
+
+	<fieldProperty 
+		parentGroupClass="span5"
+		class="input-xlarge" 
+		inputType="SELECT"
+		multiple="multiple" 
+		label="label.jconon_call_procedura_comparativa_fascia_professionale_comp3" 
+		name="fascia_professionale_comp3" 
+		property="jconon_call_procedura_comparativa:fascia_professionale_comp3"
+		widget="ui.select">
+		<jsonlist>
+			<listElement defaultLabel="Fascia 1" key="Fascia 1" label="label.fascia.1"/>
+			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
+			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+		</jsonlist>		
+	</fieldProperty>
+	<fieldProperty 
+		parentGroupClass="offset5"
+		class="input-medium currency" 
+		inputType="CURRENCY" 
+		name="compenso_annuo_altro_componente" 
+		property="jconon_call_procedura_comparativa:compenso_annuo_altro_componente">
+	</fieldProperty>
+
 	<fieldProperty 
 		class="input-xxlarge" 
 		inputType="TEXTAREA" 
@@ -140,16 +209,23 @@
 		<formFieldProperty name="titolo"/>
 		<formFieldProperty name="breve_descrizione"/>
 		<formFieldProperty name="rdp"/>
+		<formFieldProperty name="numero_dipendenti"/>
 		<formFieldProperty name="data_fine_invio_domande"/>
+		<formFieldProperty name="ora_fine_invio_domande"/>
 	</form>
 	<form name="affix_sezione_7">
 		<formFieldProperty name="tipologia_oiv"/>
 		<formFieldProperty name="tipologia_selezione"/>
-		<formFieldProperty name="fascia_professionale"/>
-		<formFieldProperty name="compenso_annuo_componente"/>
-		<formFieldProperty name="compenso_annuo_presidente"/>
 	</form>
 	<form name="affix_sezione_8">
+		<formFieldProperty name="fascia_professionale"/>
+		<formFieldProperty name="compenso_annuo_presidente"/>
+		<formFieldProperty name="fascia_professionale_comp2"/>
+		<formFieldProperty name="compenso_annuo_componente"/>
+		<formFieldProperty name="fascia_professionale_comp3"/>
+		<formFieldProperty name="compenso_annuo_altro_componente"/>
+	</form>
+	<form name="affix_sezione_9">
 		<formFieldProperty name="telefono"/>
 		<formFieldProperty name="email"/>
 		<formFieldProperty name="pec"/>
@@ -187,7 +263,7 @@
 			label="label.jconon_call_procedura_comparativa_amministrazione" 
 			name="filters-amministrazione" 
 			placeholder="placeholder.filter.like" 
-			property="root.jconon_call_procedura_comparativa:amministrazione"/>
+			property="jconon_call_procedura_comparativa:amministrazione"/>
 			
 		<formFieldProperty 
 			class="criteria-gte input-medium" 
@@ -209,6 +285,7 @@
 		<columnFieldProperty name="titolo"/>
 		<columnFieldProperty name="breve_descrizione"/>
 		<columnFieldProperty name="rdp"/>
+		<columnFieldProperty name="numero_dipendenti"/>
 		<columnFieldProperty 
 			name="data_inizio_invio_domande"
 			property="jconon_call:data_inizio_invio_domande"
@@ -216,11 +293,22 @@
 		<columnFieldProperty 
 			name="data_fine_invio_domande"
 			widget="ui.datepicker"/>
+		<columnFieldProperty name="ora_fine_invio_domande"/>
+
 		<columnFieldProperty name="tipologia_oiv"/>
 		<columnFieldProperty name="tipologia_selezione"/>
 		<columnFieldProperty name="fascia_professionale"/>
-		<columnFieldProperty name="compenso_annuo_componente"/>
-		<columnFieldProperty name="compenso_annuo_presidente"/>
+		<columnFieldProperty 
+			name="compenso_annuo_presidente"
+			label="label.jconon_call_procedura_comparativa_compenso_annuo_presidente"/>
+		<columnFieldProperty name="fascia_professionale_comp2"/>
+		<columnFieldProperty 
+			name="compenso_annuo_componente"
+			label="label.jconon_call_procedura_comparativa_compenso_annuo_componente"/>
+		<columnFieldProperty name="fascia_professionale_comp3"/>
+		<columnFieldProperty 
+			name="compenso_annuo_altro_componente"
+			label="label.jconon_call_procedura_comparativa_compenso_annuo_altro_componente"/>			
 		<columnFieldProperty name="telefono"/>
 		<columnFieldProperty name="email"/>
 		<columnFieldProperty name="pec"/>

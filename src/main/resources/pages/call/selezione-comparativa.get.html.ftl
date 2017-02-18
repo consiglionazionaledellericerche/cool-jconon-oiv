@@ -2,35 +2,36 @@
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span3">
-        <div>
-          <div id="criteria">
-            <div class="control-group form-horizontal">
-              <label class="control-label">&nbsp;</label>
-              <div class="controls">
-                <div class="btn-group">
-                  <button id="applyFilter" type="button" class="btn btn-primary btn-small"><i class="icon-filter icon-white"></i> Filtra</button>
-                  <button id="resetFilter" class="btn btn-small"><i class="icon-repeat"></i> Reset</button>
-                </div>
-              </div>
+        <div id="criteria">
+          <div class="pull-right">
+            <p>              
+            <a id="createNew" type="button" class="btn btn-primary hide" href="/manage-call?call-type=F:jconon_call_procedura_comparativa:folder"><i class="icon-plus icon-white"></i> Inserisci nuovo annuncio</a>
+            </p>
+            <div id="orderBy" class="btn-group" style="display: block;">
+              <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
+                ${message('button.order.by')}
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu"></ul>
             </div>
+            <p>
+              <div class="btn-group">
+                <button id="applyFilter" type="button" class="btn btn-primary btn-small"><i class="icon-filter icon-white"></i> Filtra</button>
+                <button id="resetFilter" class="btn btn-small"><i class="icon-repeat"></i> Reset</button>
+              </div>
+            </p>
           </div>
         </div>
       </div><!--/span-->
       <div class="list-main-call span9">
         <table class="table table-striped" id="items">
-          <thead><tr>
-            <th>
-              <h3>${message('title.selezioni.comparative')}</h3>
-            </th>
-            <th>
-              <div id="orderBy" class="btn-group">
-                <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-                  ${message('button.order.by')}
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu"></ul>
-              </div>
-            </th></tr>
+          <thead>
+            <tr>
+              <th>
+                <h3>${message('title.selezioni.comparative')}</h3>
+              </th>
+              <th></th>
+            </tr>
           </thead>
         </table>
         <div id="itemsPagination" class="pagination pagination-centered">
