@@ -205,7 +205,7 @@ public class CallOIVService extends CallService {
 	        Optional<List<String>> fasciaProfessionaleOptional = Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale"));
 	        if (numeroDipendentiOptional.isPresent() && fasciaProfessionaleOptional.isPresent()  && 
 	        	numeroDipendentiOptional.filter(x -> x.equals("Maggiore o uguale a 250")).isPresent() &&
-	        			fasciaProfessionaleOptional.get().stream().anyMatch(x -> x.equals("Fascia 2"))){
+	        			fasciaProfessionaleOptional.get().stream().anyMatch(x -> !x.equals("Fascia 3"))){
 	        		throw new ClientMessageException("message.error.fascia.presidente");
 	        }
 	        

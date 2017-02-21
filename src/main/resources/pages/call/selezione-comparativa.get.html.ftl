@@ -24,16 +24,8 @@
         </div>
       </div><!--/span-->
       <div class="list-main-call span9">
-        <table class="table table-striped" id="items">
-          <thead>
-            <tr>
-              <th>
-                <h3>${message('title.selezioni.comparative')}</h3>
-              </th>
-              <th></th>
-            </tr>
-          </thead>
-        </table>
+        <h3>${message('title.selezioni.comparative')}</h3>
+        <table class="table table-striped fixed-layout" id="items"></table>
         <div id="itemsPagination" class="pagination pagination-centered">
           <ul></ul>
         </div>

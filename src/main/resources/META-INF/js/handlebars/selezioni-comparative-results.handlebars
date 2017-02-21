@@ -1,37 +1,37 @@
 {{#each bulkinfoMap}}
 	{{#with raw}}
 		<tr>
-			<td>
-				<div class="controls controls-row">
+			<td class="span8">
+				<div class="row-fluid">
 					<div class="span3"><b>{{i18n "label.jconon_call_procedura_comparativa_amministrazione"}}</b></div>
 					<div class="span9">{{jconon_call_procedura_comparativa_amministrazione}}</div>
 				</div>	
 				{{#if jconon_call_data_inizio_invio_domande}}
-					<div class="controls controls-row">
+					<div class="row-fluid">
 						<div class="span3"><b>{{i18n "label.th.jconon_bando_data_inizio"}}</b></div>
 						<div class="span9">{{date jconon_call_data_inizio_invio_domande "DD/MM/YYYY"}}</div>
 					</div>
 				{{/if}}
 				{{#if jconon_call_procedura_comparativa_titolo}}
-					<div class="controls controls-row">
+					<div class="row-fluid">
 						<div class="span3"><b>{{i18n "label.jconon_call_procedura_comparativa_titolo"}}</b></div>
 						<div class="span9"><a href="#" id="{{cmis_objectId}}" class="displayMetadata">{{ jconon_call_procedura_comparativa_titolo}}</a></div>
 					</div>
 				{{/if}}
 				{{#if jconon_call_procedura_comparativa_breve_descrizione}}
-					<div class="controls controls-row">
+					<div class="row-fluid">
 						<div class="span3"><b>{{i18n "label.jconon_call_procedura_comparativa_breve_descrizione"}}</b></div>
 						<div class="span9">{{jconon_call_procedura_comparativa_breve_descrizione}}</div>
 					</div>
 				{{/if}}
 				{{#if jconon_call_data_fine_invio_domande}}
-					<div class="controls controls-row">
+					<div class="row-fluid">
 						<div class="span3"><b>{{i18n "label.th.jconon_bando_data_scadenza"}}</b></div>
 						<div class="span9">{{date jconon_call_data_fine_invio_domande "DD/MM/YYYY"}} {{jconon_call_procedura_comparativa_ora_fine_invio_domande}}</div>
 					</div>				
 				{{/if}}
 			</td>
-			<td></td>
+			<td class="span3"></td>
 		</tr>
 	{{/with}}
 {{/each}}
