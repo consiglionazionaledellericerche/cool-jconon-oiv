@@ -63,6 +63,7 @@
 		parentGroupClass="span5"		
 		class="input-medium"  
 		inputType="TEXT" 
+		startDate="+1d"
 		label="label.jconon_call_procedura_comparativa_data_fine_invio_domande" 
 		name="data_fine_invio_domande" 
 		property="jconon_call:data_fine_invio_domande"
@@ -130,7 +131,6 @@
 		parentGroupClass="span5"
 		class="input-xlarge" 
 		inputType="SELECT"
-		multiple="multiple" 
 		label="label.jconon_call_procedura_comparativa_fascia_professionale" 
 		name="fascia_professionale" 
 		property="jconon_call_procedura_comparativa:fascia_professionale"
@@ -138,59 +138,70 @@
 		<jsonlist>
 			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
 			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+			<listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>
 		</jsonlist>		
 	</fieldProperty>
 	<fieldProperty 
 		parentGroupClass="offset5"
 		class="input-medium currency" 
 		inputType="CURRENCY" 
+		decimal="true"
 		name="compenso_annuo_presidente" 
 		property="jconon_call_procedura_comparativa:compenso_annuo_presidente">
+		<jsonvalidator currency="true"/>
 	</fieldProperty>
 	<fieldProperty 
 		parentGroupClass="span5"
 		class="input-xlarge" 
 		inputType="SELECT"
-		multiple="multiple" 
 		label="label.jconon_call_procedura_comparativa_fascia_professionale_comp2" 
 		name="fascia_professionale_comp2" 
 		property="jconon_call_procedura_comparativa:fascia_professionale_comp2"
 		widget="ui.select">
 		<jsonlist>
+			<listElement defaultLabel="Tutte le fasce" key="Tutte le fasce" label="label.fascia.tutte"/>			
 			<listElement defaultLabel="Fascia 1" key="Fascia 1" label="label.fascia.1"/>
 			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
 			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+			<listElement defaultLabel="Fascia 1 o 2" key="Fascia 1 o 2" label="label.fascia.1.2"/>									
+			<listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>						
 		</jsonlist>		
 	</fieldProperty>
 	<fieldProperty 
 		parentGroupClass="offset5"
 		class="input-medium currency" 
 		inputType="CURRENCY" 
+		decimal="true"
 		name="compenso_annuo_componente" 
 		property="jconon_call_procedura_comparativa:compenso_annuo_componente">
+		<jsonvalidator currency="true"/>
 	</fieldProperty>
 
 	<fieldProperty 
 		parentGroupClass="span5"
 		class="input-xlarge" 
 		inputType="SELECT"
-		multiple="multiple" 
 		label="label.jconon_call_procedura_comparativa_fascia_professionale_comp3" 
 		name="fascia_professionale_comp3" 
 		property="jconon_call_procedura_comparativa:fascia_professionale_comp3"
 		widget="ui.select">
 		<jsonlist>
+			<listElement defaultLabel="Tutte le fasce" key="Tutte le fasce" label="label.fascia.tutte"/>			
 			<listElement defaultLabel="Fascia 1" key="Fascia 1" label="label.fascia.1"/>
 			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
 			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+			<listElement defaultLabel="Fascia 1 o 2" key="Fascia 1 o 2" label="label.fascia.1.2"/>									
+			<listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>						
 		</jsonlist>		
 	</fieldProperty>
 	<fieldProperty 
 		parentGroupClass="offset5"
 		class="input-medium currency" 
 		inputType="CURRENCY" 
+		decimal="true"
 		name="compenso_annuo_altro_componente" 
 		property="jconon_call_procedura_comparativa:compenso_annuo_altro_componente">
+		<jsonvalidator currency="true"/>
 	</fieldProperty>
 
 	<fieldProperty 
