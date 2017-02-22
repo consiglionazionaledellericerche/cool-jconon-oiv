@@ -173,8 +173,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
     if (bulkinfo.validate()) {
       publishEsito(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
         metadata['jconon_call_procedura_comparativa:pubblicato_esito'] = published;
-        $('#publish').find('i').removeClass(removeClass).addClass(addClass);
-        $('#publish').attr('title', title).tooltip('destroy').tooltip({placement: 'bottom'});
+        $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.esito.portale'] : i18n['button.publish.esito.portale']));
       });
     } else {
       UI.alert(i18n['message.improve.required.fields']);
@@ -192,9 +191,8 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
       var pubblicato = metadata['jconon_call_procedura_comparativa:pubblicato_esito'],
         removeClass = pubblicato ? 'icon-eye-open' : 'icon-eye-close',
         addClass = pubblicato ? 'icon-eye-close' : 'icon-eye-open',
-        title = pubblicato ? i18n['button.unpublish'] : i18n['button.publish'];
-      $('#publish').find('i').removeClass(removeClass).addClass(addClass);
-      $('#publish').attr('title', title).tooltip('destroy').tooltip({placement: 'bottom'});
+        title = pubblicato ? i18n['button.unpublish.esito.portale'] : i18n['button.publish.esito.portale'];        
+      $('#publish').html('<i class="' + addClass + '"></i> ' + title);
       showGestore();
     }
     bulkinfo = new BulkInfo({
