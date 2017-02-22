@@ -32,87 +32,8 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
       maxUploadSize: true,
       search: {
         type: 'jconon_attachment:document',
-        displayRow: function (el, refreshFn, permission) {
-          return jconon.defaultDisplayDocument(el, refreshFn, permission, true, false, 
-            {
-              sendcallfile : function () {
-                var objectId = el.id,
-                  objectTypeId = el.objectTypeId,
-                  content = $("<div>").addClass('modal-inner-fix'),
-                  bulkinfo,
-                  myModal,
-                  settings = {
-                    target: content,
-                    formclass: 'form-horizontal jconon',
-                    name: 'invia',
-                    path: "D:jconon_comunicazione:attachment"
-                  };
-                bulkinfo = new BulkInfo(settings);
-                bulkinfo.render();
-               
-                function callback() {
-                  if (bulkinfo.validate()) {
-                      var close = UI.progress(), d = bulkinfo.getData();
-                      d.push(
-                        {
-                          id: 'objectId',
-                          name: 'objectId',
-                          value: el.id
-                        },
-                        {
-                          id: 'callId',
-                          name: 'callId',
-                          value: metadata['cmis:objectId']
-                        }
-                      ); 
-                      jconon.Data.call.inviaallegato({
-                        type: 'POST',
-                        data:  d,
-                        success: function (data) {
-                          UI.info("Sono state inviate " + data.length + " comunicazioni.<br>" + (data.length !== 0 ? data.join(', ') : ''));
-                        },
-                        complete: close,
-                        error: URL.errorFn
-                      });
-                  }
-                  return false;
-                }
-                myModal = UI.modal('Invia comunicazione ['+ el.name + ']', content, callback);
-              }
-            },
-            {
-              sendcallfile : 'icon-envelope'
-            }
-          );
-        }
-      },
-      submission : {
-        callback : function (attachmentsData, data) {
-          if (data['cmis:objectTypeId'] === 'D:jconon_attachment:call_convocazioni_candidati') {
-            var startDate = moment(common.now),
-              endDate = moment(common.now).add(moment.duration(1, 'month')),
-              defaultFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
-              URL.Data.frontOffice.doc({
-                type: "POST",
-                data: {
-                  stackTrace: JSON.stringify({
-                    "avvisi:number": Number(moment(common.now).format('YYYYMMDDHH')),
-                    "avvisi:style": "information",
-                    "avvisi:type":"Convocazione Bando " + metadata['jconon_call:codice'],
-                    "avvisi:data": startDate.format(defaultFormat),
-                    "avvisi:dataScadenza": endDate.format(defaultFormat),
-                    "avvisi:title":"E' stata pubblicata la convocazione " + data['cmis:name'],
-                    "avvisi:text":"<p>Per scaricare la convocazione cliccare <a href='rest/content?nodeRef=" + data['cmis:objectId'] + "'>qui</a></p>",
-                    "avvisi:authority":"GROUP_EVERYONE"
-                  }),
-                  type_document: 'notice'
-                },
-                success: function (data) {
-                  CNR.log(data);
-                }
-              });
-          }
-        }
+        filter: false,
+        displayRow: jconon.defaultDisplayDocument
       }
     });
   }
@@ -210,8 +131,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
         showHelpDeskTecnico($('#affix_sezione_helpdesk div.well div.HelpDeskTecnico'));
         showHelpDeskNormativo($('#affix_sezione_helpdesk div.well div.HelpDeskNormativo'));
         metadata['jconon_call:pubblicato'] = published;
-        $('#publish').find('i').removeClass(removeClass).addClass(addClass);
-        $('#publish').attr('title', title).tooltip('destroy').tooltip({placement: 'bottom'});
+        $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.portale'] : i18n['button.publish.portale']));
       });
     } else {
       UI.alert(i18n['message.improve.required.fields']);
@@ -365,9 +285,8 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
       var pubblicato = metadata['jconon_call:pubblicato'],
         removeClass = pubblicato ? 'icon-eye-open' : 'icon-eye-close',
         addClass = pubblicato ? 'icon-eye-close' : 'icon-eye-open',
-        title = pubblicato ? i18n['button.unpublish'] : i18n['button.publish'];
-      $('#publish').find('i').removeClass(removeClass).addClass(addClass);
-      $('#publish').attr('title', title).tooltip('destroy').tooltip({placement: 'bottom'});
+        title = pubblicato ? i18n['button.unpublish.portale'] : i18n['button.publish.portale'];        
+      $('#publish').html('<i class="' + addClass + '"></i> ' + title);
       showGestore();
     }
     bulkinfo = new BulkInfo({

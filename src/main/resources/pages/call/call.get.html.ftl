@@ -13,7 +13,7 @@
           <div id="gestore"></div>
           <ul id="affix" class="nav nav-list"></ul>
           <br>
-          <button id="publish" class="btn btn-primary btn-large" type="button" title="${message('button.publish')}"><i class="icon-eye-open"></i> Pubblica sul Portale</button>
+          <button id="publish" class="btn btn-primary btn-large" type="button"><i class="icon-eye-open"></i> ${message('button.publish.portale')}</button>
         </div>
       </div><!--/span-->
       <div class="span9" id="field">
