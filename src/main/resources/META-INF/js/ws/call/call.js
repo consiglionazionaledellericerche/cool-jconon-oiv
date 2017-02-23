@@ -44,40 +44,6 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
     btn.parent('li').addClass('active');
   }
 
-  function showRdP(element) {
-    element.find('table.table-striped').remove();
-    Call.displayGroup(metadata['jconon_call:rdp'], element, function () {
-      showRdP(element);
-    });
-  }
-
-  function showHelpDeskTecnico(element) {
-    var idCategoriaTecnico = metadata['jconon_call:id_categoria_tecnico_helpdesk'];
-    element.find('table.table-striped.categoria-' + idCategoriaTecnico).remove();
-    if (idCategoriaTecnico) {
-      Call.groupHelpDesk(idCategoriaTecnico, element, function () {
-        showHelpDeskTecnico(element);
-      });
-    }
-  }
-
-  function showHelpDeskNormativo(element) {
-    var idCategoriaNormativa = metadata['jconon_call:id_categoria_normativa_helpdesk'];
-    element.find('table.table-striped.categoria-' + idCategoriaNormativa).remove();
-    if (idCategoriaNormativa) {
-      Call.groupHelpDesk(idCategoriaNormativa, element, function () {
-        showHelpDeskNormativo(element);
-      });
-    }
-  }
-
-  function showCommission(element) {
-    element.find('table.table-striped').remove();
-    Call.displayGroup(metadata['jconon_call:commissione'], element, function () {
-      showCommission(element);
-    });
-  }
-
   function showGestore() {
     var divGestore = $('#gestore'),
       gestore = metadata['cmis:createdBy'] || common.User.id,
@@ -108,10 +74,6 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
           cmisObjectId = data['cmis:objectId'];
           bulkinfo.addFormItem('cmis:objectId', cmisObjectId);
           metadata = data;
-          showRdP($('#affix_sezione_rdp div.well'));
-          if (!Call.isActive(metadata['jconon_call:data_inizio_invio_domande'], metadata['jconon_call:data_fine_invio_domande'])) {
-            showCommission($('#affix_sezione_commissione div.well'));            
-          }
           var showAllegati = createAttachments($('#affix_sezione_allegati div.well'));
           showAllegati();
         }
@@ -123,15 +85,14 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
   });
   $('#publish').click(function () {
     if (bulkinfo.validate()) {
-      Call.publish(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
-        showRdP($('#affix_sezione_rdp div.well'));
-        if (!Call.isActive(metadata['jconon_call:data_inizio_invio_domande'], metadata['jconon_call:data_fine_invio_domande'])) {
-          showCommission($('#affix_sezione_commissione div.well'));            
-        }
-        showHelpDeskTecnico($('#affix_sezione_helpdesk div.well div.HelpDeskTecnico'));
-        showHelpDeskNormativo($('#affix_sezione_helpdesk div.well div.HelpDeskNormativo'));
-        metadata['jconon_call:pubblicato'] = published;
-        $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.portale'] : i18n['button.publish.portale']));
+      UI.confirm(i18n.prop('message.warning.publish'), function () {
+        Call.publish(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
+          metadata['jconon_call:pubblicato'] = published;
+          if (published && !common.User.admin) {
+            window.location.href = '/avvisi-pubblici-di-selezione-comparativa';
+          }
+          $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.portale'] : i18n['button.publish.portale']));
+        });
       });
     } else {
       UI.alert(i18n['message.improve.required.fields']);
@@ -144,76 +105,10 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
     });
   });
 
-  $('#showEnMetadata').click(function () {
-    var fields = content.find("[id$='_en']").parents("div.control-group");
-    if (!$(this).hasClass('active')) {
-      fields.show();
-    } else {
-      fields.hide();
-    }
-  });
-  $('#copy').on("click", function () {
-    if ($('#copy').prop('disabled')) {
-      return;
-    }    
-    window.location = jconon.URL.call.manage + '?call-type=' + params['call-type'] + '&copyFrom=' + cmisObjectId;
-  });
-  $('#createChild').on("click", function () {
-    if ($('#createChild').prop('disabled')) {
-      return;
-    }
-    var content = $('<div><div>').addClass('modal-inner-fix'),
-      bulkinfoChild = new BulkInfo({
-        target: content,
-        formclass: 'form-horizontal',
-        path: params['call-type'],
-        name: 'create_child_call'
-      });
-    bulkinfoChild.render();
-    UI.bigmodal(i18n['button.create.child'], content, function () {
-      if (!bulkinfoChild.validate()) {
-        return false;
-      }
-      var close = UI.progress(),
-        data = bulkinfoChild.getData();
-      data.push({name: 'cmis:parentId', value: cmisObjectId});
-      data.push({name: 'cmis:objectTypeId', value: params['call-type']});
-      jconon.Data.call.child({
-        type: 'POST',
-        data: data,
-        success: function () {
-          UI.success(i18n['message.operation.performed']);
-        },
-        complete: close,
-        error: URL.errorFn
-      });
-      return false;
-    });
-  });
-
-  function onChangeMacroCall(data) {
-    var fieldsAdd = content.find("#numero_max_domande").parents("div.control-group"),
-      fieldsRemove = content.find("#path_macro_call").parents("div.control-group");
-    if (data === 'add-P:jconon_call:aspect_macro_call') {
-      fieldsAdd.show();
-      fieldsRemove.hide();
-      $('#createChild').prop('disabled', false).removeClass('disabled');
-    } else {
-      fieldsAdd.hide();
-      fieldsRemove.show();
-      $('#createChild').prop('disabled', true);
-    }
-  }
-  function manageClickMacroCall() {
-    $('#aspect_macro_call > button.btn').on("click", function () {
-      onChangeMacroCall($(this).attr('data-value'));
-    });
-  }
-
   function onChangeNumeroDipendenti(data) {
     var options = content.find('#fascia_professionale option:contains("2")');
     if (data === 'Maggiore o uguale a 250') {
-      options.attr('disabled', 'true');
+      options.attr('disabled', 'disabled');
       options.removeAttr('selected');
     } else {
       options.removeAttr('disabled');
@@ -227,65 +122,76 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
     });
   }
 
-  function showPreviewAndLabelsButton(div) {
-    div.append($('<div class="control-group">' + 
-        '<label class="control-label">Anteprima Domanda</label>' +
-        '<div class="controls"><a class="btn btn-primary" type="button" title="Anteprima domanda" href="manage-application?callId=' + cmisObjectId + '&preview=true">' + 
-        '<i class="icon-picture"></i></a></div></div>'
-      ));
-    div.append($('<div class="control-group">' +
-        '<label class="control-label">Configura etichette</label>' +
-        '<div class="controls"><a class="btn btn-info" type="button" title="Configura etichette" href="manage-call-labels?callId=' + cmisObjectId + '">' +
-        '<i class="icon-cog"></i></a></div></div>'));    
+  function onChangeTipologiaOIV(data) {
+    var options = content.find('#tipologia_selezione :not(option:contains("Monocratico"))');
+    if (data === 'Monocratico') {
+      options.attr('disabled', 'disabled');
+      options.removeAttr('selected');
+    } else {
+      options.removeAttr('disabled');
+    }
+    content.find('#tipologia_selezione').trigger('change');
   }
-  function addPreviewButton(formItem, item) {
-    var btnPreview = $('<button class="btn" type="button" title="preview"><i class="icon-picture"></i></button>').click(function (eventObject) {
-      var content = $('<div></div>').addClass('modal-inner-fix'),
-        sections = ['preview'].concat(formItem.val()),
-        bulkinfoPreview,
-        charCodeAspect = 65;
-      bulkinfoPreview =  new BulkInfo({
-        target: content,
-        formclass: 'form-horizontal jconon well',
-        path: 'F:jconon_application:folder',
-        metadata: bulkinfo.getDataJSON(),
-        name: sections,
-        callback: {
-          afterCreateForm: function (form) {
-            var rows = form.find('table tr');
-            /*jslint unparam: true*/
-            $.each(rows, function (index, el) {
-              var td = $(el).find('td:last');
-              if (td.find("[data-toggle=buttons-radio]").size() > 0) {
-                td.find('label:first').addClass('span9').removeClass('control-label');
-              }
-            });
-          },
-          afterCreateSection: function (section) {
-            var div = section.find(':first-child');
-            if (section.attr('id').indexOf('preview') !== -1) {
-              div.append($('<table></table>').addClass('table table-bordered'));
-            } else {
-              $('<tr></tr>')
-                .append('<td>' + String.fromCharCode(charCodeAspect++) + '</td>')
-                .append($('<td>').append(div))
-                .appendTo(content.find("#preview > :last-child > :last-child"));
-            }
-          }
-        }
-      });
-      bulkinfoPreview.render();
-      UI.bigmodal('Preview', content);
+
+  function manangeClickTipologiaOIV() {
+    $('#tipologia_oiv').on("change", function () {
+      onChangeTipologiaOIV($( "#tipologia_oiv option:selected" ).text());
     });
-    formItem.element.find(".controls").
-      append(btnPreview);
   }
+
+  function onChangeTipologiaSelezione(data) {
+    var selectPresidente = content.find('#fascia_professionale'),
+      selectComponente = content.find('#fascia_professionale_comp2, #fascia_professionale_comp3'),
+      optionsPresidente = content.find('#fascia_professionale :not(option:empty)'),
+      optionsComponente = content.find('#fascia_professionale_comp2 :not(option:empty), #fascia_professionale_comp3 :not(option:empty)'),
+      compensoPresidente = content.find('#compenso_annuo_presidente'),
+      compensoComponente = content.find('#compenso_annuo_componente, #compenso_annuo_altro_componente');
+    if (data === 'OIV Monocratico' || data === 'Presidente') {      
+      selectPresidente.removeAttr('disabled');
+      compensoPresidente.removeAttr('disabled');
+      optionsPresidente.removeAttr('disabled');
+
+      optionsComponente.removeAttr('selected');
+      selectComponente.attr('disabled', 'disabled');
+      optionsComponente.attr('disabled', 'disabled');
+      compensoComponente.val('');
+      compensoComponente.attr('disabled', 'disabled');
+    } else {
+      selectComponente.removeAttr('disabled');
+      optionsComponente.removeAttr('disabled');
+      compensoComponente.removeAttr('disabled');
+      if (data === 'Intero Collegio') {
+        selectPresidente.removeAttr('disabled');
+        compensoPresidente.removeAttr('disabled');
+        optionsPresidente.removeAttr('disabled');
+      } else {
+        optionsPresidente.removeAttr('selected');
+        selectPresidente.attr('disabled', 'disabled');
+        optionsPresidente.attr('disabled', 'disabled');
+        compensoPresidente.val('');
+        compensoPresidente.attr('disabled', 'disabled');
+      }
+    }
+    selectPresidente.trigger('change');
+    selectComponente.trigger('change');
+    onChangeNumeroDipendenti(metadata['jconon_call_procedura_comparativa:numero_dipendenti']);
+  }
+
+  function manangeClickTipologiaSelezione() {
+    $('#tipologia_selezione').on("change", function () {
+      onChangeTipologiaSelezione($( "#tipologia_selezione option:selected" ).text());
+    });
+  }
+
   function bulkInfoRender() {
     if (metadata) {
       var pubblicato = metadata['jconon_call:pubblicato'],
         removeClass = pubblicato ? 'icon-eye-open' : 'icon-eye-close',
         addClass = pubblicato ? 'icon-eye-close' : 'icon-eye-open',
         title = pubblicato ? i18n['button.unpublish.portale'] : i18n['button.publish.portale'];        
+      if (pubblicato && !common.User.admin) {
+        $('#publish').hide();
+      }
       $('#publish').html('<i class="' + addClass + '"></i> ' + title);
       showGestore();
     }
@@ -295,76 +201,32 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
       path: params['call-type'],
       name: forms,
       metadata: metadata,
-      callback: {
-        beforeCreateElement: function (item) {
-          if (item.name === 'elenco_aspects' ||
-              item.name === 'elenco_aspects_sezione_cnr' ||
-              item.name === 'elenco_aspects_ulteriori_dati') {
-            item.jsonlist = cache.jsonlistApplicationAspects;
-          } else if (item.name === 'elenco_association') {
-            item.jsonlist = cache.jsonlistApplicationAttachments;
-          } else if (item.name === 'elenco_field_not_required') {
-            item.jsonlist = cache.jsonlistApplicationFieldsNotRequired;
-          } else if (item.name === 'elenco_sezioni_domanda') {
-            item.jsonlist = cache.jsonlistAffixApplication;
-          } else if (item.name === 'elenco_sezioni_curriculum') {
-            item.jsonlist = cache.jsonlistApplicationCurriculums;
-          } else if (item.name === 'elenco_prodotti') {
-            item.jsonlist = cache.jsonlistApplicationProdotti;
-          } else if (item.name === 'elenco_schede_anonime') {
-            item.jsonlist = cache.jsonlistApplicationSchedeAnonime;
-          } else if (item.name === 'path_macro_call') {
-            item.jsonlist = jsonlistMacroCall;
-          }
-        },
+      callback: {        
         afterCreateSection: function (section) {
           var div = section.find(':first-child'),
-            showAllegati,
-            divHelpDeskTecnico = $('<div class="HelpDeskTecnico thumbnail"><h4>Tecnico</h4></div>'),
-            divHelpDeskNormativo = $('<div class="HelpDeskNormativo thumbnail"><h4>Normativo</h4></div>');
-          div.addClass('well').append('<h1>' + i18n[section.attr('id')]
-            + '</h1><hr></hr>');
+            showAllegati;
+          if (section.attr('id') === 'affix_sezione_allegati' && !cmisObjectId) {
+            div.addClass('well').append('<h1>' + i18n[section.attr('id') + '_initial']
+              + '</h1><hr></hr>');          
+          } else {
+            div.addClass('well').append('<h1>' + i18n[section.attr('id')]
+              + '</h1><hr></hr>');
+          }
           if (section.attr('id') === 'affix_sezione_allegati' && cmisObjectId) {
             showAllegati = createAttachments(div);
             showAllegati();
-          } else if (section.attr('id') === 'affix_sezione_rdp' && cmisObjectId) {
-            showRdP(div);
-          } else if (section.attr('id') === 'affix_sezione_helpdesk' && cmisObjectId) {
-            div.append(divHelpDeskTecnico);
-            div.append('<BR>');
-            div.append(divHelpDeskNormativo);
-            showHelpDeskTecnico(divHelpDeskTecnico);
-            showHelpDeskNormativo(divHelpDeskNormativo);
-          } else if (section.attr('id') === 'affix_sezione_commissione' && cmisObjectId) {
-            if (metadata['jconon_call:data_inizio_invio_domande'] && metadata['jconon_call:data_fine_invio_domande'] &&
-              !Call.isActive(metadata['jconon_call:data_inizio_invio_domande'], metadata['jconon_call:data_fine_invio_domande'])) {
-              showCommission(div);
-            } else {
-              section.hide();
-              $('#affix').find('li a[href=\'#affix_sezione_commissione\']').parent().hide();
-            }
           }
         },
         afterCreateForm: function (form) {
-          form.find("[id$='_en']").parents("div.control-group").hide();
-          onChangeMacroCall(
-            $('#aspect_macro_call > button.btn.active').attr('data-value')
-          );          
-          manageClickMacroCall();
           onChangeNumeroDipendenti(metadata['jconon_call_procedura_comparativa:numero_dipendenti']);          
           manangeClickNumeroDipendenti();
+          onChangeTipologiaOIV(metadata['jconon_call_procedura_comparativa:tipologia_oiv']);
+          manangeClickTipologiaOIV();
+          onChangeTipologiaSelezione(metadata['jconon_call_procedura_comparativa:tipologia_selezione']);
+          manangeClickTipologiaSelezione();
+
           $('body').scrollspy({ target: '.cnr-sidenav' });
-          if (cmisObjectId && (common.User.id === metadata['cmis:createdBy'] || common.User.admin)) {
-            showPreviewAndLabelsButton($('#affix_sezione_2 div.well'));
-          }
           content.prepend($('<div class="well jumbotron"><h1>' + i18n.prop(params['call-type']) + '</h1></div>'));
-        },
-        afterCreateElement: function (formItem, item) {
-          if (item.name === 'elenco_aspects' ||
-              item.name === 'elenco_aspects_sezione_cnr' ||
-              item.name === 'elenco_aspects_ulteriori_dati') {
-            addPreviewButton(formItem, item);
-          }
         }
       }
     });

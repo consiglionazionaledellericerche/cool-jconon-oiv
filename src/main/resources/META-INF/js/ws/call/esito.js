@@ -171,9 +171,14 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
   }
   $('#publish').click(function () {
     if (bulkinfo.validate()) {
-      publishEsito(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
-        metadata['jconon_call_procedura_comparativa:pubblicato_esito'] = published;
-        $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.esito.portale'] : i18n['button.publish.esito.portale']));
+      UI.confirm(i18n.prop('message.warning.esito.publish'), function () {
+        publishEsito(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
+          metadata['jconon_call_procedura_comparativa:pubblicato_esito'] = published;
+          if (published && !common.User.admin) {
+            window.location.href = '/avvisi-pubblici-di-selezione-comparativa';
+          }          
+          $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.esito.portale'] : i18n['button.publish.esito.portale']));
+        });
       });
     } else {
       UI.alert(i18n['message.improve.required.fields']);
@@ -191,7 +196,10 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
       var pubblicato = metadata['jconon_call_procedura_comparativa:pubblicato_esito'],
         removeClass = pubblicato ? 'icon-eye-open' : 'icon-eye-close',
         addClass = pubblicato ? 'icon-eye-close' : 'icon-eye-open',
-        title = pubblicato ? i18n['button.unpublish.esito.portale'] : i18n['button.publish.esito.portale'];        
+        title = pubblicato ? i18n['button.unpublish.esito.portale'] : i18n['button.publish.esito.portale'];
+      if (pubblicato && !common.User.admin) {
+        $('#publish').hide();
+      }        
       $('#publish').html('<i class="' + addClass + '"></i> ' + title);
       showGestore();
     }

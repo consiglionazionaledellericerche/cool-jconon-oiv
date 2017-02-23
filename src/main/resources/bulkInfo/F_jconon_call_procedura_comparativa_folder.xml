@@ -62,7 +62,9 @@
 	<fieldProperty
 		parentGroupClass="span5"		
 		class="input-medium"  
-		inputType="TEXT" 
+		inputType="TEXT"
+		todayHighlight="false" 
+		todayBtn="false"
 		startDate="+1d"
 		label="label.jconon_call_procedura_comparativa_data_fine_invio_domande" 
 		name="data_fine_invio_domande" 
