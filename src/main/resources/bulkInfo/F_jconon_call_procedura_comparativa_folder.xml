@@ -9,14 +9,12 @@
 
 	<fieldProperty 
 		class="input-xxlarge" 
-		inputType="SELECT" 
+		inputType="TEXT" 
 		label="label.jconon_call_procedura_comparativa_amministrazione" 
 		name="amministrazione" 
 		property="jconon_call_procedura_comparativa:amministrazione" 
-		tooltip="tooltip.jconon_call_procedura_comparativa_amministrazione"
-		jsonlist="common.User.other.amministrazione"
-		widget="ui.select">
-		<jsonvalidator requiredWidget="true"/>
+		tooltip="tooltip.jconon_call_procedura_comparativa_amministrazione">
+		<jsonvalidator required="true"/>
 	</fieldProperty>
 	<fieldProperty 
 		class="input-xxlarge" 
