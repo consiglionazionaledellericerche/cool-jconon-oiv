@@ -208,6 +208,20 @@ public class CallOIVService extends CallService {
 	        			fasciaProfessionaleOptional.get().stream().anyMatch(x -> !x.equals("Fascia 3"))){
 	        		throw new ClientMessageException("message.error.fascia.presidente");
 	        }
+	        Optional<String> tipologiaSelezioneOptional = Optional.ofNullable((String)properties.get("jconon_call_procedura_comparativa:tipologia_selezione"));
+	        if (tipologiaSelezioneOptional.isPresent() && 
+	        		Arrays.asList("Presidente", "Intero Collegio").stream().anyMatch(tipoSelezione -> tipoSelezione.equals(tipologiaSelezioneOptional.get())) &&
+	        		!Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale")).filter(x -> !x.isEmpty()).isPresent()) {
+	        	throw new ClientMessageException("message.error.fascia.presidente.empty");
+	        }	        
+	        if (tipologiaSelezioneOptional.isPresent() && 
+	        		Arrays.asList("Intero Collegio").stream().anyMatch(tipoSelezione -> tipoSelezione.equals(tipologiaSelezioneOptional.get())) && (
+	        				!Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale")).filter(x -> !x.isEmpty()).isPresent() ||
+	        				!Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale_comp2")).filter(x -> !x.isEmpty()).isPresent() ||
+	        				!Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale_comp3")).filter(x -> !x.isEmpty()).isPresent())
+	        		) {
+	        	throw new ClientMessageException("message.error.fascia.empty");
+	        }	        
 	        
 	        if (properties.get(PropertyIds.OBJECT_ID) == null) {
                 properties.put(PropertyIds.PARENT_ID, cacheRepository.getCompetitionFolder().getId());

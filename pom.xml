@@ -9,8 +9,8 @@
   </parent>
 
   <properties>
-    <cool-shared.version>3.0.75</cool-shared.version>
-    <cool-jconon.version>4.0.70</cool-jconon.version>
+    <cool-shared.version>3.0.76</cool-shared.version>
+    <cool-jconon.version>4.0.71</cool-jconon.version>
     <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
     <cool.mode>development</cool.mode>
     <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
