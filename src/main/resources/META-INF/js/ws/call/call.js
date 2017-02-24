@@ -174,7 +174,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
     }
     selectPresidente.trigger('change');
     selectComponente.trigger('change');
-    onChangeNumeroDipendenti(metadata['jconon_call_procedura_comparativa:numero_dipendenti']);
+    onChangeNumeroDipendenti($('#numero_dipendenti > button.btn').attr('data-value'));
   }
 
   function manangeClickTipologiaSelezione() {
