@@ -182,7 +182,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
         } else {
           customButtons.permissions = false;
         }
-        if (!isActive) {
+        if (!isActive && el.data_inizio_invio_domande && (!el['jconon_call_procedura_comparativa:pubblicato_esito'] || common.User.admin)) {
           customButtons.esitoSelezione = function () {
             window.location = 'esito-call?call-type=' + el.objectTypeId + '&cmis:objectId=' + el.id;
           };          

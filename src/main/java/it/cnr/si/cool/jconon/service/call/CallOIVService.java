@@ -42,7 +42,18 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class CallOIVService extends CallService {
-    private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_PUBBLICAZIONE_ESITO = "jconon_call_procedura_comparativa:data_pubblicazione_esito";
+    private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_TIPOLOGIA_SELEZIONE = "jconon_call_procedura_comparativa:tipologia_selezione";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE = "jconon_call_procedura_comparativa:ora_fine_invio_domande";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_NUMERO_DIPENDENTI = "jconon_call_procedura_comparativa:numero_dipendenti";
+	private static final String FASCIA_3 = "Fascia 3";
+	private static final String MAGGIORE_O_UGUALE_A_250 = "Maggiore o uguale a 250";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE_COMP3 = "jconon_call_procedura_comparativa:fascia_professionale_comp3";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE_COMP2 = "jconon_call_procedura_comparativa:fascia_professionale_comp2";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE = "jconon_call_procedura_comparativa:fascia_professionale";
+	private static final String COMPONENTE_I = "Componente/i";
+	private static final String INTERO_COLLEGIO = "Intero Collegio";
+	private static final String PRESIDENTE = "Presidente";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_PUBBLICAZIONE_ESITO = "jconon_call_procedura_comparativa:data_pubblicazione_esito";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_PUBBLICATO_ESITO = "jconon_call_procedura_comparativa:pubblicato_esito";
 	private static final String SELEZIONATO = "selezionato";
 	private static final String JCONON_ATTACHMENT_ESITO_PARTECIPANTI_ESITO = "jconon_attachment:esito_partecipanti_esito";
@@ -185,7 +196,7 @@ public class CallOIVService extends CallService {
 	        String name = amministrazione.concat("_").concat(UUID.randomUUID().toString());			
 	        properties.put(PropertyIds.NAME, folderService.integrityChecker(name));
 	        Optional<Calendar> dataFineInvioDomandeOpt = Optional.ofNullable((Calendar)properties.get(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value()));
-	        Optional<String> oraFineInvioDomande = Optional.ofNullable((String)properties.get("jconon_call_procedura_comparativa:ora_fine_invio_domande"));
+	        Optional<String> oraFineInvioDomande = Optional.ofNullable((String)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE));
 	        if (dataFineInvioDomandeOpt.isPresent()) {
 	        	Calendar dataFineInvioDomande = Calendar.getInstance();
 	        	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get().get(Calendar.YEAR));
@@ -201,26 +212,33 @@ public class CallOIVService extends CallService {
 	        	}
 	        	properties.put(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), dataFineInvioDomande);
 	        }
-	        Optional<String> numeroDipendentiOptional = Optional.ofNullable((String)properties.get("jconon_call_procedura_comparativa:numero_dipendenti"));
-	        Optional<List<String>> fasciaProfessionaleOptional = Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale"));
+	        Optional<String> numeroDipendentiOptional = Optional.ofNullable((String)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_NUMERO_DIPENDENTI));
+	        Optional<List<String>> fasciaProfessionaleOptional = Optional.ofNullable((List<String>)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE));
 	        if (numeroDipendentiOptional.isPresent() && fasciaProfessionaleOptional.isPresent()  && 
-	        	numeroDipendentiOptional.filter(x -> x.equals("Maggiore o uguale a 250")).isPresent() &&
-	        			fasciaProfessionaleOptional.get().stream().anyMatch(x -> !x.equals("Fascia 3"))){
+	        	numeroDipendentiOptional.filter(x -> x.equals(MAGGIORE_O_UGUALE_A_250)).isPresent() &&
+	        			fasciaProfessionaleOptional.get().stream().anyMatch(x -> !x.equals(FASCIA_3))){
 	        		throw new ClientMessageException("message.error.fascia.presidente");
 	        }
-	        Optional<String> tipologiaSelezioneOptional = Optional.ofNullable((String)properties.get("jconon_call_procedura_comparativa:tipologia_selezione"));
+	        Optional<String> tipologiaSelezioneOptional = Optional.ofNullable((String)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_TIPOLOGIA_SELEZIONE));
 	        if (tipologiaSelezioneOptional.isPresent() && 
-	        		Arrays.asList("Presidente", "Intero Collegio").stream().anyMatch(tipoSelezione -> tipoSelezione.equals(tipologiaSelezioneOptional.get())) &&
-	        		!Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale")).filter(x -> !x.isEmpty()).isPresent()) {
+	        		Arrays.asList(PRESIDENTE, INTERO_COLLEGIO).stream().anyMatch(tipoSelezione -> tipoSelezione.equals(tipologiaSelezioneOptional.get())) &&
+	        		!Optional.ofNullable((List<String>)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE)).filter(x -> !x.isEmpty()).isPresent()) {
 	        	throw new ClientMessageException("message.error.fascia.presidente.empty");
 	        }	        
 	        if (tipologiaSelezioneOptional.isPresent() && 
-	        		Arrays.asList("Intero Collegio").stream().anyMatch(tipoSelezione -> tipoSelezione.equals(tipologiaSelezioneOptional.get())) && (
-	        				!Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale")).filter(x -> !x.isEmpty()).isPresent() ||
-	        				!Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale_comp2")).filter(x -> !x.isEmpty()).isPresent() ||
-	        				!Optional.ofNullable((List<String>)properties.get("jconon_call_procedura_comparativa:fascia_professionale_comp3")).filter(x -> !x.isEmpty()).isPresent())
+	        		Arrays.asList(INTERO_COLLEGIO).stream().anyMatch(tipoSelezione -> tipoSelezione.equals(tipologiaSelezioneOptional.get())) && (
+	        				!Optional.ofNullable((List<String>)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE)).filter(x -> !x.isEmpty()).isPresent() ||
+	        				!Optional.ofNullable((List<String>)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE_COMP2)).filter(x -> !x.isEmpty()).isPresent() ||
+	        				!Optional.ofNullable((List<String>)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE_COMP3)).filter(x -> !x.isEmpty()).isPresent())
 	        		) {
 	        	throw new ClientMessageException("message.error.fascia.empty");
+	        }	        
+	        if (tipologiaSelezioneOptional.isPresent() && 
+	        		Arrays.asList(COMPONENTE_I).stream().anyMatch(tipoSelezione -> tipoSelezione.equals(tipologiaSelezioneOptional.get())) && (
+	        				!Optional.ofNullable((List<String>)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE_COMP2)).filter(x -> !x.isEmpty()).isPresent() &&
+	        				!Optional.ofNullable((List<String>)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE_COMP3)).filter(x -> !x.isEmpty()).isPresent())
+	        		) {
+	        	throw new ClientMessageException("message.error.fascia.componente.empty");
 	        }	        
 	        
 	        if (properties.get(PropertyIds.OBJECT_ID) == null) {
