@@ -1,8 +1,8 @@
 /*global params*/
 define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
   'cnr/cnr.bulkinfo', 'cnr/cnr.ui',
-  'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url', 'cnr/cnr.call', 'cnr/cnr.ace', 'json!cache'
-  ], function ($, i18n, header, ActionButton, Search, BulkInfo, UI, common, jconon, URL, Call, Ace, cache) {
+  'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url', 'cnr/cnr.call', 'cnr/cnr.ace', 'json!cache', 'fp/fp.application'
+  ], function ($, i18n, header, ActionButton, Search, BulkInfo, UI, common, jconon, URL, Call, Ace, cache, ApplicationFp) {
   "use strict";
   var rootTypeId = 'F:jconon_call_procedura_comparativa:folder',
     rootQueryTypeId = 'jconon_call_procedura_comparativa:folder root',
@@ -16,12 +16,25 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
     },
     search,
     bulkInfo;
+
+  function isGestore() {
+    return (common.User.other.amministrazione || common.User.admin || (common.User.groupsArray && common.User.groupsArray.indexOf('GROUP_CONCORSI') !== -1));
+  }
+
+  function init(value) {
+      var criteria = jconon.getCriteria(bulkInfo, value);
+      if (value === 'dapubblicare') {
+        criteria.isNull('root.jconon_call:data_inizio_invio_domande');
+      }
+      criteria.list(search);
+  }
+
   function manageFilterClick() {
     $('#applyFilter').on('click', function () {
-      Call.filter(bulkInfo, search);
+      init($('#filters-attivi_scaduti > button.btn').attr('data-value'));
     });
     $('#filters-attivi_scaduti').closest('.widget').on('setData', function (event, key, value) {
-      Call.filter(bulkInfo, search, null, null, null, value);
+      init(value);
     });
     $('#resetFilter').off('click').on('click', function () {
       $('#F\\:jconon_call_procedura_comparativa\\:folder input').val('');
@@ -91,7 +104,11 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
             }
           }
         });
-        Call.filter(bulkInfo, search);
+        if (isGestore) {
+          init('dapubblicare');
+        } else {
+          init('attivi');          
+        }
       }
     });
   }
@@ -143,7 +160,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
           azioni,
           isActive = Call.isActive(el.data_inizio_invio_domande, el.data_fine_invio_domande);
         customButtons.attachments = function () {
-          Call.displayAttachments(el.id);
+          ApplicationFp.displayAttachments(el.id);
         };
         if ((isActive || el.data_inizio_invio_domande === '') && (!el['jconon_call:pubblicato'] || common.User.admin)) {
           customButtons.edit = function () {
@@ -154,26 +171,9 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
               filter(bulkInfo, search);
             });
           };          
-          customButtons.publish = function (that) {
-            var published = el['jconon_call:pubblicato'],
-              message = published ? i18n['message.action.unpublish'] : i18n['message.action.publish'];
-            UI.confirm(message, function () {
-              Call.publish([
-                {name: 'cmis:objectId', value: el.id},
-                {name: 'cmis:objectTypeId', value: el.objectTypeId},
-                {name: 'skip:save', value: true}
-              ], !published, function (pubblicato, removeClass, addClass, title) {
-                el['jconon_call:pubblicato'] = pubblicato;
-                that.find('i')
-                  .removeClass(removeClass)
-                  .addClass(addClass);
-              });
-            });
-          };
         } else {
           customButtons.edit = false;
           customButtons.remove = false;
-          customButtons.publish = false;
         }
         if (common.User.admin) {
           customButtons.permissions = function () {
@@ -197,11 +197,10 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
           mimeType: el.contentType,
           allowableActions: el.allowableActions,
           defaultChoice: isMacroCall ? 'detail' : 'application'
-        }, {publish: 'CAN_APPLY_ACL', esitoSelezione: 'CAN_APPLY_ACL' },
+        }, {esitoSelezione: 'CAN_CREATE_DOCUMENT' },
           customButtons, {
             attachments : 'icon-download-alt',
-            esitoSelezione : 'icon-share-alt',
-            publish: el['jconon_call:pubblicato'] ? 'icon-eye-close' : 'icon-eye-open',
+            esitoSelezione : 'icon-share-alt'
           }, undefined, true);
         row = $(rows.get(index));
         azioni.appendTo(row.find('td:last'));
@@ -215,7 +214,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
   }
 
   bulkInfo = new BulkInfo({
-    target: $('#criteria'),
+    target: $('#criteria-call'),
     formclass: 'form-inline jconon',
     path: rootTypeId,
     name: 'all-filters',
@@ -237,11 +236,8 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
             return false;    //<---- Add this line
           }
         });
-        if (common.User.other.amministrazione) {
+        if (isGestore) {
           $('#createNew').removeClass('hide');
-          if (common.User.other.amministrazione.length === 1) {
-            $('#filters-amministrazione').val(common.User.other.amministrazione[0]);
-          }
         }
         manageFilterClick();
         displayCall(rootTypeId, rootQueryTypeId);

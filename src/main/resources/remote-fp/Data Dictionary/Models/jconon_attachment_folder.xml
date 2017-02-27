@@ -153,6 +153,16 @@
 			<description>Altri documenti</description>
 			<parent>jconon_attachment:call_fp_esito_abstract</parent>
 		</type>
+		<type name="jconon_attachment:call_fp_esito_elenco_codici_iscrizione">
+			<title>Elenco dei Codici di iscrizione in elenco nazionale dei partecipanti</title>
+			<description>Elenco dei Codici di iscrizione in elenco nazionale dei partecipanti</description>
+			<parent>jconon_attachment:call_fp_esito_abstract</parent>
+		</type>
+		<type name="jconon_attachment:call_fp_esito_provvedimento_nomina">
+			<title>Provvedimento di nomina</title>
+			<description>Provvedimento di nomina</description>
+			<parent>jconon_attachment:call_fp_esito_abstract</parent>
+		</type>
 
 		<type name="jconon_attachment:call_fp_esito_partecipanti">
 			<title>Partecipanti</title>

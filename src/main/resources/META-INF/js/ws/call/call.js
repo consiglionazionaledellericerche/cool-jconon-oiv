@@ -1,7 +1,7 @@
 /*global params*/
 define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
-  'cnr/cnr.jconon', 'cnr/cnr.ace', 'cnr/cnr.url', 'cnr/cnr.call', 'cnr/cnr.attachments', 'json!cache', 'cnr/cnr.ui.widgets', 'cnr/cnr.ui.wysiwyg', 'cnr/cnr.ace', 'json!common'
-  ], function ($, header, i18n, CNR, UI, BulkInfo, jconon, ACE, URL, Call, Attachments, cache, Widgets, Wysiwyg, Ace, common) {
+  'cnr/cnr.jconon', 'cnr/cnr.ace', 'cnr/cnr.url', 'cnr/cnr.call', 'cnr/cnr.attachments', 'json!cache', 'cnr/cnr.ui.widgets', 'cnr/cnr.ui.wysiwyg', 'cnr/cnr.ace', 'json!common', 'fp/fp.application'
+  ], function ($, header, i18n, CNR, UI, BulkInfo, jconon, ACE, URL, Call, Attachments, cache, Widgets, Wysiwyg, Ace, common, ApplicationFp) {
   "use strict";
   var ul = $('#affix'), content = $('#field'), forms = [], bulkinfo,
     toolbar = $('#toolbar-call'), jsonlistMacroCall = [], metadata = {},
@@ -33,7 +33,9 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
       search: {
         type: 'jconon_attachment:document',
         filter: false,
-        displayRow: jconon.defaultDisplayDocument
+        displayRow: function (el, refreshFn) {
+          return jconon.defaultDisplayDocument(el, refreshFn, false);
+        }
       }
     });
   }
@@ -74,6 +76,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
           cmisObjectId = data['cmis:objectId'];
           bulkinfo.addFormItem('cmis:objectId', cmisObjectId);
           metadata = data;
+          $('#affix_sezione_allegati div.well h1').text(i18n['affix_sezione_allegati']);
           var showAllegati = createAttachments($('#affix_sezione_allegati div.well'));
           showAllegati();
         }
@@ -86,16 +89,36 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
   $('#publish').click(function () {
     if (bulkinfo.validate()) {
       UI.confirm(i18n.prop('message.warning.publish'), function () {
-        Call.publish(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
-          metadata['jconon_call:pubblicato'] = published;
-          if (published && !common.User.admin) {
-            window.location.href = '/avvisi-pubblici-di-selezione-comparativa';
-          }
-          $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.portale'] : i18n['button.publish.portale']));
+        UI.confirm(i18n.prop('message.warning.publish.2'), function () {
+          Call.publish(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
+            metadata['jconon_call:pubblicato'] = published;
+            if (published && !common.User.admin) {
+              window.location.href = '/avvisi-pubblici-di-selezione-comparativa';
+            }
+            $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.portale'] : i18n['button.publish.portale']));
+          });
         });
       });
     } else {
-      UI.alert(i18n['message.improve.required.fields']);
+      var msg = content
+        .children('form')
+        .validate()
+        .errorList
+        .map(function (item) {
+          if ($(item.element).hasClass('widget')) {
+            return $(item.element).find('label').text();
+          } else {
+            return $(item.element).parents('.control-group').find('label').text();
+          }
+        })
+        .filter(function (x) {
+          return x.trim().length > 0;
+        })
+        .map(function (x) {
+          return x.length > 50 ? x.substr(0, 50) + "\u2026" : x;
+        })
+        .join('<br>');
+      UI.alert(i18n['message.improve.required.fields'] + '<br><br>' + msg)
     }
   });
 
@@ -110,10 +133,12 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
     if (data === 'Maggiore o uguale a 250') {
       options.attr('disabled', 'disabled');
       options.removeAttr('selected');
-    } else {
+    } else if (data) {
       options.removeAttr('disabled');
     }
-    content.find('#fascia_professionale').trigger('change');
+    if (data) {
+      content.find('#fascia_professionale').trigger('change');
+    }
   }
 
   function manangeClickNumeroDipendenti() {
@@ -122,20 +147,30 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
     });
   }
 
-  function onChangeTipologiaOIV(data) {
-    var options = content.find('#tipologia_selezione :not(option:contains("Monocratico"))');
-    if (data === 'Monocratico') {
-      options.attr('disabled', 'disabled');
+  function onChangeTipologiaOIV(data, onChange) {
+    var select = content.find('#tipologia_selezione'), 
+      options =  content.find('#tipologia_selezione option:selected'),
+      optionsNotMonocratico = content.find('#tipologia_selezione option').not("[value='OIV Monocratico']").not("[value='']"),
+      optionsMonocratico = content.find('#tipologia_selezione option:contains("OIV Monocratico")');
+    if (onChange) {
       options.removeAttr('selected');
-    } else {
-      options.removeAttr('disabled');
+      select.val('');      
     }
-    content.find('#tipologia_selezione').trigger('change');
+    if (data === 'Monocratico') {
+      optionsNotMonocratico.attr('disabled', 'disabled');
+      optionsMonocratico.removeAttr('disabled');
+    } else if (data === 'Collegiale') {
+      optionsMonocratico.attr('disabled', 'disabled');
+      optionsNotMonocratico.removeAttr('disabled');
+    }
+    if (data) {
+      select.trigger('change');
+    }
   }
 
   function manangeClickTipologiaOIV() {
     $('#tipologia_oiv').on("change", function () {
-      onChangeTipologiaOIV($( "#tipologia_oiv option:selected" ).text());
+      onChangeTipologiaOIV($( "#tipologia_oiv option:selected" ).text(), true);
     });
   }
 
@@ -156,7 +191,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
       optionsComponente.attr('disabled', 'disabled');
       compensoComponente.val('');
       compensoComponente.attr('disabled', 'disabled');
-    } else {
+    } else if (data) {
       selectComponente.removeAttr('disabled');
       optionsComponente.removeAttr('disabled');
       compensoComponente.removeAttr('disabled');

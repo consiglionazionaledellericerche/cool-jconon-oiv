@@ -85,6 +85,7 @@
 		label="label.jconon_call_procedura_comparativa_telefono" 
 		name="telefono" 
 		property="jconon_call_procedura_comparativa:telefono">
+		<jsonvalidator telephone-number="true"/>
 	</fieldProperty>
 	<fieldProperty 
 		class="input-xxlarge" 
@@ -211,7 +212,7 @@
 		label="label.jconon_call_procedura_comparativa_descrizione_esito" 
 		name="descrizione_esito" 
 		property="jconon_call_procedura_comparativa:descrizione_esito">
-		<jsonvalidator required="true"/>
+		<jsonvalidator required="true" minlengthAlfresco="100" maxlengthAlfresco="500"/>
 	</fieldProperty>
 
 
@@ -252,20 +253,21 @@
 			label=""/>		
 		<formFieldProperty name="descrizione_esito"/>
 	</form>	
-	<form name="esito_sezione_cv"/>
 	<form name="esito_sezione_allegati"/>
 
 	<form name="all-filters">
-		<formFieldProperty 
-			class="btn-small" 
-			default="attivi" 
+		<formFieldProperty
+			parentGroupClass="btn-group-vertical" 
+			class="input-large"
+			label="Selezioni" 
+			default="dapubblicare" 
 			name="filters-attivi_scaduti" 
 			property="filters-attivi_scaduti" 
 			widget="ui.radio">
 				<jsonlist>
-					<listElement defaultLabel="Attivi" key="attivi" label="label.attivi"/>
-					<listElement defaultLabel="Scaduti" key="scaduti" label="label.scaduti"/>
-					<listElement defaultLabel="Tutti" key="all" label="label.tutti"/>
+					<listElement defaultLabel="Aperte" key="attivi" label="label.aperte"/>
+					<listElement defaultLabel="Concluse" key="scaduti" label="label.concluse"/>
+					<listElement defaultLabel="Da Pubblicare" key="dapubblicare" label="label.dapubblicare"/>
 				</jsonlist>
 		</formFieldProperty>
 		<formFieldProperty 
@@ -324,7 +326,8 @@
 		<columnFieldProperty name="email"/>
 		<columnFieldProperty name="pec"/>
 		<columnFieldProperty name="sito_web"/>
-		<columnFieldProperty name="descrizione_esito"/>
+		<columnFieldProperty name="descrizione_esito"
+			label="label.jconon_call_procedura_comparativa_descrizione_esito_column"/>
 	</columnSet>	
 	<columnFieldProperty 
 		property="cmis:objectId" 
