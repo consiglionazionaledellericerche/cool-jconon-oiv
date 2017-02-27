@@ -104,9 +104,11 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
             }
           }
         });
-        if (isGestore) {
+        if (isGestore()) {
           init('dapubblicare');
         } else {
+          $('#filters-attivi_scaduti button').removeClass('active');
+          $('#filters-attivi_scaduti button[data-value=attivi]').addClass('active');
           init('attivi');          
         }
       }
@@ -236,7 +238,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
             return false;    //<---- Add this line
           }
         });
-        if (isGestore) {
+        if (isGestore()) {
           $('#createNew').removeClass('hide');
         }
         manageFilterClick();
