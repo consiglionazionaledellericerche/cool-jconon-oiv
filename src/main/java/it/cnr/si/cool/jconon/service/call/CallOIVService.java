@@ -3,10 +3,13 @@ package it.cnr.si.cool.jconon.service.call;
 import it.cnr.cool.cmis.model.ACLType;
 import it.cnr.cool.cmis.model.CoolPropertyIds;
 import it.cnr.cool.cmis.service.ACLService;
+import it.cnr.cool.cmis.service.CMISService;
 import it.cnr.cool.cmis.service.FolderService;
+import it.cnr.cool.exception.CoolException;
 import it.cnr.cool.security.service.UserService;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.service.I18nService;
+import it.cnr.cool.util.MimeTypes;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
@@ -16,6 +19,8 @@ import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -25,24 +30,33 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.bindings.spi.BindingSession;
+import org.apache.chemistry.opencmis.client.bindings.spi.http.Output;
+import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
+import org.apache.chemistry.opencmis.commons.impl.UrlBuilder;
+import org.apache.commons.httpclient.HttpStatus;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 @Component
 @Primary
 public class CallOIVService extends CallService {
-    private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_TIPOLOGIA_SELEZIONE = "jconon_call_procedura_comparativa:tipologia_selezione";
+    private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_PROVVEDIMENTO_NOMINA = "D:jconon_attachment:call_fp_esito_provvedimento_nomina";
+	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_ELENCO_CODICI_ISCRIZIONE = "D:jconon_attachment:call_fp_esito_elenco_codici_iscrizione";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_TIPOLOGIA_SELEZIONE = "jconon_call_procedura_comparativa:tipologia_selezione";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE = "jconon_call_procedura_comparativa:ora_fine_invio_domande";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_NUMERO_DIPENDENTI = "jconon_call_procedura_comparativa:numero_dipendenti";
 	private static final String FASCIA_3 = "Fascia 3";
@@ -55,11 +69,6 @@ public class CallOIVService extends CallService {
 	private static final String PRESIDENTE = "Presidente";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_PUBBLICAZIONE_ESITO = "jconon_call_procedura_comparativa:data_pubblicazione_esito";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_PUBBLICATO_ESITO = "jconon_call_procedura_comparativa:pubblicato_esito";
-	private static final String SELEZIONATO = "selezionato";
-	private static final String JCONON_ATTACHMENT_ESITO_PARTECIPANTI_ESITO = "jconon_attachment:esito_partecipanti_esito";
-	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_VERBALE = "D:jconon_attachment:call_fp_esito_verbale";
-	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_ALTRI_DOCUMENTI = "D:jconon_attachment:call_fp_esito_altri_documenti";
-	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_PARTECIPANTI = "D:jconon_attachment:call_fp_esito_partecipanti";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE = "jconon_call_procedura_comparativa:amministrazione";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER = "jconon_call_procedura_comparativa:folder";
 	private static final String JCONON_ATTACHMENT_CALL_FP = "jconon_attachment:call_fp";
@@ -77,6 +86,35 @@ public class CallOIVService extends CallService {
     private UserService userService;
 	@Autowired
     private CacheRepository cacheRepository;
+	@Autowired
+    private CMISService cmisService;
+	@Value("${user.admin.username}")
+	private String adminUserName;
+
+	public void publish(BindingSession cmisSession,
+			final String nodeRef, final String userId, final boolean publish, final boolean esito) {
+		String link = cmisService.getBaseURL().concat(
+				"service/cnr/jconon/procedura-comparativa/publish");
+		UrlBuilder url = new UrlBuilder(link);
+		Response resp = cmisService.getHttpInvoker(cmisSession).invokePOST(url,
+				MimeTypes.JSON.mimetype(), new Output() {
+					@Override
+					public void write(OutputStream out) throws Exception {
+						JSONObject jsonObject = new JSONObject();
+						jsonObject.put("nodeRef", nodeRef);
+						jsonObject.put("userid", userId);
+						jsonObject.put("publish", publish);
+						jsonObject.put("esito", esito);
+						out.write(jsonObject.toString().getBytes());
+					}
+				}, cmisSession);
+		int status = resp.getResponseCode();
+		if (status == HttpStatus.SC_NOT_FOUND
+				|| status == HttpStatus.SC_BAD_REQUEST
+				|| status == HttpStatus.SC_INTERNAL_SERVER_ERROR)
+			throw new CoolException("Publish failed for procedura-comparativa: "
+					+ resp.getErrorContent());
+	}
 
 	public Folder publishEsito(Session cmisSession,
 			BindingSession currentBindingSession, String objectId, boolean publish, String userId) {
@@ -86,20 +124,24 @@ public class CallOIVService extends CallService {
         if (!publish && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
         	throw new ClientMessageException("message.error.call.cannnot.modify");
         }
+        List<CmisObject> children = new ArrayList<CmisObject>();
         call.getChildren().forEach(cmisObject -> {
-        	if (Arrays.asList(
-        			D_JCONON_ATTACHMENT_CALL_FP_ESITO_VERBALE, 
-        			D_JCONON_ATTACHMENT_CALL_FP_ESITO_ALTRI_DOCUMENTI, 
-        			D_JCONON_ATTACHMENT_CALL_FP_ESITO_PARTECIPANTI
-        		).stream().anyMatch(x -> x.equals(cmisObject.getType().getId()))) {
-        		if (D_JCONON_ATTACHMENT_CALL_FP_ESITO_PARTECIPANTI.equals(cmisObject.getType().getId()) && 
-        				cmisObject.getPropertyValue(JCONON_ATTACHMENT_ESITO_PARTECIPANTI_ESITO).equals(SELEZIONATO) ) {
-        			aclService.setInheritedPermission(currentBindingSession, cmisObject.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), publish);
-        		} else if (!D_JCONON_ATTACHMENT_CALL_FP_ESITO_PARTECIPANTI.equals(cmisObject.getType().getId())){
-        			aclService.setInheritedPermission(currentBindingSession, cmisObject.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), publish);
-        		}
-        	}
+        	children.add(cmisObject);
         });
+        children.stream().filter(cmisObject -> 
+        	cmisObject.getType().getId().equals(D_JCONON_ATTACHMENT_CALL_FP_ESITO_ELENCO_CODICI_ISCRIZIONE))
+        	.findAny()
+        	.orElseThrow(() -> new ClientMessageException("message.error.call.publish.esito.attachment.elenco"));
+        children.stream().filter(cmisObject -> 
+	    	cmisObject.getType().getId().equals(D_JCONON_ATTACHMENT_CALL_FP_ESITO_PROVVEDIMENTO_NOMINA))
+	    	.findAny()
+	    	.orElseThrow(() -> new ClientMessageException("message.error.call.publish.esito.attachment.nomina"));
+        
+        publish(cmisService.getAdminSession(), 
+        		call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), 
+        		publish ? adminUserName : call.getPropertyValue(PropertyIds.CREATED_BY), 
+        		publish,
+        		true);
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(JCONON_CALL_PROCEDURA_COMPARATIVA_PUBBLICATO_ESITO, publish);        
         properties.put(JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_PUBBLICAZIONE_ESITO, publish ? today : null);
@@ -112,11 +154,10 @@ public class CallOIVService extends CallService {
 			String objectId, boolean publish, String contextURL, Locale locale) {
         final Folder call = (Folder) cmisSession.getObject(objectId);
         Calendar today = Calendar.getInstance();
-        today.add(Calendar.HOUR, -1);
+        today.set(Calendar.HOUR_OF_DAY, 1);
         if (call.getType().getId().equalsIgnoreCase(F_JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER)) {
-	        Map<String, ACLType> aces = new HashMap<String, ACLType>();
-	        aces.put(GROUP_EVERYONE, ACLType.Consumer);
-	    	CMISUser user = userService.loadUserForConfirm(userId);    	
+
+	        CMISUser user = userService.loadUserForConfirm(userId);    	
 	        if (!publish && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
 	        	throw new ClientMessageException("message.error.call.cannnot.modify");
 	        }
@@ -136,14 +177,16 @@ public class CallOIVService extends CallService {
 		        criteriaProcedureComparative.add(Restrictions.ge(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), Calendar.getInstance().getTime()));
 	            if (criteriaProcedureComparative.executeQuery(cmisSession, false, cmisSession.getDefaultContext()).getTotalNumItems() > 0)
 	                throw new ClientMessageException("message.error.publish.call.alredy.active");
-
-	        	properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), today);
-	        	aclService.addAcl(currentBindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
+	        	properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), today);	        	
 	        } else {
 		        properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), null);        
-	        	aclService.removeAcl(currentBindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
 	        }
 	        call.updateProperties(properties, true);
+	        publish(cmisService.getAdminSession(), 
+	        		call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), 
+	        		publish ? adminUserName : call.getPropertyValue(PropertyIds.CREATED_BY), 
+	        		publish,
+	        		false);
 	        return call;			
 		} else {
 			return super.publish(cmisSession, currentBindingSession, userId, objectId,
@@ -250,6 +293,7 @@ public class CallOIVService extends CallService {
                 properties.put(JCONONPropertyIds.CALL_ELENCO_ASSOCIATIONS.value(), Arrays.asList(""));
                 properties.put(JCONONPropertyIds.CALL_HAS_MACRO_CALL.value(), Boolean.FALSE);
                 properties.put(JCONONPropertyIds.CALL_ELENCO_SEZIONI_DOMANDA.value(), Arrays.asList(""));                
+                properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), null);
                 call = (Folder) cmisSession.getObject(
 	                    cmisSession.createFolder(properties, new ObjectIdImpl((String) properties.get(PropertyIds.PARENT_ID))));
 	            aclService.setInheritedPermission(bindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), false);
@@ -258,7 +302,7 @@ public class CallOIVService extends CallService {
 	            aces.put(GROUP_CONCORSI, ACLType.Coordinator);
 	            aclService.addAcl(bindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);	            
 	        } else {
-	            call = (Folder) cmisSession.getObject((String) properties.get(PropertyIds.OBJECT_ID));
+	        	call = (Folder) cmisSession.getObject((String) properties.get(PropertyIds.OBJECT_ID));
 	        	CMISUser user = userService.loadUserForConfirm(userId); 
 	        	if (isBandoInCorso(call)) {
 		            if ((Boolean)call.getPropertyValue(JCONONPropertyIds.CALL_PUBBLICATO.value()) && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {

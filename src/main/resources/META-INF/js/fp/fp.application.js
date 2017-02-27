@@ -174,8 +174,27 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       .append(tdNonCoerente)
       .append(tdButton);
   }
+
+  function displayAttachments(id) {
+    var content = $('<div></div>').addClass('modal-inner-fix');
+    jconon.findAllegati(id, content, 'jconon_attachment:document', null, function (el, refreshFn, permission) {
+      return jconon.defaultDisplayDocument(el, refreshFn, false, false);
+    });
+    UI.modal(i18n['actions.attachments'], content);
+  }
+  $.validator.addMethod('telephone-number',
+    function (value) {
+      if (value !== "") {
+        var regex = /^([0-9]*\-?\ ?\/?[0-9]*)$/;
+        return regex.test(value);
+      }
+      return true;
+    }, i18n['message.telephone-number.valid']
+    );
+
   /* Revealing Module Pattern */
   return {
+    displayAttachments: displayAttachments,
     displayEsperienzeOIV: displayEsperienzeOIV,
     URL: urls,
     Data: URL.initURL(urls),

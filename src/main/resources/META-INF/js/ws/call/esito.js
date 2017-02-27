@@ -23,7 +23,9 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
       search: {
         filter: false,
         type: 'jconon_attachment:call_fp_esito_abstract',
-        displayRow: jconon.defaultDisplayDocument
+        displayRow: function (el, refreshFn) {
+          return jconon.defaultDisplayDocument(el, refreshFn, false);
+        }
       },
       buttonUploadLabel: 'Aggiungi allegato',
       submission: {
@@ -171,13 +173,15 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
   }
   $('#publish').click(function () {
     if (bulkinfo.validate()) {
-      UI.confirm(i18n.prop('message.warning.esito.publish'), function () {
-        publishEsito(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
-          metadata['jconon_call_procedura_comparativa:pubblicato_esito'] = published;
-          if (published && !common.User.admin) {
-            window.location.href = '/avvisi-pubblici-di-selezione-comparativa';
-          }          
-          $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.esito.portale'] : i18n['button.publish.esito.portale']));
+      UI.confirm(i18n.prop('message.warning.publish'), function () {
+        UI.confirm(i18n.prop('message.warning.publish.2'), function () {
+          publishEsito(bulkinfo.getData(), $('#publish').find('i.icon-eye-open').length !== 0, function (published, removeClass, addClass, title, data) {
+            metadata['jconon_call_procedura_comparativa:pubblicato_esito'] = published;
+            if (published && !common.User.admin) {
+              window.location.href = '/avvisi-pubblici-di-selezione-comparativa';
+            }          
+            $('#publish').html('<i class="' + addClass + '"></i> ' + (published ? i18n['button.unpublish.esito.portale'] : i18n['button.publish.esito.portale']));
+          });
         });
       });
     } else {

@@ -15,7 +15,7 @@
     <cool.mode>development</cool.mode>
     <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
     <junit.version>4.12</junit.version>
-	<spring.version>4.3.3.RELEASE</spring.version>
+    <spring.version>4.3.3.RELEASE</spring.version>
   </properties>
 
   <packaging>war</packaging>

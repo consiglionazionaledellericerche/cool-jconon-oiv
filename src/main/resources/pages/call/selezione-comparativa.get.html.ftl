@@ -2,7 +2,7 @@
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span3">
-        <div id="criteria">
+        <div id="criteria-call">
           <div class="pull-right">
             <p>              
             <a id="createNew" type="button" class="btn btn-primary hide" href="/manage-call?call-type=F:jconon_call_procedura_comparativa:folder"><i class="icon-plus icon-white"></i> Inserisci nuovo annuncio</a>

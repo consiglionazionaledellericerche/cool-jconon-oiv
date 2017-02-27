@@ -67,5 +67,5 @@ public class CallOIV {
 			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
 		}
 		return rb.build();
-	}	
+	}
 }
