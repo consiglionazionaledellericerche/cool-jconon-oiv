@@ -23,7 +23,9 @@ if (nodeRef === null || userid === null) {
     child = node.children[i];
     child.setOwner(userid);
     if (publish) {
-      child.setPermission(CONSUMER, "GROUP_EVERYONE");
+      if (String(child.type) !== "{http://www.cnr.it/model/jconon_attachment/cmis}call_fp_esito_elenco_codici_iscrizione") {
+        child.setPermission(CONSUMER, "GROUP_EVERYONE");
+      }
       child.setInheritsPermissions(false);
     } else {
       child.removePermission(CONSUMER, "GROUP_EVERYONE");
