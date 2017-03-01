@@ -25,6 +25,9 @@ if (nodeRef === null || userid === null) {
     if (publish) {
       if (String(child.type) !== "{http://www.cnr.it/model/jconon_attachment/cmis}call_fp_esito_elenco_codici_iscrizione") {
         child.setPermission(CONSUMER, "GROUP_EVERYONE");
+      } else {
+        child.setPermission(CONSUMER, creator);
+        child.setPermission(CONSUMER, "GROUP_CONCORSI");        
       }
       child.setInheritsPermissions(false);
     } else {
