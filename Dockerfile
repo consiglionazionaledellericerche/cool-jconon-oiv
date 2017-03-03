@@ -4,7 +4,7 @@ MAINTAINER Francesco Uliana <francesco.uliana@cnr.it>
 
 COPY target/*.war /opt/jconon.war
 
-HEALTHCHECK --interval=5s --timeout=3s CMD curl --fail http://localhost:8080/health || exit 1
+# HEALTHCHECK --interval=5s --timeout=3s CMD curl --fail http://localhost:8080/health || exit 1
 
 EXPOSE 8080
 
