@@ -266,7 +266,7 @@
 			widget="ui.radio">
 				<jsonlist>
 					<listElement defaultLabel="Aperte" key="attivi" label="label.aperte"/>
-					<listElement defaultLabel="Concluse" key="scaduti" label="label.concluse"/>
+					<listElement defaultLabel="Scadute" key="scaduti" label="label.concluse"/>
 					<listElement defaultLabel="Da Pubblicare" key="dapubblicare" label="label.dapubblicare"/>
 				</jsonlist>
 		</formFieldProperty>
