@@ -232,11 +232,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       }
 
       if (callId) {
-        if (common.profile === 'prod') {
-          criteria.inTree(callId);
-        } else {
-          criteria.inFolder(callId);
-        }
+        criteria.inTree(callId);
         if (user) {
           criteria.and(new Criteria().equals('jconon_application:user', user).build());
         }
