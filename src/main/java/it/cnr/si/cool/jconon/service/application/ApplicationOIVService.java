@@ -547,7 +547,7 @@ public class ApplicationOIVService extends ApplicationService{
             				.stream()
             				.map(user -> userService.loadUserForConfirm(user).getEmail())
             				.collect(Collectors.toList());        		
-            		HSSFWorkbook wb = printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder where NOT jconon_application:stato_domanda = 'I' AND IN_FOLDER('" + call.getId() +"')" , true);
+            		HSSFWorkbook wb = printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder where NOT jconon_application:stato_domanda = 'I' AND IN_TREE('" + call.getId() +"')" , true);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
             		wb.write(stream);			        		
         			EmailMessage message = new EmailMessage();
