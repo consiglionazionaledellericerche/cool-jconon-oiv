@@ -1,5 +1,6 @@
 package it.cnr.si.cool.jconon.service.application;
 
+import it.cnr.cool.cmis.model.ACLType;
 import it.cnr.cool.cmis.model.CoolPropertyIds;
 import it.cnr.cool.cmis.service.CMISService;
 import it.cnr.cool.cmis.service.NodeVersionService;
@@ -39,6 +40,7 @@ import java.util.stream.Stream;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
@@ -76,6 +78,7 @@ public class PrintOIVService extends PrintService {
 			"Laurea", "Università",
 			"Fascia Professionale",
 			"Stato",
+			"Stato Corrente",
 			"Tipologia esperienza (Professionale/OIV)",
 			"Area di specializzazione",
 			"Attività svolta nell’area di specializzazione indicata",
@@ -135,8 +138,10 @@ public class PrintOIVService extends PrintService {
     	int index = 1;
         ItemIterable<QueryResult> applications = session.query(query, false);
         List<Folder> applicationList = new ArrayList<Folder>();
+        OperationContext context = session.getDefaultContext();
+        context.setIncludeAcls(true);
         for (QueryResult application : applications.getPage(Integer.MAX_VALUE)) {
-        	Folder applicationObject = (Folder) session.getObject(String.valueOf(application.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
+        	Folder applicationObject = (Folder) session.getObject(String.valueOf(application.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()), context);
         	applicationList.add(applicationObject);
 		}
         
@@ -308,6 +313,17 @@ public class PrintOIVService extends PrintService {
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:istituto_laurea"));
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita")).orElse("")); 
     	row.createCell(column++).setCellValue(ApplicationService.StatoDomanda.fromValue(applicationObject.getPropertyValue("jconon_application:stato_domanda")).displayValue());
+    	if (applicationObject.getAcl() != null && applicationObject.getAcl().getAces().stream().anyMatch(
+    			x -> x.isDirect() && x.getPermissions().stream().anyMatch(permission -> permission.contains(ACLType.Consumer.name()))
+    					&& x.getPrincipal().getId().equals(applicationObject.<String>getPropertyValue("jconon_application:user")))) {
+    		if (applicationObject.<String>getPropertyValue("jconon_application:esclusione_rinuncia") != null){
+        		row.createCell(column++).setCellValue("ESCLUSA");        			        			
+    		} else {
+        		row.createCell(column++).setCellValue("INVIATA");        			
+    		}
+    	} else {
+    		row.createCell(column++).setCellValue("MODIFICA PROFILO");
+    	}
     	if (oivObject != null) {
         	row.createCell(column++).setCellValue(oivObject.getType().getDisplayName());
         	if (oivObject.getType().getId().equalsIgnoreCase("D:jconon_scheda_anonima:precedente_incarico_oiv")) {
@@ -328,7 +344,7 @@ public class PrintOIVService extends PrintService {
         			dateFormat.format(((Calendar)oivObject.getPropertyValue("jconon_attachment:esperienza_professionale_a")).getTime())).orElse(""));    		    		
         	}
         	row.createCell(column++).setCellValue(oivObject.getSecondaryTypes().stream().anyMatch(x -> x.getId().equals(ApplicationOIVService.P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE)));
-        	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_non_coerente_motivazione")).orElse(""));         		
+        	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_non_coerente_motivazione")).orElse(""));
     	}
    }
 }
