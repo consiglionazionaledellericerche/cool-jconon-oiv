@@ -207,7 +207,7 @@ public class PrintOIVService extends PrintService {
     	HSSFSheet sheet = wb.getSheet(SHEET_DOMANDE);
     	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());    	
 		criteria.addColumn(PropertyIds.OBJECT_ID);
-		criteria.add(Restrictions.inFolder(callId));
+		criteria.add(Restrictions.inTree(callId));
 		criteria.add(Restrictions.isNotNull("jconon_application:progressivo_iscrizione_elenco"));	
 		criteria.addOrder(Order.asc("jconon_application:progressivo_iscrizione_elenco"));
 		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
