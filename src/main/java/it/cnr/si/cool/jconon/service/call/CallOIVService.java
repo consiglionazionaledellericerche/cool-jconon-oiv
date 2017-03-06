@@ -168,7 +168,8 @@ public class CallOIVService extends CallService {
                 throw new ClientMessageException("message.error.call.attachment.not.present");
 
             Map<String, Object> properties = new HashMap<String, Object>();
-	        properties.put(JCONONPropertyIds.CALL_PUBBLICATO.value(), publish);        
+	        properties.put(JCONONPropertyIds.CALL_PUBBLICATO.value(), publish);
+	        dataFineInvioDomande(properties);
 	        if (publish) {
 		        Criteria criteriaProcedureComparative = CriteriaFactory.createCriteria(JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER);
 		        criteriaProcedureComparative.add(Restrictions.eq(JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE, call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE)));
@@ -220,6 +221,27 @@ public class CallOIVService extends CallService {
             LOGGER.debug("Try to delete :" + objectId);
         call.deleteTree(true, UnfileObject.DELETE, true);
     }
+    
+    private void dataFineInvioDomande(Map<String, Object> properties) {
+        Optional<Calendar> dataFineInvioDomandeOpt = Optional.ofNullable((Calendar)properties.get(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value()));
+        Optional<String> oraFineInvioDomande = Optional.ofNullable((String)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE));
+        if (dataFineInvioDomandeOpt.isPresent()) {
+        	Calendar dataFineInvioDomande = Calendar.getInstance();
+        	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get().get(Calendar.YEAR));
+        	dataFineInvioDomande.set(Calendar.MONTH, dataFineInvioDomandeOpt.get().get(Calendar.MONTH));
+        	dataFineInvioDomande.set(Calendar.DAY_OF_MONTH, dataFineInvioDomandeOpt.get().get(Calendar.DAY_OF_MONTH));
+        	dataFineInvioDomande.set(Calendar.SECOND, 59);
+        	if (oraFineInvioDomande.isPresent()) {
+	        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, Integer.valueOf(oraFineInvioDomande.get().split(":")[0]));
+	        	dataFineInvioDomande.set(Calendar.MINUTE, Integer.valueOf(oraFineInvioDomande.get().split(":")[1]));	        		
+        	} else {
+	        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 23);
+	        	dataFineInvioDomande.set(Calendar.MINUTE, 59);
+        	}
+        	properties.put(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), dataFineInvioDomande);
+        }    	
+    }
+    
 	@SuppressWarnings("unchecked")
 	@Override
 	public Folder save(Session cmisSession, BindingSession bindingSession,
@@ -238,23 +260,7 @@ public class CallOIVService extends CallService {
 	            throw new ClientMessageException("message.error.required.amministrazione");
 	        String name = amministrazione.concat("_").concat(UUID.randomUUID().toString());			
 	        properties.put(PropertyIds.NAME, folderService.integrityChecker(name));
-	        Optional<Calendar> dataFineInvioDomandeOpt = Optional.ofNullable((Calendar)properties.get(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value()));
-	        Optional<String> oraFineInvioDomande = Optional.ofNullable((String)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE));
-	        if (dataFineInvioDomandeOpt.isPresent()) {
-	        	Calendar dataFineInvioDomande = Calendar.getInstance();
-	        	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get().get(Calendar.YEAR));
-	        	dataFineInvioDomande.set(Calendar.MONTH, dataFineInvioDomandeOpt.get().get(Calendar.MONTH));
-	        	dataFineInvioDomande.set(Calendar.DAY_OF_MONTH, dataFineInvioDomandeOpt.get().get(Calendar.DAY_OF_MONTH));
-	        	dataFineInvioDomande.set(Calendar.SECOND, 59);
-	        	if (oraFineInvioDomande.isPresent()) {
-		        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, Integer.valueOf(oraFineInvioDomande.get().split(":")[0]));
-		        	dataFineInvioDomande.set(Calendar.MINUTE, Integer.valueOf(oraFineInvioDomande.get().split(":")[1]));	        		
-	        	} else {
-		        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 23);
-		        	dataFineInvioDomande.set(Calendar.MINUTE, 59);
-	        	}
-	        	properties.put(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), dataFineInvioDomande);
-	        }
+	        dataFineInvioDomande(properties);
 	        Optional<String> numeroDipendentiOptional = Optional.ofNullable((String)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_NUMERO_DIPENDENTI));
 	        Optional<List<String>> fasciaProfessionaleOptional = Optional.ofNullable((List<String>)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_FASCIA_PROFESSIONALE));
 	        if (numeroDipendentiOptional.isPresent() && fasciaProfessionaleOptional.isPresent()  && 
