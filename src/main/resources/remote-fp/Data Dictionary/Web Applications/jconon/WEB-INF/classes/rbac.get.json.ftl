@@ -956,7 +956,9 @@
         "PUT": {
             "whitelist": {
                 "user": [],
-                "group": ["GROUP_procedureComparativeGroup", "GROUP_ALFRESCO_ADMINISTRATORS"]
+                "group": ["GROUP_procedureComparativeGroup", 
+                "GROUP_GESTORI_PROCEDURE_COMPARATIVE",
+                "GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
     },
