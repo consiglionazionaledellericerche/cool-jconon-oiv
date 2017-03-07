@@ -258,7 +258,7 @@
 	<form name="all-filters">
 		<formFieldProperty
 			parentGroupClass="btn-group-vertical" 
-			class="input-large"
+			class="span12"
 			label="Selezioni" 
 			default="dapubblicare" 
 			name="filters-attivi_scaduti" 
@@ -271,7 +271,7 @@
 				</jsonlist>
 		</formFieldProperty>
 		<formFieldProperty 
-			class="criteria-like input-large" 
+			class="criteria-like span12" 
 			inputType="TEXT" 
 			label="label.jconon_call_procedura_comparativa_amministrazione" 
 			name="filters-amministrazione" 
