@@ -64,6 +64,7 @@
             </ul>
           </li>
           </#if>
+          <li class="divider-vertical"></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>

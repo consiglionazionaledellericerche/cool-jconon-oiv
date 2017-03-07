@@ -535,7 +535,7 @@
         "GET": {
             "whitelist": {
                 "user": [],
-                "group": ["GROUP_ALFRESCO_ADMINISTRATORS", "GROUP_CONCORSI"]
+                "group": ["GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
     },
@@ -543,7 +543,7 @@
         "GET": {
             "whitelist": {
                 "user": [],
-                "group": ["GROUP_ALFRESCO_ADMINISTRATORS", "GROUP_CONCORSI"]
+                "group": ["GROUP_ALFRESCO_ADMINISTRATORS"]
             }
         }
     },
