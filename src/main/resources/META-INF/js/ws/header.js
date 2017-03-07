@@ -8,7 +8,7 @@ define(['jquery', 'json!common', 'i18n', 'ws/header.common', 'cnr/cnr.url', 'cnr
 
   headerCommon.arrangeSubMenus($('.navbar'));
 
-  headerCommon.resizeNavbar(100);
+  headerCommon.resizeNavbar(50);
 
   if (common.profile === 'fp') {
     $('#wrap').append('<div class="development"></div>');
