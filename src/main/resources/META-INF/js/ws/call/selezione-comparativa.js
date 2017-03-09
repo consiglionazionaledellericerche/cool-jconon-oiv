@@ -18,7 +18,8 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
     bulkInfo;
 
   function isGestore() {
-    return (common.User.other.amministrazione || common.User.admin || (common.User.groupsArray && common.User.groupsArray.indexOf('GROUP_CONCORSI') !== -1));
+    return (common.User.other.amministrazione || common.User.admin || (common.User.groupsArray && 
+        (common.User.groupsArray.indexOf('GROUP_CONCORSI') !== -1 || common.User.groupsArray.indexOf('GROUP_GESTORI_PROCEDURE_COMPARATIVE') !== -1)));
   }
 
   function init(value) {
