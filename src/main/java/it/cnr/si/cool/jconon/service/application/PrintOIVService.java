@@ -85,17 +85,18 @@ public class PrintOIVService extends PrintService {
 			"Fascia Professionale",
 			"Stato",
 			"Stato Corrente",
-			"Ruolo"
+			"Ruolo",
+			"Annotazione"
 			);
 	
-	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream().filter(x -> !x.equalsIgnoreCase("Ruolo")), Arrays.asList(
+	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream().filter(x -> !x.equalsIgnoreCase("Ruolo") || !x.equalsIgnoreCase("Annotazione")), Arrays.asList(
 			"Tipologia esperienza (Professionale/OIV)",
 			"Area di specializzazione",
 			"Attività svolta nell’area di specializzazione indicata",
 			"Ruolo",
 			"Data inizio(Tipologia esperienza)",
 			"Data fine(Tipologia esperienza)",
-			"Non coerente", "Motivazione"			
+			"Non coerente", "Motivazione", "Annotazione"			
 			).stream()).collect(Collectors.toList());
 	private List<String> headCSVElenco = Arrays.asList(
 			"Id","Nome", "Cognome","Data iscrizione");
@@ -366,8 +367,11 @@ public class PrintOIVService extends PrintService {
         	}
         	row.createCell(column++).setCellValue(oivObject.getSecondaryTypes().stream().anyMatch(x -> x.getId().equals(ApplicationOIVService.P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE)));
         	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_non_coerente_motivazione")).orElse(""));
+        	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_annotazione_motivazione")).orElse(""));
+
     	} else {
     		row.createCell(column++).setCellValue(lastRuolo);
+        	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_attachment:esperienza_annotazione_motivazione")).orElse(""));
     	}
    }
 }

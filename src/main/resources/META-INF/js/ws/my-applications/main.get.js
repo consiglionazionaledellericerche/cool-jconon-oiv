@@ -191,6 +191,13 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     return $('<div>').append(a).html();
   });
 
+  Handlebars.registerHelper('ifIn', function(elem, list, isRdp, options) {
+    if(list.indexOf(elem) > -1 && isRdp) {
+      return options.fn(this);
+    }
+    return options.inverse(this);
+  });
+  
   search = new Search({
     elements: elements,
     columns: ['cmis:parentId', 'jconon_application:stato_domanda', 'jconon_application:nome', 'jconon_application:cognome', 'jconon_application:data_domanda', 'jconon_application:codice_fiscale', 'jconon_application:data_nascita', 'jconon_application:esclusione_rinuncia', 'jconon_application:user'],
@@ -322,6 +329,11 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
             .on('click', '.requirements', function () {
               var data = $("<div></div>").addClass('modal-inner-fix').html($(this).data('content'));
               UI.modal('<i class="icon-info-sign text-info animated flash"></i> ' + i18n['label.th.jconon_bando_elenco_titoli_studio'], data);
+            })
+            .on('click', '.annotazione', function () {
+              var data = $("<div></div>").addClass('modal-inner-fix').html($(this).data('content'));
+              UI.modal('<i class="icon-pencil text-info animated flash"></i> Annotazioni', data);
+              return false;
             })
             .on('click', '.code', function () {
               var data = $("<div></div>").addClass('modal-inner-fix').html($(this).data('content'));
