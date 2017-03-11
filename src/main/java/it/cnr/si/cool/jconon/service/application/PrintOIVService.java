@@ -89,7 +89,7 @@ public class PrintOIVService extends PrintService {
 			"Annotazione"
 			);
 	
-	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream().filter(x -> !x.equalsIgnoreCase("Ruolo") || !x.equalsIgnoreCase("Annotazione")), Arrays.asList(
+	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream().filter(x -> !x.equalsIgnoreCase("Ruolo")).filter(x -> !x.equalsIgnoreCase("Annotazione")), Arrays.asList(
 			"Tipologia esperienza (Professionale/OIV)",
 			"Area di specializzazione",
 			"Attività svolta nell’area di specializzazione indicata",
