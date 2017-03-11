@@ -89,6 +89,7 @@ import com.hazelcast.core.Cluster;
 @Primary
 public class ApplicationOIVService extends ApplicationService{
 
+	private static final String JCONON_ATTACHMENT_ESPERIENZA_ANNOTAZIONE_MOTIVAZIONE = "jconon_attachment:esperienza_annotazione_motivazione";
 	private static final String JCONON_APPLICATION_FASCIA_PROFESSIONALE_VALIDATA = "jconon_application:fascia_professionale_validata";
 	public static final String P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE = "P:jconon_scheda_anonima:esperienza_non_coerente";
 	private static final String ELENCO_OIV_XLS = "elenco-oiv.xls";
@@ -675,6 +676,46 @@ public class ApplicationOIVService extends ApplicationService{
 		object.updateProperties(properties, Collections.singletonList(aspect), Collections.emptyList());
 		aclService.changeOwnership(cmisService.getAdminSession(), object.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), 
 				adminUserName, false, Collections.emptyList());
+	}
+
+	public void esperienzaAnnotazione(String userId, String objectId, String callId, String applicationId, String aspect, String motivazione) {
+		Session session = cmisService.createAdminSession();
+		Folder call = loadCallById(session, callId);
+		try {
+			CMISUser user = userService.loadUserForConfirm(userId);
+			if (!(user.isAdmin() || callService.isMemeberOfRDPGroup(user, call)))
+				throw new ClientMessageException("Only Admin or RdP");
+		} catch (CoolUserFactoryException e) {
+			throw new ClientMessageException("User not found " + userId, e);
+		}		
+		Optional<String> motivazioneOpt = Optional.ofNullable(motivazione);
+		CmisObject object = session.getObject(objectId);		
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put(JCONON_ATTACHMENT_ESPERIENZA_ANNOTAZIONE_MOTIVAZIONE, motivazione);
+		object.updateProperties(
+				motivazioneOpt.map(x -> properties).orElse(Collections.emptyMap()), 
+				motivazioneOpt.map(x->Collections.singletonList(aspect)).orElse(Collections.emptyList()), 
+				motivazioneOpt.map(x->Collections.<String>emptyList()).orElse(Collections.singletonList(aspect)));
+
+		Criteria criteria = CriteriaFactory.createCriteria("jconon_scheda_anonima:esperienza_annotazioni");    	
+		criteria.addColumn(JCONON_ATTACHMENT_ESPERIENZA_ANNOTAZIONE_MOTIVAZIONE);
+		criteria.add(Restrictions.inFolder(applicationId));
+		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
+		List<String> annotazioni = new ArrayList<String>();
+		iterable.forEach(
+				q -> annotazioni.add(q.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_ANNOTAZIONE_MOTIVAZIONE)
+		));
+
+		motivazione = Optional.of(annotazioni.stream().collect(Collectors.joining(", "))).filter(x -> x.length() > 0).orElse(null);
+		motivazioneOpt = Optional.ofNullable(motivazione);
+		properties.put(JCONON_ATTACHMENT_ESPERIENZA_ANNOTAZIONE_MOTIVAZIONE, motivazione);
+		
+		
+		Folder domanda = (Folder) session.getObject(applicationId);
+		domanda.updateProperties(
+				motivazioneOpt.map(x -> properties).orElse(Collections.emptyMap()),
+				motivazioneOpt.map(x->Collections.singletonList(aspect)).orElse(Collections.emptyList()), 
+				motivazioneOpt.map(x->Collections.<String>emptyList()).orElse(Collections.singletonList(aspect)));
 	}
 
 	public void esperienzaCoerente(String userId, String objectId, String callId, String aspect, String userName) {

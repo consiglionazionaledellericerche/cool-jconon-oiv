@@ -21,6 +21,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       isNonCoerente = el['cmis:secondaryObjectTypeIds'].indexOf('P:jconon_scheda_anonima:esperienza_non_coerente') !== -1,
       isRdP = el.parentProp ? (Call.isRdP(el.parentProp.relationships.parent[0]['jconon_call:rdp']) || common.User.admin) : false,
       callId = el.parentProp ? el.parentProp.relationships.parent[0]['cmis:objectId'] : undefined,
+      applicationId = el.parentProp ? el.parentProp['cmis:objectId'] : undefined,
       userName = el.parentProp ? el.parentProp['jconon_application:user'] : undefined,
       title = el['jconon_attachment:esperienza_professionale_datore_lavoro'] ||
         el['jconon_attachment:aspect_specializzazioni_universita'] ||
@@ -35,6 +36,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
         Node.displayMetadata(el.objectTypeId, el.id, true);
         return false;
       }),
+      annotazioneIsPresente = el['cmis:secondaryObjectTypeIds'].indexOf('P:jconon_scheda_anonima:esperienza_annotazioni') !== -1,
       annotationObjectType = $('<span class="annotation"><strong>' + i18n[el.objectTypeId] + '</strong></span>'),
       periodoEsperienzaDa = el['jconon_attachment:esperienza_professionale_da'] ? ('dal ' + CNR.Date.format(el['jconon_attachment:esperienza_professionale_da'], null, 'DD/MM/YYYY')) : '',
       periodoEsperienzaA = el['jconon_attachment:esperienza_professionale_a'] ? (' al ' + CNR.Date.format(el['jconon_attachment:esperienza_professionale_a'], null, 'DD/MM/YYYY')) : '',
@@ -46,6 +48,8 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       modalTitle = title + ' Ruolo: ' + ruolo,
       tdNonCoerente = $('<td>').addClass('span5'),
       motivazione = el['jconon_attachment:esperienza_non_coerente_motivazione'],
+      annotazione = el['jconon_attachment:esperienza_annotazione_motivazione'],
+      annotationAnnotazione = $('<span class="muted annotation text-warning"><strong>Annotazione:</strong> ' + annotazione  + '</span>'),
       spanNonCoerente = $('<span>').addClass('text-error animated flash').appendTo(tdNonCoerente);
     if (esperienza) {
       item.after(annotationPeriodoEsperienza);      
@@ -55,6 +59,9 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
     }
     if (ruolo) {
       item.after(annotationRuolo);
+    }
+    if (annotazioneIsPresente && isRdP) {
+      item.after(annotationAnnotazione);
     }
     if (isNonCoerente && isRdP) {
       if (motivazione !== '') {
@@ -96,6 +103,49 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       copy_curriculum: function () {
         Application.editProdotti(el, title, refreshFn, true);
       },
+      annotazioni: isRdP ? function () {
+       var content = $("<div></div>"),
+          bulkinfo = new BulkInfo({
+            target: content,
+            path: "P:jconon_scheda_anonima:esperienza_annotazioni",
+            objectId: el.id,
+            formclass: 'form-inline',
+            name: 'default'
+          });
+        bulkinfo.render();
+        UI.modal('<i class="icon-edit"></i> ' + modalTitle, content, function () {
+          var close = UI.progress(), d = bulkinfo.getData();
+          d.push(
+            {
+              id: 'cmis:objectId',
+              name: 'cmis:objectId',
+              value: el['cmis:objectId']
+            },
+            {
+              name: 'aspect', 
+              value: 'P:jconon_scheda_anonima:esperienza_annotazioni'
+            },
+            {
+              name: 'callId', 
+              value: callId
+            },            
+            {
+              name: 'applicationId', 
+              value: applicationId
+            }                        
+          );
+          $.ajax({
+            url: cache.baseUrl + "/rest/application-fp/esperienza-annotazioni",
+            type: 'POST',
+            data:  d,
+            success: function (data) {
+              UI.success(i18n['message.esperienza.annotazioni.eseguito'], refreshFn);
+            },
+            complete: close,
+            error: URL.errorFn
+          });
+        });
+      } : false,
       coerente: isRdP && isNonCoerente ? function () {
           var d = [
             {
@@ -168,7 +218,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       } : false,
       paste: Application.getTypeForDropDown('jconon_call:elenco_sezioni_curriculum', el, title, refreshFn),
       move: Application.getTypeForDropDown('jconon_call:elenco_sezioni_curriculum', el, title, refreshFn, true)
-    }, {copy_curriculum: 'icon-copy', paste: 'icon-paste', move: 'icon-move', noncoerente: 'icon-minus', coerente: 'icon-plus'}, refreshFn, true));
+    }, {copy_curriculum: 'icon-copy', paste: 'icon-paste', move: 'icon-move', noncoerente: 'icon-minus', coerente: 'icon-plus', annotazioni: 'icon-pencil'}, refreshFn, true));
     return $('<tr></tr>')
       .append(tdText)
       .append(tdNonCoerente)

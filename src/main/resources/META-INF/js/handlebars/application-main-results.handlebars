@@ -27,6 +27,11 @@
 					{{{iscrizioneElenco jconon_application_progressivo_iscrizione_elenco jconon_application_data_iscrizione_elenco}}}
 					<br>
 				{{/if}}
+				{{#ifIn 'P:jconon_scheda_anonima:esperienza_annotazioni' cmis_secondaryObjectTypeIds ../../settings.isRdP}}
+					{{{code 'Sono presenti annotazioni...' '' 'badge badge-warning annotazione' jconon_attachment_esperienza_annotazione_motivazione jconon_attachment_esperienza_annotazione_motivazione}}}
+					<br>
+				{{/ifIn}}
+
 				{{{esclusioneRinuncia jconon_application_esclusione_rinuncia jconon_application_stato_domanda jconon_application_data_domanda ../../settings.isRdP}}}
 
 			</td>

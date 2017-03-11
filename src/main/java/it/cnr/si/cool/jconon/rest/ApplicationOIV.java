@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -128,6 +129,27 @@ public class ApplicationOIV {
 				aspect = formParams.getFirst("aspect"),
 				userName = formParams.getFirst("userName");			
 			applicationOIVService.esperienzaCoerente(userId, objectId, callId, aspect, userName);
+			rb = Response.ok();			
+		} catch (ClientMessageException | CMISApplicationException e) {
+			LOGGER.error("esperienzaNonCoerente error", e);
+			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+		}
+		return rb.build();
+	}
+
+	@POST
+	@Path("esperienza-annotazioni")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response annotazioni(@Context HttpServletRequest req, MultivaluedMap<String, String> formParams) throws IOException{
+		ResponseBuilder rb;
+		try {
+			String userId = cmisService.getCMISUserFromSession(req).getId();
+			String objectId = formParams.getFirst(PropertyIds.OBJECT_ID),
+				callId = formParams.getFirst("callId"),
+				applicationId = formParams.getFirst("applicationId"),
+				aspect = formParams.getFirst("aspect"),
+				motivazione = Optional.ofNullable(formParams.getFirst("jconon_attachment:esperienza_annotazione_motivazione")).filter(x -> x.length() > 0).orElse(null);
+			applicationOIVService.esperienzaAnnotazione(userId, objectId, callId, applicationId, aspect, motivazione);
 			rb = Response.ok();			
 		} catch (ClientMessageException | CMISApplicationException e) {
 			LOGGER.error("esperienzaNonCoerente error", e);

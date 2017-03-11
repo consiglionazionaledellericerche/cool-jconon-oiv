@@ -306,7 +306,7 @@
 		</type>
 	</types>
 	<aspects>
-		<aspect name="jconon_scheda_anonima:esperienza_non_coerente">			
+		<aspect name="jconon_scheda_anonima:esperienza_non_coerente">
 			<title>Esperienza non coerente</title>
 			<properties>			
 				<property name="jconon_attachment:esperienza_non_coerente_motivazione">
@@ -322,5 +322,21 @@
 				</property>
 			</properties>
 		</aspect>
-	</aspects>	
+		<aspect name="jconon_scheda_anonima:esperienza_annotazioni">
+			<title>Annotazioni</title>
+			<properties>			
+				<property name="jconon_attachment:esperienza_annotazione_motivazione">
+					<title>Annotazione</title>
+					<description>a] inputType:TEXTAREA</description>
+					<type>d:text</type>
+					<mandatory>false</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+			</properties>
+		</aspect>
+	</aspects>
 </model>
