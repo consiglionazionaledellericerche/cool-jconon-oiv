@@ -62,6 +62,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class PrintOIVService extends PrintService {
+	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO = "jconon_attachment:esperienza_professionale_datore_lavoro";
+
+	private static final String DATORE_DI_LAVORO = "Datore di Lavoro";
+
+	private static final String ANNOTAZIONE = "Annotazione";
+
+	private static final String RUOLO = "Ruolo";
+
 	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A = "jconon_attachment:esperienza_professionale_a";
 
 	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO = "jconon_attachment:esperienza_professionale_ruolo";
@@ -85,18 +93,22 @@ public class PrintOIVService extends PrintService {
 			"Fascia Professionale",
 			"Stato",
 			"Stato Corrente",
-			"Ruolo",
-			"Annotazione"
+			RUOLO,
+			DATORE_DI_LAVORO,
+			ANNOTAZIONE
 			);
 	
-	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream().filter(x -> !x.equalsIgnoreCase("Ruolo")).filter(x -> !x.equalsIgnoreCase("Annotazione")), Arrays.asList(
+	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream()
+				.filter(x -> !x.equalsIgnoreCase(RUOLO))
+				.filter(x -> !x.equalsIgnoreCase(ANNOTAZIONE))
+				.filter(x -> !x.equalsIgnoreCase(DATORE_DI_LAVORO)), Arrays.asList(
 			"Tipologia esperienza (Professionale/OIV)",
 			"Area di specializzazione",
 			"Attività svolta nell’area di specializzazione indicata",
-			"Ruolo",
+			RUOLO,
 			"Data inizio(Tipologia esperienza)",
 			"Data fine(Tipologia esperienza)",
-			"Non coerente", "Motivazione", "Annotazione"			
+			"Non coerente", "Motivazione", ANNOTAZIONE			
 			).stream()).collect(Collectors.toList());
 	private List<String> headCSVElenco = Arrays.asList(
 			"Id","Nome", "Cognome","Data iscrizione");
@@ -169,10 +181,14 @@ public class PrintOIVService extends PrintService {
         		ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(session, false, session.getDefaultContext());
         		for (QueryResult oiv : iterableOIV.getPage(Integer.MAX_VALUE)) {
                 	Document oivObject = (Document) session.getObject(String.valueOf(oiv.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));            	
-                	getRecordCSV(session, applicationObject, oivObject, applicationNumber, user, sheet, null, index++);    			
+                	getRecordCSV(session, applicationObject, oivObject, applicationNumber, user, sheet, null, null, index++);    			
         		}
         	} else {
-            	getRecordCSV(session, applicationObject, null, applicationNumber, user, sheet, getLastRuolo(session, applicationObject), index++);
+        		QueryResult lastEsperienza = getLastEsperienza(session, applicationObject);
+            	getRecordCSV(session, applicationObject, null, applicationNumber, user, sheet, 
+            			Optional.ofNullable(lastEsperienza).map(x -> x.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO)).orElse(""),
+            			Optional.ofNullable(lastEsperienza).map(x -> x.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO)).orElse(""),
+            			index++);
         	}
         	
 		}
@@ -180,16 +196,17 @@ public class PrintOIVService extends PrintService {
         return wb;
 	}
 	
-	private String getLastRuolo(Session session, Folder applicationObject) {
-    	Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE);
-    	criteriaOIV.addColumn(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO);
-		criteriaOIV.add(Restrictions.inFolder(applicationObject.getId()));
-		criteriaOIV.addOrder(Order.desc(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A));
-		ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(session, false, session.getDefaultContext());
-		for (QueryResult oiv : iterableOIV.getPage(1)) {
-			return Optional.ofNullable(oiv.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO)).orElse("");
+	private QueryResult getLastEsperienza(Session session, Folder applicationObject) {
+    	Criteria criteriaEsperienza = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE);
+    	criteriaEsperienza.addColumn(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO);
+    	criteriaEsperienza.addColumn(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO);    	
+		criteriaEsperienza.add(Restrictions.inFolder(applicationObject.getId()));
+		criteriaEsperienza.addOrder(Order.desc(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A));
+		ItemIterable<QueryResult> iterableEsperienza = criteriaEsperienza.executeQuery(session, false, session.getDefaultContext());
+		for (QueryResult esperienza : iterableEsperienza.getPage(1)) {
+			return esperienza;
 		}
-		return "";
+		return null;
 	}
 	@Override
 	public Map<String, Object> extractionApplicationForSingleCall(
@@ -294,7 +311,7 @@ public class PrintOIVService extends PrintService {
 		return doc.getId();
 	}	
 
-    private void getRecordCSV(Session session, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, HSSFSheet sheet, String lastRuolo, int index) {
+    private void getRecordCSV(Session session, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, HSSFSheet sheet, String lastRuolo, String lastDatoreLavoro, int index) {
     	int column = 0;
     	HSSFRow row = sheet.createRow(index);
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:progressivo_iscrizione_elenco")).
@@ -371,6 +388,7 @@ public class PrintOIVService extends PrintService {
 
     	} else {
     		row.createCell(column++).setCellValue(lastRuolo);
+    		row.createCell(column++).setCellValue(lastDatoreLavoro);    		
         	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_attachment:esperienza_annotazione_motivazione")).orElse(""));
     	}
    }

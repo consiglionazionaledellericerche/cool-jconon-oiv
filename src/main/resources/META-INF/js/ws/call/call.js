@@ -209,7 +209,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
     }
     selectPresidente.trigger('change');
     selectComponente.trigger('change');
-    onChangeNumeroDipendenti($('#numero_dipendenti > button.btn').attr('data-value'));
+    onChangeNumeroDipendenti($('#numero_dipendenti > button.btn.active').attr('data-value'));
   }
 
   function manangeClickTipologiaSelezione() {
