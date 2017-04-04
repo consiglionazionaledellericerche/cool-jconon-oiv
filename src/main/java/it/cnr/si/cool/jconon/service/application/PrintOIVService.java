@@ -62,6 +62,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class PrintOIVService extends PrintService {
+	private static final String FASCIA_PROFESSIONALE_VALIDATA = "Fascia Professionale Validata";
+
 	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO = "jconon_attachment:esperienza_professionale_datore_lavoro";
 
 	private static final String DATORE_DI_LAVORO = "Datore di Lavoro";
@@ -90,17 +92,19 @@ public class PrintOIVService extends PrintService {
 			"Comune di Reperibilita'","Indirizzo di Reperibilita'",
 			"CAP di Reperibilita'","Telefono","Data Invio Domanda",
 			"Laurea", "Università",
-			"Fascia Professionale",
+			"Fascia Professionale Attribuita",
 			"Stato",
 			"Stato Corrente",
 			RUOLO,
 			DATORE_DI_LAVORO,
-			ANNOTAZIONE
+			ANNOTAZIONE,
+			FASCIA_PROFESSIONALE_VALIDATA
 			);
 	
 	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream()
 				.filter(x -> !x.equalsIgnoreCase(RUOLO))
 				.filter(x -> !x.equalsIgnoreCase(ANNOTAZIONE))
+				.filter(x -> !x.equalsIgnoreCase(FASCIA_PROFESSIONALE_VALIDATA))
 				.filter(x -> !x.equalsIgnoreCase(DATORE_DI_LAVORO)), Arrays.asList(
 			"Tipologia esperienza (Professionale/OIV)",
 			"Area di specializzazione",
@@ -108,7 +112,10 @@ public class PrintOIVService extends PrintService {
 			RUOLO,
 			"Data inizio(Tipologia esperienza)",
 			"Data fine(Tipologia esperienza)",
-			"Non coerente", "Motivazione", ANNOTAZIONE			
+			"Non coerente", 
+			"Motivazione", 
+			ANNOTAZIONE,
+			FASCIA_PROFESSIONALE_VALIDATA
 			).stream()).collect(Collectors.toList());
 	private List<String> headCSVElenco = Arrays.asList(
 			"Id","Nome", "Cognome","Data iscrizione");
@@ -385,11 +392,11 @@ public class PrintOIVService extends PrintService {
         	row.createCell(column++).setCellValue(oivObject.getSecondaryTypes().stream().anyMatch(x -> x.getId().equals(ApplicationOIVService.P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE)));
         	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_non_coerente_motivazione")).orElse(""));
         	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_annotazione_motivazione")).orElse(""));
-
     	} else {
     		row.createCell(column++).setCellValue(lastRuolo);
     		row.createCell(column++).setCellValue(lastDatoreLavoro);    		
         	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_attachment:esperienza_annotazione_motivazione")).orElse(""));
     	}
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_validata")).orElse(""));     	
    }
 }

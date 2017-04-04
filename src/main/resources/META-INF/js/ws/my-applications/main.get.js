@@ -157,10 +157,12 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     return $('<div>').append(item).html();
   });
 
-  Handlebars.registerHelper('iscrizioneElenco', function declare(numero, data) {
-    var dateFormat = "DD MMMM YYYY",
+  Handlebars.registerHelper('iscrizioneElenco', function declare(numero, data, fascia_professionale_validata, fascia_professionale_attribuita) {
+    var dateFormat = "DD/MM/YYYY",
       item = $('<label class="label label-info"></label>')
-        .append('Iscritto in Elenco il ' + CNR.Date.format(data, '-', dateFormat) + ' con progressivo n° '+ numero);
+        .append('Iscritto in Elenco il ' + CNR.Date.format(data, '-', dateFormat) + 
+          ' con progressivo n° '+ numero + 
+          ' e fascia: ' + (fascia_professionale_validata || fascia_professionale_attribuita));
     return $('<div>').append(item).html();
   });
 
