@@ -64,7 +64,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 @Primary
 public class CallOIVService extends CallService {
-    private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_PROVVEDIMENTO_NOMINA = "D:jconon_attachment:call_fp_esito_provvedimento_nomina";
+    private static final String JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA = "jconon_attachment:procedura_comparativa_ora_fine_proroga";
+	private static final String JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA = "jconon_attachment:procedura_comparativa_data_fine_proroga";
+	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_PROVVEDIMENTO_NOMINA = "D:jconon_attachment:call_fp_esito_provvedimento_nomina";
 	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_ELENCO_CODICI_ISCRIZIONE = "D:jconon_attachment:call_fp_esito_elenco_codici_iscrizione";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_TIPOLOGIA_SELEZIONE = "jconon_call_procedura_comparativa:tipologia_selezione";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE = "jconon_call_procedura_comparativa:ora_fine_invio_domande";
@@ -310,6 +312,8 @@ public class CallOIVService extends CallService {
                 properties.put(JCONONPropertyIds.CALL_HAS_MACRO_CALL.value(), Boolean.FALSE);
                 properties.put(JCONONPropertyIds.CALL_ELENCO_SEZIONI_DOMANDA.value(), Arrays.asList(""));                
                 properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), null);
+        		properties.put(JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA, null);
+                
                 call = (Folder) cmisSession.getObject(
 	                    cmisSession.createFolder(properties, new ObjectIdImpl((String) properties.get(PropertyIds.PARENT_ID))));
 	            aclService.setInheritedPermission(bindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), false);
@@ -350,8 +354,8 @@ public class CallOIVService extends CallService {
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put(PropertyIds.OBJECT_TYPE_ID, "D:jconon_attachment:call_fp_procedura_comparativa_proroga");		
 		properties.put(PropertyIds.NAME, file.getOriginalFilename());
-		properties.put("jconon_attachment:procedura_comparativa_data_fine_proroga", calcolaDataProroga);
-		properties.put("jconon_attachment:procedura_comparativa_ora_fine_proroga", oraProroga);
+		properties.put(JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA, calcolaDataProroga);
+		properties.put(JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA, oraProroga);
 		ContentStream contentStream = new ContentStreamImpl(file.getOriginalFilename(), BigInteger.valueOf(file.getSize()), 
 				file.getContentType(), file.getInputStream());
 		Document proroga = call.createDocument(properties, contentStream, VersioningState.MAJOR);
