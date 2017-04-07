@@ -1,8 +1,8 @@
 /*global params*/
 define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
   'cnr/cnr.bulkinfo', 'cnr/cnr.ui',
-  'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url', 'cnr/cnr.call', 'cnr/cnr.ace', 'json!cache', 'fp/fp.application'
-  ], function ($, i18n, header, ActionButton, Search, BulkInfo, UI, common, jconon, URL, Call, Ace, cache, ApplicationFp) {
+  'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url', 'cnr/cnr.call', 'cnr/cnr.ace', 'json!cache', 'fp/fp.application', 'cnr/cnr'
+  ], function ($, i18n, header, ActionButton, Search, BulkInfo, UI, common, jconon, URL, Call, Ace, cache, ApplicationFp, CNR) {
   "use strict";
   var rootTypeId = 'F:jconon_call_procedura_comparativa:folder',
     rootQueryTypeId = 'jconon_call_procedura_comparativa:folder root',
@@ -23,7 +23,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
   }
 
   function init(value) {
-      var criteria = jconon.getCriteria(bulkInfo, value);
+      var criteria = ApplicationFp.getCriteria(bulkInfo, value);
       if (value === 'dapubblicare') {
         criteria.isNull('root.jconon_call:data_inizio_invio_domande');
       }
@@ -161,7 +161,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
           isMacroCall = secondaryObjectTypeIds === null ? false : secondaryObjectTypeIds.indexOf('P:jconon_call:aspect_macro_call') >= 0,
           row,
           azioni,
-          isActive = Call.isActive(el.data_inizio_invio_domande, el.data_fine_invio_domande);
+          isActive = ApplicationFp.callIsActive(el.data_inizio_invio_domande, el.data_fine_invio_domande, el['jconon_call_procedura_comparativa:data_fine_proroga']);
         customButtons.attachments = function () {
           ApplicationFp.displayAttachments(el.id);
         };
@@ -185,6 +185,84 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
         } else {
           customButtons.permissions = false;
         }
+        if (el.data_inizio_invio_domande && (!el['jconon_call_procedura_comparativa:pubblicato_esito'] || common.User.admin)) {
+          customButtons.prorogaTermini = function () {
+            var content = $("<div></div>"),
+              bulkinfo = new BulkInfo({
+                target: content,
+                path: "D:jconon_attachment:call_fp_procedura_comparativa_proroga",
+                formclass: 'form-inline jconon',
+                name: 'default'
+              }),
+              container = $('<div class="fileupload fileupload-new" data-provides="fileupload"></div>'),
+              input = $('<div class="input-append"></div>'),
+              btn = $('<span class="btn btn-file btn-primary"></span>'),
+              inputFile = $('<input type="file" name="prorogatermini"/>'),
+              btnPrimary,
+              modal;
+
+            btn
+              .append('<span class="fileupload-new"><i class="icon-upload"></i> Carica file</span>')
+              .append('<span class="fileupload-exists">Cambia</span>')
+              .append(inputFile);
+
+            input
+              .append('<div class="uneditable-input input-xlarge"><i class="icon-file fileupload-exists"></i><span class="fileupload-preview"></span></div>')
+              .append(btn)
+              .appendTo(container);
+
+            content.append(container);
+            container.before("<hr>");  
+            // set widget 'value'
+            function setValue(value) {
+              container.data('value', value);
+            }
+
+            setValue(null);
+            input.append('<a href="#" class="btn fileupload-exists" data-dismiss="fileupload">Rimuovi</a>');
+            inputFile.on('change', function (e) {
+              var path = $(e.target).val();
+              setValue(path);
+            });
+
+            function sendFile() {
+              if (bulkinfo.validate()) {
+                var fd = new CNR.FormData();                
+                fd.data.append("objectId", el['cmis:objectId']);                
+                $.each(inputFile[0].files || [], function (i, file) {
+                  fd.data.append('prorogatermini', file);
+                });
+                $.each(bulkinfo.getData(), function (index, item) {
+                  fd.data.append(item.name, item.value || '');
+                });
+                var close = UI.progress();
+                $.ajax({
+                    type: "POST",
+                    url: cache.baseUrl + "/rest/call-fp/carica-proroga",
+                    data:  fd.getData(),
+                    enctype: fd.contentType,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function(data){
+                      UI.success(i18n.prop('message.allegato.proroga.done'), function () {
+                        $('#resetFilter').click();
+                      });
+                    },
+                    complete: close,
+                    error: URL.errorFn
+                });                
+              } else {
+                return false;
+              } 
+            }
+            bulkinfo.render();
+            UI.modal('<i class="icon-time"></i> ' + i18n.prop('actions.prorogaTermini'), content, sendFile);              
+          };          
+        } else {
+          customButtons.prorogaTermini = false;  
+        }
+
         if (!isActive && el.data_inizio_invio_domande && (!el['jconon_call_procedura_comparativa:pubblicato_esito'] || common.User.admin)) {
           customButtons.esitoSelezione = function () {
             window.location = 'esito-call?call-type=' + el.objectTypeId + '&cmis:objectId=' + el.id;
@@ -200,10 +278,11 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
           mimeType: el.contentType,
           allowableActions: el.allowableActions,
           defaultChoice: isMacroCall ? 'detail' : 'application'
-        }, {esitoSelezione: 'CAN_CREATE_DOCUMENT' },
+        }, {esitoSelezione: 'CAN_CREATE_DOCUMENT', prorogaTermini: 'CAN_CREATE_DOCUMENT' },
           customButtons, {
             attachments : 'icon-download-alt',
-            esitoSelezione : 'icon-share-alt'
+            esitoSelezione : 'icon-share-alt',
+            prorogaTermini : 'icon-time'
           }, undefined, true);
         row = $(rows.get(index));
         azioni.appendTo(row.find('td:last'));
