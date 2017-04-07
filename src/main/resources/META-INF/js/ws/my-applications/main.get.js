@@ -159,7 +159,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
 
   Handlebars.registerHelper('iscrizioneElenco', function declare(numero, data, fascia_professionale_validata, fascia_professionale_attribuita) {
     var dateFormat = "DD/MM/YYYY",
-      fascia = String(fascia_professionale_validata || fascia_professionale_attribuita),
+      fascia = String(fascia_professionale_validata),
       item = $('<label class="label label-info"></label>')
         .append('Iscritto in Elenco il ' + CNR.Date.format(data, '-', dateFormat) + 
           ' con progressivo n° '+ numero + 
