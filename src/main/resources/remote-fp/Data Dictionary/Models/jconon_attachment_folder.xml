@@ -137,6 +137,28 @@
 			<description>Altri documenti</description>
 			<parent>jconon_attachment:call_fp_abstract</parent>
 		</type>
+		<type name="jconon_attachment:call_fp_procedura_comparativa_proroga">
+			<title>Proroga dei Termini</title>
+			<description>Proroga dei Termini</description>
+			<parent>jconon_attachment:document</parent>
+			<properties>
+				<property name="jconon_attachment:procedura_comparativa_data_fine_proroga">
+					<title>Data finale di proroga</title>
+					<description>Data finale di proroga</description>
+					<type>d:datetime</type>
+				</property>
+				<property name="jconon_attachment:procedura_comparativa_ora_fine_proroga">
+					<title>Ora fine proroga</title>
+					<description>Ora fine proroga</description>
+					<type>d:text</type>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+			</properties>
+		</type>
 
 		<type name="jconon_attachment:call_fp_esito_abstract">
 			<title>Allegato astratto all'esito del Bando di concorso</title>

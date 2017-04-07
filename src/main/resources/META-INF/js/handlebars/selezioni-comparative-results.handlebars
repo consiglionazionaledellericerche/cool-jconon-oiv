@@ -28,8 +28,15 @@
 					<div class="row-fluid">
 						<div class="span3"><b>{{i18n "label.th.jconon_bando_data_scadenza"}}</b></div>
 						<div class="span9">{{date jconon_call_data_fine_invio_domande "DD/MM/YYYY"}} {{jconon_call_procedura_comparativa_ora_fine_invio_domande}}</div>
-					</div>				
+					</div>
 				{{/if}}
+				{{#if jconon_call_procedura_comparativa_data_fine_proroga}}
+					<div class="row-fluid">
+						<div class="span3"><b>{{i18n "label.procedura_comparativa_data_fine_proroga"}}</b></div>
+						<div class="span9">{{date jconon_call_procedura_comparativa_data_fine_proroga "DD/MM/YYYY"}} {{jconon_call_procedura_comparativa_ora_fine_proroga}}</div>
+					</div>
+				{{/if}}
+
 			</td>
 			<td class="span3"></td>
 		</tr>

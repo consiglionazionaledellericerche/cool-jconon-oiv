@@ -4,13 +4,17 @@ import it.cnr.cool.cmis.model.CoolPropertyIds;
 import it.cnr.cool.cmis.service.CMISService;
 import it.cnr.cool.cmis.service.NodeMetadataService;
 import it.cnr.cool.security.SecurityChecked;
+import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.mock.RequestUtils;
 import it.cnr.si.cool.jconon.service.call.CallOIVService;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.CookieParam;
@@ -31,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 @Path("call-fp")
 @Component
@@ -43,6 +50,8 @@ public class CallOIV {
 	private CMISService cmisService;
 	@Autowired
 	private NodeMetadataService nodeMetadataService;
+	@Autowired
+	private CommonsMultipartResolver resolver;
 	
 	@POST
 	@Path("publish-esito")
@@ -68,4 +77,28 @@ public class CallOIV {
 		}
 		return rb.build();
 	}
+	
+	@POST
+	@Path("carica-proroga")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response caricaProroga(@Context HttpServletRequest req) throws IOException{
+		ResponseBuilder rb;
+		try {
+			Session session = cmisService.getCurrentCMISSession(req);		
+	    	MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
+			String idCall = mRequest.getParameter("objectId");
+			String dataProroga = mRequest.getParameter("jconon_attachment:procedura_comparativa_data_fine_proroga");
+			String oraProroga = mRequest.getParameter("jconon_attachment:procedura_comparativa_ora_fine_proroga");			
+			LOGGER.debug("carica proroga su procedura comparativa : {}", idCall);
+	    	MultipartFile file = mRequest.getFile("prorogatermini");
+	    	Optional.ofNullable(file).orElseThrow(() -> new ClientMessageException("Allegare il file della proroga dei termini!"));    		    				
+			Map<String, Object> model = callService.caricaProroga(session, cmisService.getCMISUserFromSession(req), idCall, dataProroga, oraProroga, file);
+			rb = Response.ok(model);			
+		} catch (ClientMessageException | CMISApplicationException | ParseException e) {
+			LOGGER.warn("send error", e);
+			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+		}
+		return rb.build();
+	}
+	
 }

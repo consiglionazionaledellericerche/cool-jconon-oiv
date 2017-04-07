@@ -10,6 +10,7 @@ import it.cnr.cool.security.service.UserService;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.service.I18nService;
 import it.cnr.cool.util.MimeTypes;
+import it.cnr.cool.util.StringUtil;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
@@ -19,10 +20,14 @@ import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
 import it.spasia.opencmis.criteria.restrictions.Restrictions;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,6 +36,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
+import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
@@ -40,8 +46,11 @@ import org.apache.chemistry.opencmis.client.bindings.spi.http.Output;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.client.runtime.ObjectIdImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.impl.UrlBuilder;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.httpclient.HttpStatus;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -50,6 +59,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @Primary
@@ -326,6 +336,58 @@ public class CallOIVService extends CallService {
 			return super.save(cmisSession, bindingSession, contextURL, locale, userId,
 					properties, aspectProperties);			
 		}
+	}
+
+	public Map<String, Object> caricaProroga(Session session, CMISUser cmisUserFromSession, String idCall, String dataProroga,
+			String oraProroga, MultipartFile file) throws IOException, ParseException {
+		Folder call = (Folder) session.getObject(idCall);
+		Calendar calcolaDataProroga = calcolaDataProroga(dataProroga, oraProroga);
+		//controllo sulle date
+		if (calcolaDataProroga.before(Optional.ofNullable(call.getPropertyValue("jconon_call_procedura_comparativa:data_fine_proroga"))
+				.orElse(call.getPropertyValue(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value())))) {
+			throw new ClientMessageException("La data di proroga deve essere successiva alla data presente sulla procedura comparativa!");
+		}
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put(PropertyIds.OBJECT_TYPE_ID, "D:jconon_attachment:call_fp_procedura_comparativa_proroga");		
+		properties.put(PropertyIds.NAME, file.getOriginalFilename());
+		properties.put("jconon_attachment:procedura_comparativa_data_fine_proroga", calcolaDataProroga);
+		properties.put("jconon_attachment:procedura_comparativa_ora_fine_proroga", oraProroga);
+		ContentStream contentStream = new ContentStreamImpl(file.getOriginalFilename(), BigInteger.valueOf(file.getSize()), 
+				file.getContentType(), file.getInputStream());
+		Document proroga = call.createDocument(properties, contentStream, VersioningState.MAJOR);
+		aclService.setInheritedPermission(cmisService.getAdminSession(), proroga.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), false);
+		aclService.changeOwnership(cmisService.getAdminSession(), proroga.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), 
+				adminUserName, false, Collections.emptyList());
+        Map<String, ACLType> aces = new HashMap<String, ACLType>();
+        aces.put(GROUP_EVERYONE, ACLType.Consumer);
+        aclService.addAcl(cmisService.getAdminSession(), proroga.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), aces);	            
+		
+		
+		Map<String, Object> propertiesCall = new HashMap<String, Object>();
+		propertiesCall.put("jconon_call_procedura_comparativa:data_fine_proroga", calcolaDataProroga);
+		propertiesCall.put("jconon_call_procedura_comparativa:ora_fine_proroga", oraProroga);
+		call.updateProperties(propertiesCall, true);
+		
+		return null;
+	}
+
+	private Calendar calcolaDataProroga(String dataProroga, String oraProroga) throws ParseException {
+        Calendar dataFineInvioDomandeOpt = Calendar.getInstance();
+        dataFineInvioDomandeOpt.setTime(StringUtil.CMIS_DATEFORMAT.parse(dataProroga));        
+        Optional<String> oraFineInvioDomande = Optional.ofNullable(oraProroga).filter(x -> x.length() > 0);
+    	Calendar dataFineInvioDomande = Calendar.getInstance();
+    	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get(Calendar.YEAR));
+    	dataFineInvioDomande.set(Calendar.MONTH, dataFineInvioDomandeOpt.get(Calendar.MONTH));
+    	dataFineInvioDomande.set(Calendar.DAY_OF_MONTH, dataFineInvioDomandeOpt.get(Calendar.DAY_OF_MONTH));
+    	dataFineInvioDomande.set(Calendar.SECOND, 59);
+    	if (oraFineInvioDomande.isPresent()) {
+        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, Integer.valueOf(oraFineInvioDomande.get().split(":")[0]));
+        	dataFineInvioDomande.set(Calendar.MINUTE, Integer.valueOf(oraFineInvioDomande.get().split(":")[1]));	        		
+    	} else {
+        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 23);
+        	dataFineInvioDomande.set(Calendar.MINUTE, 59);
+    	}
+		return dataFineInvioDomande;
 	}
 	
 }

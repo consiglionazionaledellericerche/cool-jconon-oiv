@@ -70,6 +70,27 @@
 		widget="ui.datepicker">
 		<jsonvalidator requiredWidget="true"/>
 	</fieldProperty>
+	<fieldProperty
+		parentGroupClass="span5"		
+		class="input-medium"  
+		inputType="TEXT"
+		todayHighlight="false" 
+		todayBtn="false"
+		startDate="+1d"
+		label="label.procedura_comparativa_data_fine_proroga" 
+		name="data_fine_proroga" 
+		property="jconon_call_procedura_comparativa:data_fine_proroga"
+		widget="ui.datepicker">
+		<jsonvalidator requiredWidget="true"/>
+	</fieldProperty>	
+	<fieldProperty 
+		class="input-small" 
+		inputType="TEXT" 
+		label="label.procedura_comparativa_ora_fine_proroga" 
+		name="ora_fine_proroga" 
+		property="jconon_call_procedura_comparativa:ora_fine_proroga"
+		widget="ui.timepicker"/>
+			
 	<fieldProperty 
 		parentGroupClass="offset5"
 		class="input-small" 
@@ -307,6 +328,10 @@
 			name="data_fine_invio_domande"
 			widget="ui.datepicker"/>
 		<columnFieldProperty name="ora_fine_invio_domande"/>
+		<columnFieldProperty 
+			name="data_fine_proroga"
+			widget="ui.datepicker"/>
+		<columnFieldProperty name="ora_fine_proroga"/>
 
 		<columnFieldProperty name="tipologia_oiv"/>
 		<columnFieldProperty name="tipologia_selezione"/>
@@ -343,6 +368,12 @@
 		label="label.column.jconon_call_data_fine_invio_domande" 
 		property="jconon_call:data_fine_invio_domande" 
 		name="data_fine_invio_domande"/>
+	<columnFieldProperty 
+		class="sort" 
+		label="label.procedura_comparativa_data_fine_proroga" 
+		property="jconon_call_procedura_comparativa:data_fine_proroga" 
+		name="data_fine_proroga"/>
+
 	<columnFieldProperty 
 		class="sort" 
 		name="amministrazione"/>

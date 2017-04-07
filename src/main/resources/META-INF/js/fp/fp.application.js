@@ -232,6 +232,87 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
     });
     UI.modal(i18n['actions.attachments'], content);
   }
+
+  function callIsActive(inizio, fine, proroga) {
+    var data_inizio = CNR.Date.parse(inizio),
+      data_fine = CNR.Date.parse(proroga || fine),
+      data_now = CNR.Date.parse(common.now);
+    if (data_inizio <= data_now && data_fine >= data_now) {
+      return true;
+    }
+    return false;
+  }
+
+  function getCriteria(bulkInfo, attivi_scadutiValue) {
+    var propDataInizio = 'root.jconon_call:data_inizio_invio_domande',
+      propDataFine = 'root.jconon_call:data_fine_invio_domande',
+      propDataProroga = 'root.jconon_call_procedura_comparativa:data_fine_proroga',
+
+      criteria = new Criteria(),
+      timestamp = moment(common.now).toDate().getTime(),
+      isoDate;
+
+    // il timestamp cambia ogni 10 minuti
+    timestamp = timestamp - timestamp % (10 * 60 * 1000);
+    isoDate = new Date(timestamp).toISOString();
+    $.each(bulkInfo.getFieldProperties(), function (index, el) {
+      var propValue = bulkInfo.getDataValueById(el.name),
+        re = /^criteria\-/;
+      if (el.property) {
+        if (el['class'] && propValue) {
+          $(el['class'].split(' ')).each(function (index, myClass) {
+            if (re.test(myClass)) {
+              var fn = myClass.replace(re, '');
+              propValue = propValue.replace('\'', '\\\'');
+              if (fn === 'contains') {
+                criteria[fn](el.property + ':\\\'*' + propValue + '*\\\'', 'root');
+              } else {
+                criteria[fn](el.property, propValue, el.widget === 'ui.datepicker' ? 'date' : null);
+              }
+            }
+          });
+        } else {
+          if (propValue) {            
+            criteria.equals(el.property, propValue.replace('\'', '\\\''));
+          }
+        }
+      }
+      if (el.name === 'filters-attivi_scaduti') {
+        if (attivi_scadutiValue ? attivi_scadutiValue === 'attivi' : propValue === 'attivi') {
+          criteria.lte(propDataInizio, isoDate, 'date');
+          criteria.and(
+            {type: '>=', what: propDataProroga, to: isoDate, valueType: 'date'},
+            {type: 'NOT NULL', what: propDataProroga}
+          );
+          criteria.complex(
+            {type: 'open_parenthesis'},
+              {type: 'open_parenthesis'},
+                {type: '>=', what: propDataFine, boolOpAfter: 'AND', to: isoDate, valueType: 'date'},
+                {type: 'NULL', what: propDataProroga},
+              {type: 'close_parenthesis'},
+              {type: 'NOT NULL', boolOpBefore: 'OR', what: propDataProroga},
+              {type: 'NULL', boolOpBefore: 'OR', what: propDataFine},
+            {type: 'close_parenthesis'}
+          );
+        } else if (attivi_scadutiValue ? attivi_scadutiValue === 'scaduti' : propValue === 'scaduti') {
+          criteria.complex(
+            {type: 'open_parenthesis'},
+              {type: 'open_parenthesis'},
+                {type: '<=', what: propDataFine, boolOpAfter: 'AND', to: isoDate, valueType: 'date'},
+                {type: 'NULL', what: propDataProroga},
+              {type: 'close_parenthesis'},
+                {type: '<=', what: propDataProroga,boolOpBefore: 'OR', to: isoDate, valueType: 'date'},
+            {type: 'close_parenthesis'}
+          );
+        } else if (attivi_scadutiValue ? attivi_scadutiValue === 'tutti' : propValue === 'tutti') {
+          if (common.User.groupsArray == undefined || common.User.groupsArray.indexOf('GROUP_GESTORI_BANDI') === -1) {
+            criteria.lte(propDataInizio, isoDate, 'date');            
+          }
+        }
+      }
+    });
+    return criteria;
+  }
   $.validator.addMethod('telephone-number',
     function (value) {
       if (value !== "") {
@@ -248,6 +329,8 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
     displayEsperienzeOIV: displayEsperienzeOIV,
     URL: urls,
     Data: URL.initURL(urls),
-    init: init    
+    init: init,
+    callIsActive: callIsActive,
+    getCriteria: getCriteria
   };
 });
