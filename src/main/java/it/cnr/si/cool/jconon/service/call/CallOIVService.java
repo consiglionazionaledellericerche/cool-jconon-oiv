@@ -13,6 +13,7 @@ import it.cnr.cool.util.MimeTypes;
 import it.cnr.cool.util.StringUtil;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
+import it.cnr.si.cool.jconon.cmis.model.JCONONPolicyType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.repository.CacheRepository;
 import it.cnr.si.cool.jconon.service.cache.CompetitionFolderService;
@@ -64,7 +65,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 @Primary
 public class CallOIVService extends CallService {
-    private static final String JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA = "jconon_attachment:procedura_comparativa_ora_fine_proroga";
+    private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA = "jconon_call_procedura_comparativa:ora_fine_proroga";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA = "jconon_call_procedura_comparativa:data_fine_proroga";
+	private static final String JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA = "jconon_attachment:procedura_comparativa_ora_fine_proroga";
 	private static final String JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA = "jconon_attachment:procedura_comparativa_data_fine_proroga";
 	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_PROVVEDIMENTO_NOMINA = "D:jconon_attachment:call_fp_esito_provvedimento_nomina";
 	private static final String D_JCONON_ATTACHMENT_CALL_FP_ESITO_ELENCO_CODICI_ISCRIZIONE = "D:jconon_attachment:call_fp_esito_elenco_codici_iscrizione";
@@ -343,19 +346,22 @@ public class CallOIVService extends CallService {
 	}
 
 	public Map<String, Object> caricaProroga(Session session, CMISUser cmisUserFromSession, String idCall, String dataProroga,
-			String oraProroga, MultipartFile file) throws IOException, ParseException {
+			String oraProroga, String title, String description, MultipartFile file) throws IOException, ParseException {
 		Folder call = (Folder) session.getObject(idCall);
 		Calendar calcolaDataProroga = calcolaDataProroga(dataProroga, oraProroga);
 		//controllo sulle date
-		if (calcolaDataProroga.before(Optional.ofNullable(call.getPropertyValue("jconon_call_procedura_comparativa:data_fine_proroga"))
+		if (calcolaDataProroga.before(Optional.ofNullable(call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA))
 				.orElse(call.getPropertyValue(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value())))) {
 			throw new ClientMessageException("La data di proroga deve essere successiva alla data presente sulla procedura comparativa!");
 		}
 		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, Arrays.asList(JCONONPolicyType.TITLED_ASPECT.value()));
 		properties.put(PropertyIds.OBJECT_TYPE_ID, "D:jconon_attachment:call_fp_procedura_comparativa_proroga");		
 		properties.put(PropertyIds.NAME, file.getOriginalFilename());
 		properties.put(JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA, calcolaDataProroga);
 		properties.put(JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA, oraProroga);
+		properties.put("cm:title", title);
+		properties.put("cm:description", description);		
 		ContentStream contentStream = new ContentStreamImpl(file.getOriginalFilename(), BigInteger.valueOf(file.getSize()), 
 				file.getContentType(), file.getInputStream());
 		Document proroga = call.createDocument(properties, contentStream, VersioningState.MAJOR);
@@ -365,11 +371,10 @@ public class CallOIVService extends CallService {
         Map<String, ACLType> aces = new HashMap<String, ACLType>();
         aces.put(GROUP_EVERYONE, ACLType.Consumer);
         aclService.addAcl(cmisService.getAdminSession(), proroga.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), aces);	            
-		
-		
+				
 		Map<String, Object> propertiesCall = new HashMap<String, Object>();
-		propertiesCall.put("jconon_call_procedura_comparativa:data_fine_proroga", calcolaDataProroga);
-		propertiesCall.put("jconon_call_procedura_comparativa:ora_fine_proroga", oraProroga);
+		propertiesCall.put(JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA, calcolaDataProroga);
+		propertiesCall.put(JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA, oraProroga);
 		call.updateProperties(propertiesCall, true);
 		
 		return null;
@@ -388,9 +393,9 @@ public class CallOIVService extends CallService {
         	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, Integer.valueOf(oraFineInvioDomande.get().split(":")[0]));
         	dataFineInvioDomande.set(Calendar.MINUTE, Integer.valueOf(oraFineInvioDomande.get().split(":")[1]));	        		
     	} else {
-        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 23);
+        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 21);
         	dataFineInvioDomande.set(Calendar.MINUTE, 59);
-    	}
+    	}    	
 		return dataFineInvioDomande;
 	}
 	
