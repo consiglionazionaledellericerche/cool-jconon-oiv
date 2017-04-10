@@ -1,8 +1,8 @@
 /*global params*/
 define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
   'cnr/cnr.bulkinfo', 'cnr/cnr.ui',
-  'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url', 'cnr/cnr.call', 'cnr/cnr.ace', 'json!cache', 'fp/fp.application', 'cnr/cnr'
-  ], function ($, i18n, header, ActionButton, Search, BulkInfo, UI, common, jconon, URL, Call, Ace, cache, ApplicationFp, CNR) {
+  'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url', 'cnr/cnr.call', 'cnr/cnr.ace', 'json!cache', 'fp/fp.application', 'cnr/cnr', 'cnr/cnr.attachments'
+  ], function ($, i18n, header, ActionButton, Search, BulkInfo, UI, common, jconon, URL, Call, Ace, cache, ApplicationFp, CNR, Attachments) {
   "use strict";
   var rootTypeId = 'F:jconon_call_procedura_comparativa:folder',
     rootQueryTypeId = 'jconon_call_procedura_comparativa:folder root',
@@ -258,9 +258,38 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
             }
             bulkinfo.render();
             UI.modal('<i class="icon-time"></i> ' + i18n.prop('actions.prorogaTermini'), content, sendFile);              
-          };          
+          };
+          customButtons.altriDocumenti = function () {
+            var applicationAttachments = [{
+              "key": "D:jconon_attachment:call_fp_altri_documenti",
+              "label": "D:jconon_attachment:call_fp_altri_documenti",
+              "description": "Altri documenti",
+              "defaultLabel": "Altri documenti",
+              "id": "D:jconon_attachment:call_fp_altri_documenti"
+            }], content = $("<div></div>").addClass('modal-inner-fix'), 
+            bigModal,               
+            attachment = new Attachments({
+              isSaved: true,
+              affix: content,
+              objectTypes: applicationAttachments,
+              cmisObjectId: el['cmis:objectId'],
+              search: {
+                type: 'jconon_attachment:call_fp_altri_documenti',
+                displayRow: function (el, refreshFn) {
+                  return jconon.defaultDisplayDocument(el, refreshFn, false);
+                },
+                fetchCmisObject: true,
+                calculateTotalNumItems: true,
+                maxItems: 10,
+                filter: false
+              }
+            });
+            attachment();
+            bigModal = UI.bigmodal('<i class="icon-upload-alt"></i> Altri Documenti', content);            
+          };
         } else {
-          customButtons.prorogaTermini = false;  
+          customButtons.prorogaTermini = false;
+          customButtons.altriDocumenti = false;  
         }
 
         if (!isActive && el.data_inizio_invio_domande && (!el['jconon_call_procedura_comparativa:pubblicato_esito'] || common.User.admin)) {
@@ -278,11 +307,12 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
           mimeType: el.contentType,
           allowableActions: el.allowableActions,
           defaultChoice: isMacroCall ? 'detail' : 'application'
-        }, {esitoSelezione: 'CAN_CREATE_DOCUMENT', prorogaTermini: 'CAN_CREATE_DOCUMENT' },
+        }, {esitoSelezione: 'CAN_CREATE_DOCUMENT', prorogaTermini: 'CAN_CREATE_DOCUMENT', altriDocumenti : 'CAN_CREATE_DOCUMENT'},
           customButtons, {
             attachments : 'icon-download-alt',
             esitoSelezione : 'icon-share-alt',
-            prorogaTermini : 'icon-time'
+            prorogaTermini : 'icon-time',
+            altriDocumenti : 'icon-upload-alt'
           }, undefined, true);
         row = $(rows.get(index));
         azioni.appendTo(row.find('td:last'));

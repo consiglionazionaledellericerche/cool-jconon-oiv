@@ -88,11 +88,13 @@ public class CallOIV {
 	    	MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
 			String idCall = mRequest.getParameter("objectId");
 			String dataProroga = mRequest.getParameter("jconon_attachment:procedura_comparativa_data_fine_proroga");
-			String oraProroga = mRequest.getParameter("jconon_attachment:procedura_comparativa_ora_fine_proroga");			
+			String oraProroga = mRequest.getParameter("jconon_attachment:procedura_comparativa_ora_fine_proroga");
+			String title = Optional.of(mRequest.getParameter("cm:title")).filter(x -> x.length() > 0).orElse(null);
+			String description = Optional.of(mRequest.getParameter("cm:description")).filter(x -> x.length() > 0).orElse(null);			
 			LOGGER.debug("carica proroga su procedura comparativa : {}", idCall);
 	    	MultipartFile file = mRequest.getFile("prorogatermini");
 	    	Optional.ofNullable(file).orElseThrow(() -> new ClientMessageException("Allegare il file della proroga dei termini!"));    		    				
-			Map<String, Object> model = callService.caricaProroga(session, cmisService.getCMISUserFromSession(req), idCall, dataProroga, oraProroga, file);
+			Map<String, Object> model = callService.caricaProroga(session, cmisService.getCMISUserFromSession(req), idCall, dataProroga, oraProroga, title, description, file);
 			rb = Response.ok(model);			
 		} catch (ClientMessageException | CMISApplicationException | ParseException e) {
 			LOGGER.warn("send error", e);
