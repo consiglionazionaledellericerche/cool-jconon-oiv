@@ -280,9 +280,14 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       if (el.name === 'filters-attivi_scaduti') {
         if (attivi_scadutiValue ? attivi_scadutiValue === 'attivi' : propValue === 'attivi') {
           criteria.lte(propDataInizio, isoDate, 'date');
-          criteria.and(
-            {type: '>=', what: propDataProroga, to: isoDate, valueType: 'date'},
-            {type: 'NOT NULL', what: propDataProroga}
+          criteria.complex(
+            {type: 'open_parenthesis'},
+              {type: 'open_parenthesis'},
+                 {type: '>=', what: propDataProroga, boolOpAfter: 'AND', to: isoDate, valueType: 'date'},
+                 {type: 'NOT NULL', what: propDataProroga},
+              {type: 'close_parenthesis'},
+              {type: 'NULL', boolOpBefore: 'OR', what: propDataProroga},
+            {type: 'close_parenthesis'}
           );
           criteria.complex(
             {type: 'open_parenthesis'},
