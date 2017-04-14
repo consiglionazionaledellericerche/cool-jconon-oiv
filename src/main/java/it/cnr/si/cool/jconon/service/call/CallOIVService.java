@@ -169,7 +169,7 @@ public class CallOIVService extends CallService {
 			BindingSession currentBindingSession, String userId,
 			String objectId, boolean publish, String contextURL, Locale locale) {
         final Folder call = (Folder) cmisSession.getObject(objectId);
-        Calendar today = Calendar.getInstance();
+        Calendar today = Calendar.getInstance(TimeZone.getDefault(), Locale.ITALY);
         today.set(Calendar.HOUR_OF_DAY, 1);
         if (call.getType().getId().equalsIgnoreCase(F_JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER)) {
 
@@ -242,7 +242,7 @@ public class CallOIVService extends CallService {
         Optional<Calendar> dataFineInvioDomandeOpt = Optional.ofNullable((Calendar)properties.get(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value()));
         Optional<String> oraFineInvioDomande = Optional.ofNullable((String)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE));
         if (dataFineInvioDomandeOpt.isPresent()) {
-        	Calendar dataFineInvioDomande = Calendar.getInstance(TimeZone.getDefault());
+        	Calendar dataFineInvioDomande = Calendar.getInstance(TimeZone.getDefault(), Locale.ITALY);
         	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get().get(Calendar.YEAR));
         	dataFineInvioDomande.set(Calendar.MONTH, dataFineInvioDomandeOpt.get().get(Calendar.MONTH));
         	dataFineInvioDomande.set(Calendar.DAY_OF_MONTH, dataFineInvioDomandeOpt.get().get(Calendar.DAY_OF_MONTH));
@@ -382,10 +382,10 @@ public class CallOIVService extends CallService {
 	}
 
 	private Calendar calcolaDataProroga(String dataProroga, String oraProroga) throws ParseException {
-        Calendar dataFineInvioDomandeOpt = Calendar.getInstance(TimeZone.getDefault());
+        Calendar dataFineInvioDomandeOpt = Calendar.getInstance(TimeZone.getDefault(), Locale.ITALY);
         dataFineInvioDomandeOpt.setTime(StringUtil.CMIS_DATEFORMAT.parse(dataProroga));        
         Optional<String> oraFineInvioDomande = Optional.ofNullable(oraProroga).filter(x -> x.length() > 0);
-    	Calendar dataFineInvioDomande = Calendar.getInstance(TimeZone.getDefault());
+    	Calendar dataFineInvioDomande = Calendar.getInstance(TimeZone.getDefault(), Locale.ITALY);
     	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get(Calendar.YEAR));
     	dataFineInvioDomande.set(Calendar.MONTH, dataFineInvioDomandeOpt.get(Calendar.MONTH));
     	dataFineInvioDomande.set(Calendar.DAY_OF_MONTH, dataFineInvioDomandeOpt.get(Calendar.DAY_OF_MONTH));
