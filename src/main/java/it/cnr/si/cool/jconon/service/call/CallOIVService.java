@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import org.apache.chemistry.opencmis.client.api.CmisObject;
@@ -381,7 +382,7 @@ public class CallOIVService extends CallService {
 	}
 
 	private Calendar calcolaDataProroga(String dataProroga, String oraProroga) throws ParseException {
-        Calendar dataFineInvioDomandeOpt = Calendar.getInstance();
+        Calendar dataFineInvioDomandeOpt = Calendar.getInstance(TimeZone.getDefault());
         dataFineInvioDomandeOpt.setTime(StringUtil.CMIS_DATEFORMAT.parse(dataProroga));        
         Optional<String> oraFineInvioDomande = Optional.ofNullable(oraProroga).filter(x -> x.length() > 0);
     	Calendar dataFineInvioDomande = Calendar.getInstance();
@@ -393,7 +394,7 @@ public class CallOIVService extends CallService {
         	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, Integer.valueOf(oraFineInvioDomande.get().split(":")[0]));
         	dataFineInvioDomande.set(Calendar.MINUTE, Integer.valueOf(oraFineInvioDomande.get().split(":")[1]));	        		
     	} else {
-        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 21);
+        	dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 23);
         	dataFineInvioDomande.set(Calendar.MINUTE, 59);
     	}    	
 		return dataFineInvioDomande;
