@@ -66,7 +66,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 @Primary
 public class CallOIVService extends CallService {
-    private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA = "jconon_call_procedura_comparativa:ora_fine_proroga";
+    private static final String EUROPE_ROME = "Europe/Rome";
+	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA = "jconon_call_procedura_comparativa:ora_fine_proroga";
 	private static final String JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA = "jconon_call_procedura_comparativa:data_fine_proroga";
 	private static final String JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_ORA_FINE_PROROGA = "jconon_attachment:procedura_comparativa_ora_fine_proroga";
 	private static final String JCONON_ATTACHMENT_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA = "jconon_attachment:procedura_comparativa_data_fine_proroga";
@@ -135,7 +136,7 @@ public class CallOIVService extends CallService {
 	public Folder publishEsito(Session cmisSession,
 			BindingSession currentBindingSession, String objectId, boolean publish, String userId) {
         final Folder call = (Folder) cmisSession.getObject(objectId);
-        Calendar today = Calendar.getInstance();
+        Calendar today = Calendar.getInstance(TimeZone.getTimeZone(EUROPE_ROME), Locale.ITALY);
         CMISUser user = userService.loadUserForConfirm(userId);    	
         if (!publish && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
         	throw new ClientMessageException("message.error.call.cannnot.modify");
@@ -169,7 +170,7 @@ public class CallOIVService extends CallService {
 			BindingSession currentBindingSession, String userId,
 			String objectId, boolean publish, String contextURL, Locale locale) {
         final Folder call = (Folder) cmisSession.getObject(objectId);
-        Calendar today = Calendar.getInstance(TimeZone.getDefault(), Locale.ITALY);
+        Calendar today = Calendar.getInstance(TimeZone.getTimeZone(EUROPE_ROME), Locale.ITALY);
         today.set(Calendar.HOUR_OF_DAY, 1);
         if (call.getType().getId().equalsIgnoreCase(F_JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER)) {
 
@@ -191,7 +192,7 @@ public class CallOIVService extends CallService {
 		        criteriaProcedureComparative.add(Restrictions.eq(JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE, call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE)));
 		        criteriaProcedureComparative.add(Restrictions.ne(PropertyIds.OBJECT_ID, call.getId()));
 		        criteriaProcedureComparative.add(Restrictions.eq(JCONONPropertyIds.CALL_PUBBLICATO.value(), true));
-		        criteriaProcedureComparative.add(Restrictions.ge(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), Calendar.getInstance().getTime()));
+		        criteriaProcedureComparative.add(Restrictions.ge(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), Calendar.getInstance(TimeZone.getTimeZone(EUROPE_ROME), Locale.ITALY).getTime()));
 	            if (criteriaProcedureComparative.executeQuery(cmisSession, false, cmisSession.getDefaultContext()).getTotalNumItems() > 0)
 	                throw new ClientMessageException("message.error.publish.call.alredy.active");
 	        	properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), today);	        	
@@ -242,7 +243,7 @@ public class CallOIVService extends CallService {
         Optional<Calendar> dataFineInvioDomandeOpt = Optional.ofNullable((Calendar)properties.get(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value()));
         Optional<String> oraFineInvioDomande = Optional.ofNullable((String)properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE));
         if (dataFineInvioDomandeOpt.isPresent()) {
-        	Calendar dataFineInvioDomande = Calendar.getInstance(TimeZone.getDefault(), Locale.ITALY);
+        	Calendar dataFineInvioDomande = Calendar.getInstance(Locale.ITALY);
         	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get().get(Calendar.YEAR));
         	dataFineInvioDomande.set(Calendar.MONTH, dataFineInvioDomandeOpt.get().get(Calendar.MONTH));
         	dataFineInvioDomande.set(Calendar.DAY_OF_MONTH, dataFineInvioDomandeOpt.get().get(Calendar.DAY_OF_MONTH));
@@ -382,10 +383,10 @@ public class CallOIVService extends CallService {
 	}
 
 	private Calendar calcolaDataProroga(String dataProroga, String oraProroga) throws ParseException {
-        Calendar dataFineInvioDomandeOpt = Calendar.getInstance(TimeZone.getDefault(), Locale.ITALY);
+        Calendar dataFineInvioDomandeOpt = Calendar.getInstance(TimeZone.getTimeZone(EUROPE_ROME), Locale.ITALY);
         dataFineInvioDomandeOpt.setTime(StringUtil.CMIS_DATEFORMAT.parse(dataProroga));        
         Optional<String> oraFineInvioDomande = Optional.ofNullable(oraProroga).filter(x -> x.length() > 0);
-    	Calendar dataFineInvioDomande = Calendar.getInstance(TimeZone.getDefault(), Locale.ITALY);
+    	Calendar dataFineInvioDomande = Calendar.getInstance(TimeZone.getTimeZone(EUROPE_ROME), Locale.ITALY);
     	dataFineInvioDomande.set(Calendar.YEAR, dataFineInvioDomandeOpt.get(Calendar.YEAR));
     	dataFineInvioDomande.set(Calendar.MONTH, dataFineInvioDomandeOpt.get(Calendar.MONTH));
     	dataFineInvioDomande.set(Calendar.DAY_OF_MONTH, dataFineInvioDomandeOpt.get(Calendar.DAY_OF_MONTH));
