@@ -32,7 +32,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
 
   function manageFilterClick() {
     $('#applyFilter').on('click', function () {
-      init($('#filters-attivi_scaduti > button.btn').attr('data-value'));
+      init($('#filters-attivi_scaduti > button.btn.active').attr('data-value'));
     });
     $('#filters-attivi_scaduti').closest('.widget').on('setData', function (event, key, value) {
       init(value);
