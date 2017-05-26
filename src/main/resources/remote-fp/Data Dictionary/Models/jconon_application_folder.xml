@@ -496,7 +496,27 @@
 					<value>ALTRA UNIVERSITA'</value>
 				</list>
 			</parameter>
-		</constraint>					
+		</constraint>	
+		<constraint name="jconon_application:elenco_non_occupato" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>disoccupato</value>
+					<value>in pensione</value>
+				</list>
+			</parameter>
+		</constraint>
+		<constraint name="jconon_application:elenco_settore" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>Pubblica amministrazione</value>
+					<value>Forze armate</value>
+					<value>Magistratura</value>
+					<value>Università</value>
+					<value>Settore privato</value>
+					<value>Libera professione</value>
+				</list>
+			</parameter>
+		</constraint>		
 	</constraints>
 	<types>
 		<type name="jconon_application:folder">
@@ -2522,5 +2542,79 @@
 				</property>
 			</properties>
 		</aspect>
+		<aspect name="jconon_application:aspect_situazione_lavorativa">
+			<title>Situazione Lavorativa</title>
+			<parent>jconon_application:aspects</parent>
+			<properties>
+				<property name="jconon_application:fl_occupato">
+					<title>Occupato</title>
+					<description>1] Flag Occupato ui.radio</description>
+					<type>d:boolean</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="jconon_application:non_occupato">
+					<title>Posizione</title>
+					<description>2) class:fl_occupato_false</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_application:elenco_non_occupato" />
+					</constraints>					
+				</property>
+				<property name="jconon_application:fl_dipendente_pubblico">
+					<title>Dipendente Pubblico</title>
+					<description>3) class:fl_occupato_true ui.radio</description>
+					<type>d:boolean</type>
+					<mandatory>true</mandatory>
+				</property>
+				<property name="jconon_application:situazione_lavorativa_settore">
+					<title>Settore</title>
+					<description>4) class:fl_occupato_true</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+					<constraints>
+						<constraint ref="jconon_application:elenco_settore" />
+					</constraints>					
+				</property>
+				<property name="jconon_application:situazione_lavorativa_ruolo">
+					<title>Ruolo</title>
+					<description>5) class:fl_occupato_true widget:ui.select</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_application:situazione_lavorativa_datore_lavoro">
+					<title>Datore di lavoro attuale</title>
+					<description>6) class:fl_occupato_true inputType:TEXTAREA</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+				<property name="jconon_application:situazione_lavorativa_data_inizio_lavoro">
+					<title>Data di inizio rapporto di lavoro</title>
+					<description>7) class:fl_occupato_true</description>
+					<type>d:datetime</type>
+					<mandatory>true</mandatory>
+				</property>
+			</properties>
+		</aspect>		
 	</aspects>
 </model>

@@ -62,6 +62,24 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class PrintOIVService extends PrintService {
+	private static final String NO = "No";
+
+	private static final String SI = "Si";
+
+	private static final String DATA_DI_INIZIO_RAPPORTO_DI_LAVORO = "Data di inizio rapporto di lavoro";
+
+	private static final String DATORE_DI_LAVORO_ATTUALE = "Datore di lavoro attuale";
+
+	private static final String RUOLO2 = "Ruolo";
+
+	private static final String SETTORE = "Settore";
+
+	private static final String DIPENDENTE_PUBBLICO = "Dipendente Pubblico";
+
+	private static final String POSIZIONE = "Posizione";
+
+	private static final String OCCUPATO = "Occupato";
+
 	private static final String FASCIA_PROFESSIONALE_VALIDATA = "Fascia Professionale Validata";
 
 	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO = "jconon_attachment:esperienza_professionale_datore_lavoro";
@@ -70,7 +88,7 @@ public class PrintOIVService extends PrintService {
 
 	private static final String ANNOTAZIONE = "Annotazione";
 
-	private static final String RUOLO = "Ruolo";
+	private static final String RUOLO = RUOLO2;
 
 	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A = "jconon_attachment:esperienza_professionale_a";
 
@@ -98,14 +116,28 @@ public class PrintOIVService extends PrintService {
 			RUOLO,
 			DATORE_DI_LAVORO,
 			ANNOTAZIONE,
-			FASCIA_PROFESSIONALE_VALIDATA
+			FASCIA_PROFESSIONALE_VALIDATA,
+			OCCUPATO,
+			POSIZIONE,
+			DIPENDENTE_PUBBLICO,
+			SETTORE,
+			RUOLO2,
+			DATORE_DI_LAVORO_ATTUALE,
+			DATA_DI_INIZIO_RAPPORTO_DI_LAVORO
 			);
 	
 	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream()
 				.filter(x -> !x.equalsIgnoreCase(RUOLO))
 				.filter(x -> !x.equalsIgnoreCase(ANNOTAZIONE))
 				.filter(x -> !x.equalsIgnoreCase(FASCIA_PROFESSIONALE_VALIDATA))
-				.filter(x -> !x.equalsIgnoreCase(DATORE_DI_LAVORO)), Arrays.asList(
+				.filter(x -> !x.equalsIgnoreCase(DATORE_DI_LAVORO))
+				.filter(x -> !x.equalsIgnoreCase(OCCUPATO))
+				.filter(x -> !x.equalsIgnoreCase(POSIZIONE))
+				.filter(x -> !x.equalsIgnoreCase(DIPENDENTE_PUBBLICO))
+				.filter(x -> !x.equalsIgnoreCase(SETTORE))
+				.filter(x -> !x.equalsIgnoreCase(RUOLO2))
+				.filter(x -> !x.equalsIgnoreCase(DATORE_DI_LAVORO_ATTUALE))
+				.filter(x -> !x.equalsIgnoreCase(DATA_DI_INIZIO_RAPPORTO_DI_LAVORO)), Arrays.asList(
 			"Tipologia esperienza (Professionale/OIV)",
 			"Area di specializzazione",
 			"Attività svolta nell’area di specializzazione indicata",
@@ -115,8 +147,14 @@ public class PrintOIVService extends PrintService {
 			"Non coerente", 
 			"Motivazione", 
 			ANNOTAZIONE,
-			FASCIA_PROFESSIONALE_VALIDATA
-			).stream()).collect(Collectors.toList());
+			FASCIA_PROFESSIONALE_VALIDATA,
+			OCCUPATO,
+			POSIZIONE,
+			DIPENDENTE_PUBBLICO,
+			SETTORE,
+			RUOLO2,
+			DATORE_DI_LAVORO_ATTUALE,
+			DATA_DI_INIZIO_RAPPORTO_DI_LAVORO).stream()).collect(Collectors.toList());
 	private List<String> headCSVElenco = Arrays.asList(
 			"Id","Nome", "Cognome","Data iscrizione");
 
@@ -141,6 +179,12 @@ public class PrintOIVService extends PrintService {
 		cmisService.createAdminSession().getObject(archiviaRicevutaReportModel).updateProperties(Collections.emptyMap(), 
 				Collections.singletonList(P_JCONON_APPLICATION_ASPECT_FASCIA_PROFESSIONALE_ATTRIBUITA), Collections.emptyList());		
 		return result;
+	}
+	@Override
+	protected String getTitle(int i, Dichiarazioni dichiarazione) {
+		if (dichiarazione.equals(Dichiarazioni.datiCNR) || dichiarazione.equals(Dichiarazioni.ulterioriDati))
+			return "";
+		return super.getTitle(i, dichiarazione);
 	}
 	
 	@Override
@@ -397,6 +441,14 @@ public class PrintOIVService extends PrintService {
     		row.createCell(column++).setCellValue(lastDatoreLavoro);    		
         	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_attachment:esperienza_annotazione_motivazione")).orElse(""));
     	}
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_validata")).orElse(""));     	
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_validata")).orElse(""));
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<Boolean>getPropertyValue("jconon_application:fl_occupato")).map(x -> x ? SI : NO).orElse(""));
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:non_occupato")).orElse(""));    	
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<Boolean>getPropertyValue("jconon_application:fl_dipendente_pubblico")).map(x -> x ? SI : NO).orElse(""));
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_settore")).orElse(""));    	    	
+       	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_ruolo")).orElse(""));    	    	
+       	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_datore_lavoro")).orElse(""));    	    	
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:situazione_lavorativa_data_inizio_lavoro")).map(map -> 
+			dateFormat.format(((Calendar)applicationObject.getPropertyValue("jconon_application:situazione_lavorativa_data_inizio_lavoro")).getTime())).orElse(""));    		   	
    }
 }
