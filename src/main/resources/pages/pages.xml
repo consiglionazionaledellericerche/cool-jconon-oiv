@@ -52,6 +52,11 @@
   </page>
   <page>
     <id>manage-call</id>
+    <path>/pages/call/manage-procedura-comparativa.get.html.ftl</path>
+    <authentication>user</authentication>
+  </page>
+  <page>
+    <id>manage-oiv</id>
     <path>/pages/call/call.get.html.ftl</path>
     <authentication>user</authentication>
   </page>

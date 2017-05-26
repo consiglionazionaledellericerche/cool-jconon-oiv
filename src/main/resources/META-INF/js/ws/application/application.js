@@ -16,7 +16,143 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     buttonPeople  = $('<button type="button" class="btn btn-small"><i class="icon-folder-open"></i> ' + i18n['button.explorer.people'] + '</button>'),
     buttonPeopleScelti  = $('<button type="button" class="btn btn-small"><i class="icon-folder-open"></i> ' + i18n['button.explorer.people'] + '</button>'),
     refreshFnProdotti, refreshFnProdottiScelti,
-    saved;
+    saved,
+    optionPubblico = [
+      'Pubblica amministrazione','Forze armate','Magistratura','Università'
+    ],
+    ruoloLavorativo = [
+      {
+        key : 'Dirigente',
+        defaultLabel: 'Dirigente',
+        label: 'label.ruolo.lavorativo.Dirigente',
+        group: 'Pubblica amministrazione'
+      },{
+        key : 'Funzionario',
+        defaultLabel: 'Funzionario',
+        label: 'label.ruolo.lavorativo.Funzionario',
+        group: 'Pubblica amministrazione'
+      },{
+        key : 'Impiegato',
+        defaultLabel: 'Impiegato',
+        label: 'label.ruolo.lavorativo.Impiegato',
+        group: 'Pubblica amministrazione'
+      },{
+        key : 'ALTRO',
+        defaultLabel: 'ALTRO',
+        label: 'label.ruolo.lavorativo.ALTRO',
+        group: 'Pubblica amministrazione'
+      },{
+        key : 'Ufficiale',
+        defaultLabel: 'Ufficiale',
+        label: 'label.ruolo.lavorativo.Ufficiale',
+        group: 'Forze armate'
+      },{
+        key : 'Sottufficiale/ispettore',
+        defaultLabel: 'Sottufficiale/ispettore',
+        label: 'label.ruolo.lavorativo.Sottufficiale/ispettore',
+        group: 'Forze armate'
+      },{
+        key : 'Sovraintendente',
+        defaultLabel: 'Sovraintendente',
+        label: 'label.ruolo.lavorativo.Sovraintendente',
+        group: 'Forze armate'
+      },{
+        key : 'ALTRO',
+        defaultLabel: 'ALTRO',
+        label: 'label.ruolo.lavorativo.ALTRO',
+        group: 'Forze armate'
+      },{
+        key : 'Magistrato ordinario',
+        defaultLabel: 'Magistrato ordinario',
+        label: 'label.ruolo.lavorativo.Magistratoordinario',
+        group: 'Magistratura'
+      },{
+        key : 'Magistrato amministrativo',
+        defaultLabel: 'Magistrato amministrativo',
+        label: 'label.ruolo.lavorativo.Magistratoamministrativo',
+        group: 'Magistratura'
+      },{
+        key : 'Magistrato contabile',
+        defaultLabel: 'Magistrato contabile',
+        label: 'label.ruolo.lavorativo.Magistratocontabile',
+        group: 'Magistratura'
+      },{
+        key : 'Magistrato onorario',
+        defaultLabel: 'Magistrato onorario',
+        label: 'label.ruolo.lavorativo.Magistratoonorario',
+        group: 'Magistratura'
+      },{
+        key : 'ALTRO',
+        defaultLabel: 'ALTRO',
+        label: 'label.ruolo.lavorativo.ALTRO',
+        group: 'Magistratura'
+      },{
+        key : 'Professore ordinario',
+        defaultLabel: 'Professore ordinario',
+        label: 'label.ruolo.lavorativo.Professoreordinario',
+        group: 'Università'
+      },{
+        key : 'Professore associato',
+        defaultLabel: 'Professore associato',
+        label: 'label.ruolo.lavorativo.Professoreassociato',
+        group: 'Università'
+      },{
+        key : 'Ricercatore',
+        defaultLabel: 'Ricercatore',
+        label: 'label.ruolo.lavorativo.Ricercatore',
+        group: 'Università'
+      },{
+        key : 'ALTRO',
+        defaultLabel: 'ALTRO',
+        label: 'label.ruolo.lavorativo.ALTRO',
+        group: 'Università'
+      },{
+        key : 'Imprenditore',
+        defaultLabel: 'Imprenditore',
+        label: 'label.ruolo.lavorativo.Imprenditore',
+        group: 'Settore privato'
+      },{
+        key : 'Dirigente',
+        defaultLabel: 'Dirigente',
+        label: 'label.ruolo.lavorativo.Dirigente',
+        group: 'Settore privato'
+      },{
+        key : 'Quadro',
+        defaultLabel: 'Quadro',
+        label: 'label.ruolo.lavorativo.Quadro',
+        group: 'Settore privato'
+      },{
+        key : 'Impiegato',
+        defaultLabel: 'Impiegato',
+        label: 'label.ruolo.lavorativo.Impiegato',
+        group: 'Settore privato'
+      },{
+        key : 'ALTRO',
+        defaultLabel: 'ALTRO',
+        label: 'label.ruolo.lavorativo.ALTRO',
+        group: 'Settore privato'
+      },{
+        key : 'Avvocato',
+        defaultLabel: 'Avvocato',
+        label: 'label.ruolo.lavorativo.Avvocato',
+        group: 'Libera professione'
+      },{
+        key : 'Commercialista/revisore',
+        defaultLabel: 'Commercialista/revisore',
+        label: 'label.ruolo.lavorativo.Commercialista/revisore',
+        group: 'Libera professione'
+      },{
+        key : 'Consulente',
+        defaultLabel: 'Consulente',
+        label: 'label.ruolo.lavorativo.Consulente',
+        group: 'Libera professione'
+      },{
+        key : 'ALTRO',
+        defaultLabel: 'ALTRO',
+        label: 'label.ruolo.lavorativo.ALTRO',
+        group: 'Libera professione'
+      }
+    ];
 
   if (content.hasClass('error-allegati-empty')) {
     UI.alert(content.data('message') || i18n['message.error.allegati.empty'], null, null, true);
@@ -325,6 +461,52 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     btn.parent('li').addClass('active');
   }
 
+  function onChangeDipendentePubblico(data) {
+    var optionsPubblico = content.find('#situazione_lavorativa_settore option').filter(
+        function(i, e) {
+          return optionPubblico.indexOf($(e).text()) !== -1
+        }
+    ),optionsPrivato = content.find('#situazione_lavorativa_settore option').filter(
+        function(i, e) {
+          return optionPubblico.indexOf($(e).text()) === -1
+        }
+    );
+    if (data === 'true') {
+      optionsPrivato.attr('disabled', 'disabled');
+      optionsPubblico.removeAttr('disabled');
+    } else if (data === 'false') {
+      optionsPubblico.attr('disabled', 'disabled');
+      optionsPrivato.removeAttr('disabled');
+    }
+    content.find('#situazione_lavorativa_settore').val('');
+    content.find('#situazione_lavorativa_settore').trigger('change');
+  }
+
+  function manangeClickDipendentePubblico() {
+    $('#fl_dipendente_pubblico > button.btn').on("click", function () {
+      onChangeDipendentePubblico($(this).attr('data-value'));
+    });
+  }
+
+  function onChangeSettore(data, onChange) {
+    var select = content.find('#situazione_lavorativa_ruolo'), 
+      options = content.find('#situazione_lavorativa_ruolo option'),
+      optionsGroup = content.find('#situazione_lavorativa_ruolo optgroup[label!="' + data + '"] option');
+    if (onChange) {
+      options.removeAttr('selected');
+      select.val('');      
+    }
+    options.removeAttr('disabled');
+    optionsGroup.attr('disabled', 'disabled');
+    select.trigger('change');
+  }
+
+  function manangeClickSettore() {
+    $('#situazione_lavorativa_settore').on("change", function () {
+      onChangeSettore($("#situazione_lavorativa_settore option:selected" ).text(), true);
+    });
+  }
+
   function manageNazioni(value, fieldsItaly, fieldsForeign) {
     if (value && value.toUpperCase() === 'ITALIA') {
       fieldsForeign.val('').trigger('blur');
@@ -432,6 +614,9 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           if (item.name === 'email_comunicazioni') {
             item.class = 'input-xlarge';
           }
+          if (item.name === 'situazione_lavorativa_ruolo') {
+            item.jsonlist = ruoloLavorativo;
+          }
         },
         afterCreateForm: function (form) {
           var rows = form.find('#affix_tabDichiarazioni table tr'),
@@ -470,6 +655,9 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           tabAnagraficaFunction();
           tabResidenzaFunction();
           tabReperibilitaFunction();
+          manangeClickDipendentePubblico();
+          manangeClickSettore();
+          onChangeSettore(metadata['jconon_application:situazione_lavorativa_settore']);
         },
         afterCreateSection: function (section) {
           var div = section.find(':first-child'),
