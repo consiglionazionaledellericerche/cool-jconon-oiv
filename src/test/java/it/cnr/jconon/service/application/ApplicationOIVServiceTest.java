@@ -23,14 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertTrue;
 
@@ -91,11 +89,11 @@ public class ApplicationOIVServiceTest {
 	}
     
     public static void main(String[] args) {
-		aggiornaProcedureComparative();
+		aggiornaFasciaAttribuita();
 	}
     
 	public static void aggiornaProcedureComparative() {
-		Session session = getRepositorySession("admin","Alf4FpPw");
+		Session session = getRepositorySession("admin","**********");
 		ItemIterable<QueryResult> query = session.query("select cmis:objectId from jconon_call_procedura_comparativa:folder", false, session.getDefaultContext());
 		for (QueryResult queryResult : query.getPage(Integer.MAX_VALUE)) {
 			CmisObject procedura = session.getObject(queryResult.<String>getPropertyValueById(PropertyIds.OBJECT_ID));
@@ -107,7 +105,7 @@ public class ApplicationOIVServiceTest {
 	}    
     
 	public static void aggiornaFascia() {
-		Session session = getRepositorySession("admin","Alf4FpPw");
+		Session session = getRepositorySession("admin","*********");
 		Map<Integer, String> map = new HashMap<Integer, String>();
 		map.put(1, "1");
 		map.put(2, "2");
@@ -386,6 +384,117 @@ public class ApplicationOIVServiceTest {
         Session session = SessionFactoryImpl.newInstance().createSession(sessionParameters);
         return session;
     }
-    
+
+    public static void aggiornaFasciaAttribuita() {
+		List<String> codici = new ArrayList<String>();
+		codici.add("NNNRGR85P22H931L");
+		codici.add("SVSNLC62T14F158E");
+		codici.add("DDNNSB82T68L425V");
+		codici.add("LBNCRL73D21F799X");
+		codici.add("CNQNNN86A24L845Y");
+		codici.add("CCCMHL67A27D643T");
+		codici.add("CMPFNC68A63I293J");
+		codici.add("DLLPLA75L07L840P");
+		codici.add("DMNNTN75E14F839M");
+		codici.add("DNAFPP70S08D969N");
+		codici.add("DCCCNZ77T54A509R");
+		codici.add("DSTGRL71S58Z112T");
+		codici.add("DLLDDV78P16F205Q");
+		codici.add("DBTPLA64B08F299P");
+		codici.add("FRCNTN64S04H501F");
+		codici.add("MGLGPP66A25M088Z");
+		codici.add("GGLPCR65M09E783B");
+		codici.add("NNICML43R26F065P");
+		codici.add("NCMGCH82D25D423S");
+		codici.add("LRVRSR71R23H269V");
+		codici.add("LNERND45L04G687J");
+		codici.add("LDILCU75T29G224N");
+		codici.add("MLLNCL54M17A662L");
+		codici.add("MRCMNC72S58A944H");
+		codici.add("MRGFDN74E16G813Y");
+		codici.add("MZZMSM71T02B898F");
+		codici.add("MZZGNN61A24C351R");
+		codici.add("MLFLRT67C31C933N");
+		codici.add("MNDNRC79P21C129N");
+		codici.add("MRCMHL74L29C352R");
+		codici.add("RBCFMN68A67E339C");
+		codici.add("SCPNCL77B13F205X");
+		codici.add("SCRCRN75H62C352K");
+		codici.add("SCMPLA68M13F839S");
+		codici.add("SMLNTN87P01L083U");
+		codici.add("TMSNNF64P28I452Q");
+		codici.add("VLRGDU58L28H501Y");
+		codici.add("LCNSMN79E66Z133K");
+		codici.add("BSCFRC76E42C890G");
+		codici.add("CMPLCU85E54A285Z");
+		codici.add("CHDPQL82L09G596K");
+		codici.add("DMRSRN70M71D742H");
+		codici.add("DPCMRA77D08B157Q");
+		codici.add("VNINTN63L05F839J");
+		codici.add("PSCMHL61S08A662J");
+		codici.add("BDNFRC61S41D969R");
+		codici.add("BNDNDR71P05L188Z");
+		codici.add("DPRDVD85S07B354R");
+		codici.add("FRCMRA58C14L049Y");
+		codici.add("FROSRG65B20H321I");
+		codici.add("MNDNCL74E09I410H");
+		codici.add("NTLGFR60C07B963V");
+		codici.add("PCAPLA64L24L781R");
+		codici.add("PNTCST77H25E340F");
+		codici.add("PTRMHL73E19A883Z");
+		codici.add("PCNPLA71C51F839Q");
+		codici.add("SBTFRC75A28H703N");
+		codici.add("SCLSLV75A19F152R");
+		codici.add("SCLFNC73C14D122M");
+		codici.add("SRRLSN58A03H501S");
+		codici.add("SRVFNC76E13L845X");
+		codici.add("SCLMRA72B63I537H");
+		codici.add("SPCPLA61S01A944J");
+		codici.add("TMSCLN66E52H221H");
+		codici.add("ZTTSLL56H57G224N");
+		codici.add("NTNCCT79D48D960Q");
+		codici.add("CRSGRL84T19E704S");
+		codici.add("CTPGNE71B18F839N");
+		codici.add("LNGSVN60B45C361Q");
+		codici.add("NTNNLM72R60L025T");
+		codici.add("BRNPLT69M18I754U");
+		codici.add("BSCGPP69C18B180C");
+		codici.add("CRCRSO61R65H501D");
+		codici.add("DLSCRL69D69L103X");
+		codici.add("DLCNTN64H19F924C");
+		codici.add("DLLSVT69A28A669B");
+		codici.add("DNFNLM55D69D643N");
+		codici.add("FCNGNN72E18I533X");
+		codici.add("FRTGNE76S19A345Z");
+		codici.add("GCCGCS68M06D086E");
+		codici.add("LVLLRD71S20G942Q");
+		codici.add("LCCSRN72L48L025T");
+		codici.add("MTNGTN67R31C361I");
+		codici.add("VRDLRT81H03B963V");
+		codici.add("CCRMRC67S14H501X");
+		codici.add("MBRLRD71R31H501U");
+		codici.add("PPTNDR67C26H501D");
+		codici.add("BLZDNT75L58E507E");
+		codici.add("MRCBRN73M11H501R");
+		codici.add("PSTMTT60S22A674P");
+		codici.add("TRLMDL81R52I119D");
+		codici.add("PRZMRA74E65G309Q");
+		List<String> collect = codici.stream().map(x -> "'" + x + "'").collect(Collectors.toList());
+		Map<String, Serializable> properties = new HashMap<String, Serializable>();
+		properties.put("jconon_application:fascia_professionale_attribuita","0");
+		properties.put("jconon_application:fascia_professionale_esegui_calcolo", "false");
+
+		Session session = getRepositorySession("admin","*************");
+		ItemIterable<QueryResult> query = session.query("select cmis:objectId from jconon_application:folder where jconon_application:codice_fiscale IN ("
+				+ String.join(",",collect) + ")", false, session.getDefaultContext());
+		for (QueryResult queryResult : query.getPage(Integer.MAX_VALUE)) {
+			CmisObject domanda = session.getObject(queryResult.<String>getPropertyValueById(PropertyIds.OBJECT_ID));
+			String fasciaAttribuita = domanda.getPropertyValue("jconon_application:fascia_professionale_attribuita");
+			if (!fasciaAttribuita.equals("0")) {
+				LOGGER.info("{} --> Fascia attribuita:{}", domanda.getName(), fasciaAttribuita);
+				//domanda.updateProperties(properties);
+			}
+		}
+	}
 
 }
