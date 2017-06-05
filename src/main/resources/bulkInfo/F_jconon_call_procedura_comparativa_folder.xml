@@ -292,12 +292,12 @@
 				</jsonlist>
 		</formFieldProperty>
 		<formFieldProperty 
-			class="criteria-like span12" 
+			class="criteria-contains span12" 
 			inputType="TEXT" 
 			label="label.jconon_call_procedura_comparativa_amministrazione" 
 			name="filters-amministrazione" 
 			placeholder="placeholder.filter.like" 
-			property="root.jconon_call_procedura_comparativa:amministrazione"/>
+			property="jconon_call_procedura_comparativa:amministrazione"/>
 			
 		<formFieldProperty 
 			class="criteria-gte input-medium" 
