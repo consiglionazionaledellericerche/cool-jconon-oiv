@@ -461,7 +461,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
     btn.parent('li').addClass('active');
   }
 
-  function onChangeDipendentePubblico(data) {
+  function onChangeDipendentePubblico(data, onload) {
     var optionsPubblico = content.find('#situazione_lavorativa_settore option').filter(
         function(i, e) {
           return optionPubblico.indexOf($(e).text()) !== -1
@@ -478,13 +478,15 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
       optionsPubblico.attr('disabled', 'disabled');
       optionsPrivato.removeAttr('disabled');
     }
-    content.find('#situazione_lavorativa_settore').val('');
-    content.find('#situazione_lavorativa_settore').trigger('change');
+    if (!onload) {
+        content.find('#situazione_lavorativa_settore').val('');
+        content.find('#situazione_lavorativa_settore').trigger('change');
+    }
   }
 
   function manangeClickDipendentePubblico() {
     $('#fl_dipendente_pubblico > button.btn').on("click", function () {
-      onChangeDipendentePubblico($(this).attr('data-value'));
+      onChangeDipendentePubblico($(this).attr('data-value'), false);
     });
   }
 
@@ -657,6 +659,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           tabReperibilitaFunction();
           manangeClickDipendentePubblico();
           manangeClickSettore();
+          onChangeDipendentePubblico(metadata['jconon_application:fl_dipendente_pubblico'], true);
           onChangeSettore(metadata['jconon_application:situazione_lavorativa_settore']);
         },
         afterCreateSection: function (section) {
