@@ -659,7 +659,7 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
           tabReperibilitaFunction();
           manangeClickDipendentePubblico();
           manangeClickSettore();
-          onChangeDipendentePubblico(metadata['jconon_application:fl_dipendente_pubblico'], true);
+          onChangeDipendentePubblico(String(metadata['jconon_application:fl_dipendente_pubblico']), true);
           onChangeSettore(metadata['jconon_application:situazione_lavorativa_settore']);
         },
         afterCreateSection: function (section) {
