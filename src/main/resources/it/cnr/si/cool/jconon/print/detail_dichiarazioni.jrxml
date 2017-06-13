@@ -9,7 +9,7 @@
 		<band height="15" splitType="Prevent">
 			<textField isStretchWithOverflow="true">
 				<reportElement x="0" y="0" width="465" height="15" uuid="60d1c085-44eb-4166-90a7-0e3e4d641039"/>
-				<textElement markup="none">
+				<textElement markup="html">
 					<font fontName="Times New Roman"/>
 				</textElement>
 				<textFieldExpression><![CDATA[(($F{first} == null || $F{first}.length() == 0) ? "" : $F{first} + ($F{first}.lastIndexOf(":") != -1 || $F{first}.lastIndexOf("&nbsp;") != -1 ||$F{second} == null || $F{second}.length() == 0? "" : ": ")) + $F{second}]]></textFieldExpression>

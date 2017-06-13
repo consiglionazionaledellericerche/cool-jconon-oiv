@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bulkInfo xmlns="http://www.cnr.it/schema/BulkInfo_v2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          cmisQueryName="jconon_application:aspect_situazione_lavorativa"
+          cmisTypeName="P:jconon_application:aspect_situazione_lavorativa"
+          longDescription="Aspect Situazione lavorativa"
+          shortDescription="Aspect Situazione lavorativa"
+          xsi:schemaLocation="http://www.cnr.it/schema/BulkInfo_v2 BulkInfo_v2">
+
+    <fieldProperty
+            labelClass="control-label"
+            name="fl_occupato"
+            property="jconon_application:fl_occupato"
+            inputType="RADIOGROUP"
+            class="input-sm check"
+            widget="ui.radio">
+        <jsonlabel
+                default="Occupato"
+                key="label.jconon_application.fl_occupato"/>
+        <jsonvalidator requiredWidget="true"/>
+        <jsonlist>
+            <listElement defaultLabel="Y" key="true" label="label.option.yes"/>
+            <listElement defaultLabel="N" key="false" label="label.option.no"/>
+        </jsonlist>
+    </fieldProperty>
+    <fieldProperty
+            class="fl_occupato_false span12"
+            inputType="SELECT"
+            name="non_occupato"
+            property="jconon_application:non_occupato"
+            widget="ui.select">
+        <jsonlabel
+                default="Posizione"
+                key="label.jconon_application.non_occupato"/>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="fl_occupato_true input-sm check"
+            name="fl_dipendente_pubblico"
+            inputType="RADIOGROUP"
+            property="jconon_application:fl_dipendente_pubblico"
+            widget="ui.radio">
+        <jsonlabel
+                default="Dipendente Pubblico"
+                key="label.jconon_application.fl_dipendente_pubblico"/>
+        <jsonlist>
+            <listElement defaultLabel="Y" key="true" label="label.option.yes"/>
+            <listElement defaultLabel="N" key="false" label="label.option.no"/>
+        </jsonlist>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12 fl_occupato_true"
+            inputType="SELECT"
+            name="situazione_lavorativa_settore"
+            property="jconon_application:situazione_lavorativa_settore"
+            widget="ui.select">
+        <jsonlabel
+                default="Settore"
+                key="label.jconon_application.situazione_lavorativa_settore"/>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12 fl_occupato_true"
+            inputType="SELECT"
+            name="situazione_lavorativa_ruolo"
+            property="jconon_application:situazione_lavorativa_ruolo"
+            widget="ui.select">
+        <jsonlabel
+                default="Ruolo"
+                key="label.jconon_application.situazione_lavorativa_ruolo"/>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12 fl_occupato_true"
+            inputType="TEXTAREA"
+            rows="4"
+            name="situazione_lavorativa_datore_lavoro"
+            property="jconon_application:situazione_lavorativa_datore_lavoro">
+        <jsonlabel
+                default="Datore di lavoro attuale"
+                key="label.jconon_application.situazione_lavorativa_datore_lavoro"/>
+        <jsonvalidator required="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span3 fl_occupato_true"
+            inputType="TEXT"
+            name="situazione_lavorativa_data_inizio_lavoro"
+            property="jconon_application:situazione_lavorativa_data_inizio_lavoro"
+            endDate="+0d"
+            widget="ui.datepicker">
+        <jsonlabel
+                default="Data di inizio rapporto di lavoro"
+                key="label.jconon_application.situazione_lavorativa_data_inizio_lavoro"/>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+
+    <formFieldProperty name="fl_occupato"/>
+    <formFieldProperty name="non_occupato"/>
+    <formFieldProperty name="fl_dipendente_pubblico"/>
+    <formFieldProperty name="situazione_lavorativa_settore"/>
+    <formFieldProperty name="situazione_lavorativa_ruolo"/>
+    <formFieldProperty name="situazione_lavorativa_datore_lavoro"/>
+    <formFieldProperty name="situazione_lavorativa_data_inizio_lavoro"/>
+
+    <form name="P:jconon_application:aspect_situazione_lavorativa">
+        <formFieldProperty name="fl_occupato"/>
+        <formFieldProperty name="non_occupato"/>
+        <formFieldProperty name="fl_dipendente_pubblico"/>
+        <formFieldProperty name="situazione_lavorativa_settore"/>
+        <formFieldProperty name="situazione_lavorativa_ruolo"/>
+        <formFieldProperty name="situazione_lavorativa_datore_lavoro"/>
+        <formFieldProperty name="situazione_lavorativa_data_inizio_lavoro"/>
+    </form>
+
+    <printForm name="jconon_application:fl_occupato">
+        <printFieldProperty label="label.jconon_application.fl_occupato.print_true" name="fl_occupato_true" key="true"/>
+        <printFieldProperty label="label.jconon_application.fl_occupato.print_false" name="fl_occupato_false" key="false"/>
+    </printForm>
+    <printForm name="jconon_application:fl_dipendente_pubblico">
+        <printFieldProperty label="label.jconon_application.fl_dipendente_pubblico.print_true" name="fl_occupato_true" key="true"/>
+        <printFieldProperty label="label.jconon_application.fl_dipendente_pubblico.print_false" name="fl_occupato_false" key="false"/>
+    </printForm>
+
+    <printForm name="P:jconon_application:aspect_situazione_lavorativa">
+        <printFieldProperty
+                formName="jconon_application:fl_occupato"
+                name="fl_occupato"/>
+        <printFieldProperty name="non_occupato">
+            <jsonlabel key="label.jconon_application.non_occupato.print"/>
+        </printFieldProperty>
+        <printFieldProperty
+                formName="jconon_application:fl_dipendente_pubblico"
+                name="fl_dipendente_pubblico"/>
+        <printFieldProperty name="situazione_lavorativa_settore">
+            <jsonlabel key="label.jconon_application.situazione_lavorativa_settore.print"/>
+        </printFieldProperty>
+        <printFieldProperty name="situazione_lavorativa_ruolo">
+            <jsonlabel key="label.jconon_application.situazione_lavorativa_ruolo.print"/>
+        </printFieldProperty>
+        <printFieldProperty name="situazione_lavorativa_datore_lavoro">
+            <jsonlabel key="label.jconon_application.situazione_lavorativa_datore_lavoro.print"/>
+        </printFieldProperty>
+        <printFieldProperty name="situazione_lavorativa_data_inizio_lavoro">
+            <jsonlabel key="label.jconon_application.situazione_lavorativa_data_inizio_lavoro.print"/>
+        </printFieldProperty>
+    </printForm>
+
+
+</bulkInfo>
