@@ -125,7 +125,8 @@ public class ApplicationOIVService extends ApplicationService{
 
 	
 	public static final String FASCIA1 = "1", FASCIA2 = "2", FASCIA3 = "3";
-	
+	public static final String EMAIL_DOMANDE_OIV = "EMAIL_DOMANDE_OIV";
+
 	@Autowired
 	private CMISService cmisService;
 	@Autowired
@@ -540,7 +541,7 @@ public class ApplicationOIVService extends ApplicationService{
         	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
         		try {
             		Folder call = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));        		
-            		List<String> emailList = groupService.children(call.getPropertyValue(JCONONPropertyIds.CALL_RDP.value()), cmisService.getAdminSession())
+            		List<String> emailList = groupService.children(EMAIL_DOMANDE_OIV, cmisService.getAdminSession())
             				.stream()
             				.filter(x -> !x.getShortName().equals("app.performance"))
             				.map(CMISAuthority::getShortName)
