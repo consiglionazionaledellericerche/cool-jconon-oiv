@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.time.ZoneId;
@@ -69,6 +70,21 @@ public class ApplicationOIVServiceTest {
 
     }
 
+    public void estraiAllIscritti() {
+		try {
+			applicationOIVService.extractionApplicationForAllIscritti(
+                    getRepositorySession("admin", "********"),
+                    "SELECT cmis:objectId FROM jconon_application:folder " +
+                            "WHERE IN_TREE ('a5ed6f55-f674-4925-885a-1f52307a63e0') " +
+                            "AND jconon_application:progressivo_iscrizione_elenco is not null " +
+                            "ORDER BY jconon_application:progressivo_iscrizione_elenco ASC",
+                    null,
+                    "admin");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
     private static Calendar calcolaDataProroga(String dataProroga, String oraProroga) throws ParseException {
         Calendar dataFineInvioDomandeOpt = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALY);
         dataFineInvioDomandeOpt.setTime(StringUtil.CMIS_DATEFORMAT.parse(dataProroga));        
@@ -87,11 +103,13 @@ public class ApplicationOIVServiceTest {
     	}    	
 		return dataFineInvioDomande;
 	}
-    
+
+	/*
     public static void main(String[] args) {
 		aggiornaFascia();
 	}
-    
+    */
+
 	public static void aggiornaProcedureComparative() {
 		Session session = getRepositorySession("admin","**********");
 		ItemIterable<QueryResult> query = session.query("select cmis:objectId from jconon_call_procedura_comparativa:folder", false, session.getDefaultContext());
