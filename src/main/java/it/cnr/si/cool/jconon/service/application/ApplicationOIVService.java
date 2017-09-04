@@ -522,6 +522,13 @@ public class ApplicationOIVService extends ApplicationService{
 	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId, String callId) throws IOException {
 		return printService.extractionApplicationForElenco(session, query, userId, callId);
 	}
+
+    public Map<String, Object> extractionApplicationForAllIscritti(
+            Session session, String query, String contexURL, String userId)
+            throws IOException {
+	    return printService.extractionApplicationForAllIscritti(session, query, contexURL, userId);
+    }
+
     @Scheduled(cron="0 0 22 * * *")
     public void estraiExcelOIV() {
         List<String> members = cluster
