@@ -5,14 +5,12 @@ import it.cnr.cool.util.StringUtil;
 import it.cnr.si.cool.jconon.CoolJcononApplication;
 import it.cnr.si.cool.jconon.service.application.ApplicationOIVService;
 
-import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
-import org.apache.chemistry.opencmis.client.api.QueryResult;
-import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,8 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.ZoneId;
 import java.util.*;
@@ -104,11 +105,19 @@ public class ApplicationOIVServiceTest {
 		return dataFineInvioDomande;
 	}
 
-	/*
+
     public static void main(String[] args) {
-		aggiornaFascia();
-	}
-    */
+        escludiDallElenco();
+    }
+
+	public static void escludiDallElenco() {
+        Session session = getRepositorySession("admin","********");
+        final CmisObject object = session.getObject("b7356c91-1cfd-40eb-ac35-d43bfcfef416");
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("jconon_application:fl_rimosso_elenco", true);
+        map.put("jconon_application:data_rimozione_elenco", new GregorianCalendar(2017,Calendar.SEPTEMBER,6));
+        object.updateProperties(Collections.singletonMap("jconon_application:fl_rimosso_elenco", true));
+    }
 
 	public static void aggiornaProcedureComparative() {
 		Session session = getRepositorySession("admin","**********");

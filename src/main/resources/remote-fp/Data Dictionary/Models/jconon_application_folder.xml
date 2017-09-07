@@ -860,6 +860,19 @@
 					<type>d:datetime</type>
 					<mandatory>false</mandatory>
 				</property>
+				<property name="jconon_application:fl_rimosso_elenco">
+					<title>Flag rimozione dall'elenco</title>
+					<description>Flag rimozione dall'elenco</description>
+					<type>d:boolean</type>
+					<mandatory>false</mandatory>
+					<default>false</default>
+				</property>
+				<property name="jconon_application:data_rimozione_elenco">
+					<title>Data rimozione dall'elenco</title>
+					<description>Data rimozione dall'elenco</description>
+					<type>d:datetime</type>
+					<mandatory>false</mandatory>
+				</property>
 				<property name="jconon_application:data_ultimo_invio">
 					<title>Data ultimo invio</title>
 					<description>Data ultimo invio</description>

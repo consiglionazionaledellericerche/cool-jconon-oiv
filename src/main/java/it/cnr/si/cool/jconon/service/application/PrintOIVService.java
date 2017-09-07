@@ -360,13 +360,20 @@ public class PrintOIVService extends PrintService {
     	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());    	
 		criteria.addColumn(PropertyIds.OBJECT_ID);
 		criteria.add(Restrictions.inTree(callId));
-		criteria.add(Restrictions.isNotNull("jconon_application:progressivo_iscrizione_elenco"));	
+		criteria.add(Restrictions.isNotNull("jconon_application:progressivo_iscrizione_elenco"));
 		criteria.addOrder(Order.asc("jconon_application:progressivo_iscrizione_elenco"));
 		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
 		int index = 1;
     	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
     		Folder application = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
-        	getRecordElencoCSV(session, application, sheet, index++);    			    		
+            /**
+             * Test se rimosso dall'elenco
+             */
+    		if (!Optional.ofNullable(application.getProperty("jconon_application:fl_rimosso_elenco"))
+                    .map(objectProperty -> objectProperty.<Boolean>getValue())
+                    .orElse(false)) {
+                getRecordElencoCSV(session, application, sheet, index++);
+            }
     	}
     	autoSizeColumns(wb);
     	return wb;
