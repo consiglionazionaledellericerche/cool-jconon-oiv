@@ -107,6 +107,8 @@ public class ApplicationOIVService extends ApplicationService{
 	private static final String JCONON_APPLICATION_DATA_ISCRIZIONE_ELENCO = "jconon_application:data_iscrizione_elenco";
 
 	private static final String JCONON_APPLICATION_FL_INVIA_NOTIFICA_EMAIL = "jconon_application:fl_invia_notifica_email";
+	private static final String JCONON_APPLICATION_OGGETTO_NOTIFICA_EMAIL = "jconon_application:oggetto_notifica_email";
+	private static final String JCONON_APPLICATION_TESTO_NOTIFICA_EMAIL = "jconon_application:testo_notifica_email";
 
 	private static final String INF250 = "<250", SUP250=">=250";
 
@@ -485,7 +487,7 @@ public class ApplicationOIVService extends ApplicationService{
 	@Override
 	public void reject(Session currentCMISSession, String nodeRef, String nodeRefDocumento) {
 		super.reject(currentCMISSession, nodeRef, nodeRefDocumento);
-    	Folder application = loadApplicationById(currentCMISSession, nodeRef, null); 
+    	Folder application = loadApplicationById(currentCMISSession, nodeRef, null);
     	Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
     	Document doc = (Document) currentCMISSession.getObject(nodeRefDocumento);
     	if (doc.<Boolean>getPropertyValue(JCONON_APPLICATION_FL_INVIA_NOTIFICA_EMAIL)) {
@@ -509,14 +511,19 @@ public class ApplicationOIVService extends ApplicationService{
     			message.setRecipients(emailList);
     			message.setBccRecipients(Arrays.asList(mailFromDefault));
     			String body = Util.processTemplate(mailModel, "/pages/application/application.esclusione.html.ftl");
-    			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + i18nService.getLabel("mail.subject.esclusione", Locale.ITALIAN));
-    			message.setBody(body);
+    			message.setSubject(doc.<String>getPropertyValue(JCONON_APPLICATION_OGGETTO_NOTIFICA_EMAIL));
+    			message.setBody(doc.<String>getPropertyValue(JCONON_APPLICATION_TESTO_NOTIFICA_EMAIL));
     			message.setAttachments(Arrays.asList(new AttachmentBean(doc.getName(), IOUtils.toByteArray(doc.getContentStream().getStream()))));
     			mailService.send(message);
     		} catch (TemplateException | IOException e) {
     			LOGGER.error("Cannot send email for reject applicationId: {}", nodeRef, e);
     		}    		
     	}
+    	Map<String,Object> properties = new HashMap<String,Object>();
+        properties.put("jconon_application:fl_rimosso_elenco",
+                Optional.ofNullable(application.getPropertyValue("jconon_application:progressivo_iscrizione_elenco")).map(o -> Boolean.TRUE).orElse(Boolean.FALSE));
+        properties.put("jconon_application:data_rimozione_elenco", Calendar.getInstance());
+        cmisService.createAdminSession().getObject(application.getId()).updateProperties(properties);
 	}
 
 	public Map<String, Object> extractionApplicationForElenco(Session session, String query, String userId, String callId) throws IOException {

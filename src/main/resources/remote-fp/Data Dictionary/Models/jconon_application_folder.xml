@@ -2549,8 +2549,20 @@
 			<properties>
 				<property name="jconon_application:fl_invia_notifica_email">
 					<title>Invia notifica</title>
-					<description>Flag fl_invia_notifica_email ui.checkbox</description>
+					<description>1] Flag fl_invia_notifica_email ui.checkbox</description>
 					<type>d:boolean</type>
+					<mandatory>false</mandatory>
+				</property>
+				<property name="jconon_application:oggetto_notifica_email">
+					<title>Testo</title>
+					<description>2] class:fl_invia_notifica_email_true</description>
+					<type>d:text</type>
+					<mandatory>false</mandatory>
+				</property>
+				<property name="jconon_application:testo_notifica_email">
+					<title>Testo</title>
+					<description>3] widget:ui.wysiwyg class:fl_invia_notifica_email_true</description>
+					<type>d:text</type>
 					<mandatory>false</mandatory>
 				</property>
 			</properties>

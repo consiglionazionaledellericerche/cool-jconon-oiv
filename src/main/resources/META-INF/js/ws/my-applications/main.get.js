@@ -1,6 +1,13 @@
-define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search', 'cnr/cnr.url', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.actionbutton', 'cnr/cnr.jconon', 'handlebars', 'cnr/cnr', 'moment', 'cnr/cnr.application', 'cnr/cnr.criteria', 'cnr/cnr.ace', 'cnr/cnr.call', 'cnr/cnr.node', 'json!cache', 'fp/fp.application'], function ($, header, common, BulkInfo, Search, URL, i18n, UI, ActionButton, jconon, Handlebars, CNR, moment, Application, Criteria, Ace, Call, Node, cache, ApplicationFp) {
+define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search', 'cnr/cnr.url', 'i18n', 
+  'cnr/cnr.ui', 'cnr/cnr.actionbutton', 'cnr/cnr.jconon', 'handlebars', 'cnr/cnr', 
+  'moment', 'cnr/cnr.application', 'cnr/cnr.criteria', 'cnr/cnr.ace', 'cnr/cnr.call', 
+  'cnr/cnr.node', 'json!cache', 'fp/fp.application','cnr/cnr.ui.widgets', 'cnr/cnr.ui.wysiwyg'],
+  function ($, header, common, BulkInfo, Search, URL, i18n, 
+    UI, ActionButton, jconon, Handlebars, CNR, 
+    moment, Application, Criteria, Ace, Call, 
+    Node, cache, ApplicationFp, Widgets, Wysiwyg) {
   "use strict";
-
+  Widgets['ui.wysiwyg'] = Wysiwyg;
   var search,
     rootTypeId = 'F:jconon_application:folder',
     typeId = 'F:jconon_call:folder',
@@ -113,12 +120,14 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     search.execute();
   }
 
-  function allegaDocumentoAllaDomanda(type, objectId, successCallback) {
-    Node.submission({
+  function allegaDocumentoAllaDomanda(type, objectId, successCallback, bigmodal, callbackModal) {
+    return Node.submission({
       nodeRef: objectId,
       objectType: type,
       crudStatus: "INSERT",
       requiresFile: true,
+      bigmodal: bigmodal,
+      callbackModal: callbackModal,
       showFile: true,
       externalData: [
         {
@@ -167,21 +176,13 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     return $('<div>').append(item).html();
   });
 
-  Handlebars.registerHelper('esclusioneRinuncia', function esclusioneRinunciaFn(esclusioneRinuncia, statoDomanda, dataDomanda, isRdP) {
+  Handlebars.registerHelper('esclusioneRinuncia', function esclusioneRinunciaFn(esclusioneRinuncia, statoDomanda, rimossoElenco, dataRimozione) {
 
-    var m = {
-      'E': 'Esclusa',
-      'R': 'Ritirata',
-      'S': 'Scheda anonima respinta',
-      'N': 'Non Ammesso'
-    }, a;
-
-    if (statoDomanda === 'C' && dataDomanda && m[esclusioneRinuncia]) {
-      if ((esclusioneRinuncia === 'S' && isRdP) || esclusioneRinuncia !== 'S') {
-        a = $('<span class="label label-important animated flash"></span>').append(m[esclusioneRinuncia]);
-      }
+    var a, testo = rimossoElenco === true ? "Cancellato dall'Elenco in data " : "Escluso dall'Elenco in data ";
+    testo += CNR.Date.format(dataRimozione, "-", "DD/MM/YYYY");
+    if (esclusioneRinuncia) {
+        a = $('<span class="label label-important animated flash"></span>').append(testo);
     }
-
     return $('<div>').append(a).html();
   });
 
@@ -503,9 +504,9 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                   }
                 }
                 if (common.User.admin || Call.isRdP(callData['jconon_call:rdp'])) {
-                  if (el['jconon_application:esclusione_rinuncia'] !== 'E' && el['jconon_application:progressivo_iscrizione_elenco'] == '') {
+                  if (el['jconon_application:esclusione_rinuncia'] !== 'E') {
                     customButtons.escludi = function () {
-                      allegaDocumentoAllaDomanda('D_jconon_esclusione_attachment_fp',
+                      var bulkInfoAllegato = allegaDocumentoAllaDomanda('D_jconon_esclusione_attachment_fp',
                         el['cmis:objectId'],
                         function (attachmentsData, data) {
                           jconon.Data.application.reject({
@@ -519,33 +520,69 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                             },
                             error: jconon.error
                           });
+                        }, true, function (modal) {
+                            $(window).on('shown.bs.modal', function (event) {
+                                var nome = el['jconon_application:nome'].replace(/^(.)|(\s|\-)(.)/g, function($word) {
+                                    return $word.toUpperCase();
+                                }), cognome = el['jconon_application:cognome'].replace(/^(.)|(\s|\-)(.)/g, function($word) {
+                                    return $word.toUpperCase();
+                                });
+                                modal.find('#oggetto_notifica_email').val(i18n['app.name'] + ' - ' + i18n['mail.subject.esclusione']);
+                                var testo = '<p>' + i18n['mail.confirm.application.1'];
+                                    testo += el['jconon_application:sesso'] === 'M' ? ' dott.' : ' dott.ssa';
+                                    testo += ' <b style="text-transform: capitalize;">' + nome + ' ' + cognome + '</b>, </p>';
+                                    testo += '<p>' + i18n['mail.esclusione.application.1'] + '</p>';
+                                    testo += '<p>' + i18n['mail.iscrizione.application.6'] + '</p><br>';
+                                    testo += callData['jconon_call:requisiti'];
+
+                                var textarea = modal.find('#testo_notifica_email');
+                                textarea.val(testo);
+                                var ck = textarea.ckeditor({
+                                    toolbarGroups: [
+                                        { name: 'clipboard', groups: ['clipboard'] },
+                                        { name: 'basicstyles', groups: ['basicstyles'] },
+                                        { name: 'paragraph', groups: ['list', 'align'] }],
+                                        removePlugins: 'elementspath'
+                                });
+                                ck.editor.on('change', function () {
+                                  var html = ck.val();
+                                  textarea.parent().find('control-group widget').data('value', html || null);
+                                });
+
+                                ck.editor.on('setData', function (event) {
+                                  var html = event.data.dataValue;
+                                  textarea.parent().find('control-group widget').data('value', html || null);
+                                });
+                            });
                         }
                       );
                     };
-                    customButtons.inserisci = function () {
-                      UI.confirm(i18n.prop('message.confirm.iscrizione.elenco', el['jconon_application:nome'], el['jconon_application:cognome']), function () {
-                        var close = UI.progress();
-                        jconon.Data.application.readmission({
-                          type: 'POST',
-                          data: {
-                            nodeRef : el['cmis:objectId']
-                          },
-                          success: function () {
-                            URL.Data.proxy.childrenGroup({
-                              type: 'POST',
-                              data: JSON.stringify({
-                                'parent_group_name': 'GROUP_ELENCO_OIV',
-                                'child_name': el['jconon_application:user']
-                              }),
-                              contentType: 'application/json'
-                            });
-                            UI.success('Iscrizione avvenuta correttamente.');
-                            $('#applyFilter').click();
-                          },
-                          complete: close,
-                          error: jconon.error
-                        });                      
-                      });  
+                    if (el['jconon_application:progressivo_iscrizione_elenco'] == '') {
+                      customButtons.inserisci = function () {
+                        UI.confirm(i18n.prop('message.confirm.iscrizione.elenco', el['jconon_application:nome'], el['jconon_application:cognome']), function () {
+                          var close = UI.progress();
+                          jconon.Data.application.readmission({
+                            type: 'POST',
+                            data: {
+                              nodeRef : el['cmis:objectId']
+                            },
+                            success: function () {
+                              URL.Data.proxy.childrenGroup({
+                                type: 'POST',
+                                data: JSON.stringify({
+                                  'parent_group_name': 'GROUP_ELENCO_OIV',
+                                  'child_name': el['jconon_application:user']
+                                }),
+                                contentType: 'application/json'
+                              });
+                              UI.success('Iscrizione avvenuta correttamente.');
+                              $('#applyFilter').click();
+                            },
+                            complete: close,
+                            error: jconon.error
+                          });                      
+                        });  
+                      }
                     }
                   }
                 }                
