@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bulkInfo xmlns="http://www.cnr.it/schema/BulkInfo_v2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          cmisQueryName="jconon_application:aspect_invia_notifica_email"
+          cmisTypeName="P:jconon_application:aspect_invia_notifica_email"
+          longDescription="Aspect notifica mail"
+          shortDescription="Aspect notifica mail"
+          xsi:schemaLocation="http://www.cnr.it/schema/BulkInfo_v2 BulkInfo_v2">
+
+    <fieldProperty
+            labelClass="control-label"
+            name="fl_invia_notifica_email"
+            property="jconon_application:fl_invia_notifica_email"
+            inputType="RADIOGROUP"
+            default="false"
+            class="input-sm check"
+            widget="ui.radio">
+        <jsonlabel
+                default="Invia notifica"
+                key="label.jconon_application.fl_invia_notifica_email"/>
+        <jsonvalidator requiredWidget="true"/>
+        <jsonlist>
+            <listElement defaultLabel="Y" key="true" label="label.option.yes"/>
+            <listElement defaultLabel="N" key="false" label="label.option.no"/>
+        </jsonlist>
+    </fieldProperty>
+    <fieldProperty
+            class="fl_invia_notifica_email_true span8"
+            inputType="TEXT"
+            name="oggetto_notifica_email"
+            property="jconon_application:oggetto_notifica_email">
+        <jsonlabel
+                default="Oggetto:"
+                key="label.jconon_application.oggetto_notifica_email"/>
+        <jsonvalidator required="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="fl_invia_notifica_email_true span8"
+            inputType="TEXTAREA"
+            rows="5"
+            name="testo_notifica_email"
+            property="jconon_application:testo_notifica_email">
+        <jsonlabel
+                default="Testo:"
+                key="label.jconon_application.testo_notifica_email"/>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    
+    <formFieldProperty name="fl_invia_notifica_email"/>
+    <formFieldProperty name="oggetto_notifica_email"/>
+    <formFieldProperty name="testo_notifica_email"/>
+ 
+</bulkInfo>

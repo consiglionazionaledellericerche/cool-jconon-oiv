@@ -107,16 +107,16 @@ public class ApplicationOIVServiceTest {
 
 
     public static void main(String[] args) {
-        escludiDallElenco();
+    	aggiornaFasciaAttribuita();
     }
 
 	public static void escludiDallElenco() {
-        Session session = getRepositorySession("admin","********");
+        Session session = getRepositorySession("admin","***********");
         final CmisObject object = session.getObject("b7356c91-1cfd-40eb-ac35-d43bfcfef416");
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("jconon_application:fl_rimosso_elenco", true);
         map.put("jconon_application:data_rimozione_elenco", new GregorianCalendar(2017,Calendar.SEPTEMBER,6));
-        object.updateProperties(Collections.singletonMap("jconon_application:fl_rimosso_elenco", true));
+        object.updateProperties(map);
     }
 
 	public static void aggiornaProcedureComparative() {
@@ -419,55 +419,36 @@ public class ApplicationOIVServiceTest {
 
     public static void aggiornaFasciaAttribuita() {
 		List<String> codici = new ArrayList<String>();
-		codici.add("TSTGLC81E19H926Y");
-		codici.add("RSTCLD81C30A662A");
-		codici.add("CLMRLA75M18D423G");
-		codici.add("DCRNTN87B19F839X");
-		codici.add("TRRSVT61B15C351A");
-		codici.add("SQMPLA65M29F839S");
-		codici.add("BCCPRZ55T03C704S");
-		codici.add("DNNFRC70S17L781I");
-		codici.add("SLPLCU78D19G337T");
-		codici.add("SLMRSR58R66D733L");
-		codici.add("LVRMCL77E56G596B");
-		codici.add("TSCMRC78L03D205M");
-		codici.add("RVIMRC73C10F133I");
-		codici.add("GDCFNC84P24C495Q");
-		codici.add("DPLMNL73H51H501B");
-		codici.add("RVGLCU64T53A326T");
-		codici.add("DLNRSR68T55H882W");
-		codici.add("RVZRDY72R17D643S");
-		codici.add("LNEMHL86A17D086H");
-		codici.add("PSCMGV83M63I874O");
-		codici.add("VCCLRT77M01B354P");
-		codici.add("SNGNDR88H08A522E");
-		codici.add("MRTCLL80P10F839I");
-		codici.add("DPLLSN85M17F839O");
-		codici.add("NCNGLC77R17I804K");
-		codici.add("BRGFBA74M13I754T");
-		codici.add("VNTGNN78A15I234L");
-		codici.add("RSTSMN69B14L682G");
-		codici.add("BNCCSM79B49L049C");
-		codici.add("PLMVCN75D18F839M");
-		codici.add("PRFMRC83H28F839H");
-		codici.add("SNTLSN77T16E388L");
-		codici.add("NGRGST75P24F520Y");
-		codici.add("GCNGMN74D42A662H");
-		codici.add("BNCLVR68R60D086R");
-		codici.add("GLTMRC52E29H501Z");
-		codici.add("MRLNNA77T54G674F");
-		codici.add("BRNSVT84M30H163T");
-		codici.add("FLCGPP80H03H224P");
-		codici.add("LNRGPP82C21I754M");
-		codici.add("FRNGNN80H47A089U");
-		codici.add("CRSCCT85H43C352B");
+		codici.add("CDLVCN68C26D708F");
+		codici.add("CGLNLP65B14E716K");
+		codici.add("DLLDNL62E47B180J");
+		codici.add("FLNLGU71T44E290Y");
+		codici.add("LFLMGS47S59A509Q");
+		codici.add("NRDMNT63R41F839R");
+		codici.add("RTLMRA58S19F839Y");
+		codici.add("PNRSVT53H23B872P");
+		codici.add("RGRMRA68E20A783F");
+		codici.add("RBRGNN63C26A571M");
+		codici.add("LNGVGN83B42G273H");
+		codici.add("DCRWTR73A01H703S");
+		codici.add("ZZILRC71T20F839P");
+		codici.add("MNTGRD59M09F913B");
+		codici.add("QRNLRA87E49B157P");
+		codici.add("RNCVCN64M10H703F");
+		codici.add("RGHBBR70A45H501A");
+		codici.add("MLLFBA64D01H501G");
+		codici.add("SLRLCN74C21F839G");
+		codici.add("TRCSDR58S06C129V");
+		codici.add("SRRMHL74P18L418F");
+		codici.add("CSCPRI77D09D505K");
+
 
 		List<String> collect = codici.stream().map(x -> "'" + x + "'").collect(Collectors.toList());
 		Map<String, Serializable> properties = new HashMap<String, Serializable>();
 		properties.put("jconon_application:fascia_professionale_attribuita","0");
 		properties.put("jconon_application:fascia_professionale_esegui_calcolo", "false");
 
-		Session session = getRepositorySession("admin","******");
+		Session session = getRepositorySession("admin","*****");
 		ItemIterable<QueryResult> query = session.query("select cmis:objectId from jconon_application:folder where jconon_application:codice_fiscale IN ("
 				+ String.join(",",collect) + ")", false, session.getDefaultContext());
 		for (QueryResult queryResult : query.getPage(Integer.MAX_VALUE)) {
