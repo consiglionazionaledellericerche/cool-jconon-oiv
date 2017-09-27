@@ -506,7 +506,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                 if (common.User.admin || Call.isRdP(callData['jconon_call:rdp'])) {
                   if (el['jconon_application:esclusione_rinuncia'] !== 'E') {
                     customButtons.escludi = function () {
-                      var bulkInfoAllegato = allegaDocumentoAllaDomanda('D_jconon_esclusione_attachment_fp',
+                      var bulkInfoAllegato = allegaDocumentoAllaDomanda('D_jconon_esclusione_attachment',
                         el['cmis:objectId'],
                         function (attachmentsData, data) {
                           jconon.Data.application.reject({

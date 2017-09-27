@@ -45,9 +45,13 @@
                 key="label.jconon_application.testo_notifica_email"/>
         <jsonvalidator requiredWidget="true"/>
     </fieldProperty>
+
     
     <formFieldProperty name="fl_invia_notifica_email"/>
     <formFieldProperty name="oggetto_notifica_email"/>
     <formFieldProperty name="testo_notifica_email"/>
- 
+
+    <columnFieldProperty name="oggetto_notifica_email"/>
+    <columnFieldProperty name="testo_notifica_email"/>
+
 </bulkInfo>
