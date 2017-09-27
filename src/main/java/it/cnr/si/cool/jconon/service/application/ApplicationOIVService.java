@@ -170,15 +170,20 @@ public class ApplicationOIVService extends ApplicationService{
 			String userId, Map<String, Object> properties,
 			Map<String, Object> aspectProperties) {
 		String objectId = (String) properties.get(PropertyIds.OBJECT_ID);
-		if (properties.containsKey(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO) && properties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO).equals("false")) {
+		if (properties.containsKey(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO) &&
+                properties.get(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO).equals("false")) {
 			properties.put(JCONON_APPLICATION_ESEGUI_CONTROLLO_FASCIA, false);
 			properties.remove(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO);
 			aspectProperties.remove(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ESEGUI_CALCOLO);
-			return super.save(currentCMISSession, contextURL, locale, userId, properties, aspectProperties);						
+            properties.put("jconon_application:fl_rimosso_elenco", false);
+			Folder application = super.save(currentCMISSession, contextURL, locale, userId, properties, aspectProperties);
+            super.readmission(currentCMISSession, objectId);
+			return application;
 		} else {
 			eseguiCalcolo(objectId, aspectProperties);
 			return super.save(currentCMISSession, contextURL, locale, userId, properties, aspectProperties);			
 		}
+
 	}
 	
 	@Override
