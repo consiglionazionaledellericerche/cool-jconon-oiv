@@ -9,7 +9,11 @@ import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
+import org.apache.chemistry.opencmis.commons.data.Ace;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.enums.AclPropagation;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlEntryImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlPrincipalDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Ignore;
@@ -105,9 +109,43 @@ public class ApplicationOIVServiceTest {
 		return dataFineInvioDomande;
 	}
 
+	public static void controllaPermessi() {
+		Session session = getRepositorySession("admin", "*******");
+        OperationContext defaultContext = session.getDefaultContext();
+        defaultContext.setIncludeAcls(true);
+        ItemIterable<QueryResult> query = session.query("select cmis:objectId from jconon_application:folder WHERE (IN_TREE ('a5ed6f55-f674-4925-885a-1f52307a63e0') AND ((NOT ((jconon_application:stato_domanda = 'I')) AND ((jconon_application:stato_domanda = 'C')))))", false, defaultContext);
+		for (QueryResult queryResult : query.getPage(Integer.MAX_VALUE)) {
+			CmisObject domanda = session.getObject(queryResult.<String>getPropertyValueById(PropertyIds.OBJECT_ID));
+			domanda.getAcl().getAces().stream()
+                    .filter(ace -> ace.getPrincipalId().equals("GROUP_CONCORSI"))
+                    .filter(ace -> ace.getPermissions().contains("{http://www.alfresco.org/model/content/1.0}cmobject.Coordinator"))
+                    .forEach(ace -> {
+                        domanda.removeAcl(Arrays.asList(ace), AclPropagation.REPOSITORYDETERMINED);
+                        LOGGER.info("Permesso {} domanda {}", ace, domanda.getId());
+                    });
+		}
+	}
+
+	public static void aggiornaPermessi() {
+        Session session = getRepositorySession("admin", "******");
+        OperationContext defaultContext = session.getDefaultContext();
+        defaultContext.setIncludeAcls(true);
+        String[] domande = {
+                "5b511d40-746f-49e2-88fb-15da31a43869"
+        };
+        final Ace group_concorsi = new AccessControlEntryImpl(
+                new AccessControlPrincipalDataImpl("GROUP_CONCORSI"),
+                Collections.singletonList("{http://www.alfresco.org/model/content/1.0}cmobject.Contributor")
+        );
+
+        Arrays.asList(domande).stream().forEach(s -> {
+            CmisObject domanda = session.getObject(s);
+            domanda.addAcl(Collections.singletonList(group_concorsi), AclPropagation.REPOSITORYDETERMINED);
+        });
+    }
 
     public static void main(String[] args) {
-    	aggiornaFasciaAttribuita();
+        aggiornaPermessi();
     }
 
 	public static void escludiDallElenco() {
