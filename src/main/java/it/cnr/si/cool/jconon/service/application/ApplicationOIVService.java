@@ -185,7 +185,14 @@ public class ApplicationOIVService extends ApplicationService{
 		}
 
 	}
-	
+
+	@Override
+	public void addCoordinatorToConcorsiGroup(String nodeRef) {
+		/**
+		 * Non aggiunge mai il gruppo concorsi come coordinator
+		 */
+	}
+
 	@Override
 	public Map<String, String> sendApplication(Session currentCMISSession, final String applicationSourceId, final String contextURL, 
 			final Locale locale, String userId, Map<String, Object> properties, Map<String, Object> aspectProperties) {
