@@ -531,7 +531,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                 var testo = '<p>' + i18n['mail.confirm.application.1'];
                                     testo += el['jconon_application:sesso'] === 'M' ? ' dott.' : ' dott.ssa';
                                     testo += ' <b style="text-transform: capitalize;">' + nome + ' ' + cognome + '</b>, </p>';
-                                    testo += '<p>' + callData['jconon_call:requisiti_en'] + '</p>';
+                                    testo += callData['jconon_call:requisiti_en'];
 
                                 var textarea = modal.find('#testo_notifica_email');
                                 textarea.val(testo);
