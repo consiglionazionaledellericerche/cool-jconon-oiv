@@ -110,7 +110,7 @@ public class ApplicationOIVServiceTest {
 	}
 
 	public static void controllaPermessi() {
-		Session session = getRepositorySession("admin", "*******");
+		Session session = getRepositorySession("admin", "********");
         OperationContext defaultContext = session.getDefaultContext();
         defaultContext.setIncludeAcls(true);
         ItemIterable<QueryResult> query = session.query("select cmis:objectId from jconon_application:folder WHERE (IN_TREE ('a5ed6f55-f674-4925-885a-1f52307a63e0') AND ((NOT ((jconon_application:stato_domanda = 'I')) AND ((jconon_application:stato_domanda = 'C')))))", false, defaultContext);
@@ -120,7 +120,7 @@ public class ApplicationOIVServiceTest {
                     .filter(ace -> ace.getPrincipalId().equals("GROUP_CONCORSI"))
                     .filter(ace -> ace.getPermissions().contains("{http://www.alfresco.org/model/content/1.0}cmobject.Coordinator"))
                     .forEach(ace -> {
-                        domanda.removeAcl(Arrays.asList(ace), AclPropagation.REPOSITORYDETERMINED);
+                        //domanda.removeAcl(Arrays.asList(ace), AclPropagation.REPOSITORYDETERMINED);
                         LOGGER.info("Permesso {} domanda {}", ace, domanda.getId());
                     });
 		}
@@ -131,7 +131,7 @@ public class ApplicationOIVServiceTest {
         OperationContext defaultContext = session.getDefaultContext();
         defaultContext.setIncludeAcls(true);
         String[] domande = {
-                "5b511d40-746f-49e2-88fb-15da31a43869"
+                "efdabc75-4bbf-436e-9a2b-f70c2e4eca93"
         };
         final Ace group_concorsi = new AccessControlEntryImpl(
                 new AccessControlPrincipalDataImpl("GROUP_CONCORSI"),
@@ -145,7 +145,7 @@ public class ApplicationOIVServiceTest {
     }
 
     public static void main(String[] args) {
-        aggiornaPermessi();
+        controllaPermessi();
     }
 
 	public static void escludiDallElenco() {
