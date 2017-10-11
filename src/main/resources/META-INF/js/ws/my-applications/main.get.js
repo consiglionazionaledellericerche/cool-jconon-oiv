@@ -528,9 +528,9 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                     return $word.toUpperCase();
                                 });
                                 modal.find('#oggetto_notifica_email').val(i18n['app.name'] + ' - ' + i18n['mail.subject.esclusione']);
-                                var testo = '<p>' + i18n['mail.confirm.application.1'];
+                                var testo = i18n['mail.confirm.application.1'];
                                     testo += el['jconon_application:sesso'] === 'M' ? ' dott.' : ' dott.ssa';
-                                    testo += ' <b style="text-transform: capitalize;">' + nome + ' ' + cognome + '</b>, </p>';
+                                    testo += ' <b style="text-transform: capitalize;">' + nome + ' ' + cognome + '</b>,';
                                     testo += callData['jconon_call:requisiti_en'];
 
                                 var textarea = modal.find('#testo_notifica_email');
