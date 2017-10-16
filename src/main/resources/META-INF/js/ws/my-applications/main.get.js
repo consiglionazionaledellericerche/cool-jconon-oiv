@@ -178,7 +178,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
 
   Handlebars.registerHelper('esclusioneRinuncia', function esclusioneRinunciaFn(esclusioneRinuncia, statoDomanda, rimossoElenco, dataRimozione) {
 
-    var a, testo = rimossoElenco === true ? "Cancellato dall'Elenco in data " : "Escluso dall'Elenco in data ";
+    var a, testo = rimossoElenco === true ? "Comunicazione inviata in data " : "Comunicazione inviata in data ";
     testo += CNR.Date.format(dataRimozione, "-", "DD/MM/YYYY");
     if (esclusioneRinuncia) {
         a = $('<span class="label label-important animated flash"></span>').append(testo);
@@ -504,7 +504,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                   }
                 }
                 if (common.User.admin || Call.isRdP(callData['jconon_call:rdp'])) {
-                  if (el['jconon_application:esclusione_rinuncia'] !== 'E') {
+                  if (el['jconon_application:esclusione_rinuncia'] !== 'E' && el['jconon_application:progressivo_iscrizione_elenco'] == '') {
                     customButtons.escludi = function () {
                       var bulkInfoAllegato = allegaDocumentoAllaDomanda('D_jconon_esclusione_attachment',
                         el['cmis:objectId'],

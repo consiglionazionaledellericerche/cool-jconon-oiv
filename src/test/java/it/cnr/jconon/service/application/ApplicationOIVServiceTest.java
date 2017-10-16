@@ -110,7 +110,7 @@ public class ApplicationOIVServiceTest {
 	}
 
 	public static void controllaPermessi() {
-		Session session = getRepositorySession("admin", "********");
+		Session session = getRepositorySession("admin", "******");
         OperationContext defaultContext = session.getDefaultContext();
         defaultContext.setIncludeAcls(true);
         ItemIterable<QueryResult> query = session.query("select cmis:objectId from jconon_application:folder WHERE (IN_TREE ('a5ed6f55-f674-4925-885a-1f52307a63e0') AND ((NOT ((jconon_application:stato_domanda = 'I')) AND ((jconon_application:stato_domanda = 'C')))))", false, defaultContext);
