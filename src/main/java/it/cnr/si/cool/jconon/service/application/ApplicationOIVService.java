@@ -495,7 +495,48 @@ public class ApplicationOIVService extends ApplicationService{
     	}
 		
 	}
-	
+
+	private void messageToUser(Folder application, Folder call, Document doc) {
+		CMISUser user;
+		try {
+			user = userService.loadUserForConfirm(
+					application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
+		} catch (CoolUserFactoryException e) {
+			throw new ClientMessageException("User not found of application " + application.getId(), e);
+		}
+		String email = Optional.ofNullable(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_EMAIL_COMUNICAZIONI.value())).orElse(user.getEmail());
+		try {
+			Map<String, Object> mailModel = new HashMap<String, Object>();
+			List<String> emailList = new ArrayList<String>();
+			emailList.add(email);
+			mailModel.put("folder", application);
+			mailModel.put("call", call);
+			mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
+			mailModel.put("email_comunicazione", email);
+			EmailMessage message = new EmailMessage();
+			message.setRecipients(emailList);
+			message.setBccRecipients(Arrays.asList(mailFromDefault));
+			message.setSubject(doc.<String>getPropertyValue(JCONON_APPLICATION_OGGETTO_NOTIFICA_EMAIL));
+			message.setBody(doc.<String>getPropertyValue(JCONON_APPLICATION_TESTO_NOTIFICA_EMAIL));
+			message.setAttachments(Arrays.asList(new AttachmentBean(doc.getName(), IOUtils.toByteArray(doc.getContentStream().getStream()))));
+			mailService.send(message);
+		} catch (IOException e) {
+			LOGGER.error("Cannot send email for applicationId: {}", application.getId(), e);
+		}
+	}
+
+	public void message(Session currentCMISSession, String nodeRef, String nodeRefDocumento) {
+		Folder application = loadApplicationById(currentCMISSession, nodeRef, null);
+		Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
+		Document doc = (Document) currentCMISSession.getObject(nodeRefDocumento);
+		if (doc.<Boolean>getPropertyValue(JCONON_APPLICATION_FL_INVIA_NOTIFICA_EMAIL)) {
+		    messageToUser(application, call, doc);
+		}
+		Map<String,Object> properties = new HashMap<String,Object>();
+		properties.put("jconon_application:data_invio_comunicazione", Calendar.getInstance());
+		cmisService.createAdminSession().getObject(application.getId()).updateProperties(properties);
+	}
+
 	@Override
 	public void reject(Session currentCMISSession, String nodeRef, String nodeRefDocumento) {
 		super.reject(currentCMISSession, nodeRef, nodeRefDocumento);
@@ -503,33 +544,7 @@ public class ApplicationOIVService extends ApplicationService{
     	Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
     	Document doc = (Document) currentCMISSession.getObject(nodeRefDocumento);
     	if (doc.<Boolean>getPropertyValue(JCONON_APPLICATION_FL_INVIA_NOTIFICA_EMAIL)) {
-    		CMISUser user;
-    		try {
-    			user = userService.loadUserForConfirm(
-    					application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
-    		} catch (CoolUserFactoryException e) {
-    			throw new ClientMessageException("User not found of application " + nodeRef, e);
-    		}		
-        	String email = Optional.ofNullable(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_EMAIL_COMUNICAZIONI.value())).orElse(user.getEmail());		
-    		try {
-    			Map<String, Object> mailModel = new HashMap<String, Object>();
-    			List<String> emailList = new ArrayList<String>();
-    			emailList.add(email);
-    			mailModel.put("folder", application);
-    			mailModel.put("call", call);
-    			mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
-    			mailModel.put("email_comunicazione", email);
-    			EmailMessage message = new EmailMessage();
-    			message.setRecipients(emailList);
-    			message.setBccRecipients(Arrays.asList(mailFromDefault));
-    			String body = Util.processTemplate(mailModel, "/pages/application/application.esclusione.html.ftl");
-    			message.setSubject(doc.<String>getPropertyValue(JCONON_APPLICATION_OGGETTO_NOTIFICA_EMAIL));
-    			message.setBody(doc.<String>getPropertyValue(JCONON_APPLICATION_TESTO_NOTIFICA_EMAIL));
-    			message.setAttachments(Arrays.asList(new AttachmentBean(doc.getName(), IOUtils.toByteArray(doc.getContentStream().getStream()))));
-    			mailService.send(message);
-    		} catch (TemplateException | IOException e) {
-    			LOGGER.error("Cannot send email for reject applicationId: {}", nodeRef, e);
-    		}    		
+            messageToUser(application, call, doc);
     	}
     	Map<String,Object> properties = new HashMap<String,Object>();
         properties.put("jconon_application:fl_rimosso_elenco",

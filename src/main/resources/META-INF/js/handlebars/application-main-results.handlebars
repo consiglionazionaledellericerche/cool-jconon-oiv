@@ -31,7 +31,9 @@
 					{{{code 'Sono presenti annotazioni...' '' 'badge badge-warning annotazione' jconon_attachment_esperienza_annotazione_motivazione jconon_attachment_esperienza_annotazione_motivazione}}}
 					<br>
 				{{/ifIn}}
-
+                {{#if jconon_application_data_invio_comunicazione}}
+                    {{{comunicazione jconon_application_data_invio_comunicazione}}}
+                {{/if}}
 				{{{esclusioneRinuncia jconon_application_esclusione_rinuncia jconon_application_stato_domanda jconon_application_fl_rimosso_elenco jconon_application_data_rimozione_elenco}}}
 
 			</td>
