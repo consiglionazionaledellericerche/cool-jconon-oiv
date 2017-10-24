@@ -9,17 +9,10 @@ import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.service.application.ApplicationOIVService;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -172,6 +165,21 @@ public class ApplicationOIV {
 			rb = Response.status(Status.INTERNAL_SERVER_ERROR);
 		}
 		return rb.build();
-	}	
-	
+	}
+
+	@POST
+	@Path("message")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response message(@Context HttpServletRequest req,
+									  @FormParam("nodeRef") String nodeRef, @FormParam("nodeRefDocumento") String nodeRefDocumento) throws IOException{
+        ResponseBuilder rb;
+	    LOGGER.debug("Message for application:" + nodeRef);
+
+		applicationOIVService.message(cmisService.getCurrentCMISSession(req),
+				nodeRef, nodeRefDocumento);
+		Map<String, Object> model = new HashMap<String, Object>();
+		model.put("nodeRef", nodeRef);
+        rb = Response.ok(model);
+        return rb.build();
+	}
 }

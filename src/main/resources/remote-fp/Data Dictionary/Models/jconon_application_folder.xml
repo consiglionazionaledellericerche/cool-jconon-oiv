@@ -873,6 +873,12 @@
 					<type>d:datetime</type>
 					<mandatory>false</mandatory>
 				</property>
+				<property name="jconon_application:data_invio_comunicazione">
+					<title>Data invio ultima comunicazione</title>
+					<description>Data invio ultima comunicazione</description>
+					<type>d:datetime</type>
+					<mandatory>false</mandatory>
+				</property>
 				<property name="jconon_application:data_ultimo_invio">
 					<title>Data ultimo invio</title>
 					<description>Data ultimo invio</description>

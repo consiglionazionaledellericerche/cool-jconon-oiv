@@ -177,12 +177,18 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
   });
 
   Handlebars.registerHelper('esclusioneRinuncia', function esclusioneRinunciaFn(esclusioneRinuncia, statoDomanda, rimossoElenco, dataRimozione) {
-
-    var a, testo = rimossoElenco === true ? "Comunicazione inviata in data " : "Comunicazione inviata in data ";
+    var a, testo = rimossoElenco === true ? "Cancellato dall'Elenco in data " : "Escluso dall'Elenco in data ";
     testo += CNR.Date.format(dataRimozione, "-", "DD/MM/YYYY");
     if (esclusioneRinuncia) {
         a = $('<span class="label label-important animated flash"></span>').append(testo);
     }
+    return $('<div>').append(a).html();
+  });
+
+  Handlebars.registerHelper('comunicazione', function comunicazioneFn(dataComunicazione) {
+    var a, testo = "Comunicazione inviata in data ";
+    testo += CNR.Date.format(dataComunicazione, "-", "DD/MM/YYYY");
+    a = $('<span class="label label-success animated flash"></span>').append(testo);
     return $('<div>').append(a).html();
   });
 
@@ -504,7 +510,58 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                   }
                 }
                 if (common.User.admin || Call.isRdP(callData['jconon_call:rdp'])) {
-                  if (el['jconon_application:esclusione_rinuncia'] !== 'E' && el['jconon_application:progressivo_iscrizione_elenco'] == '') {
+                    customButtons.comunicazione = function () {
+                      var bulkInfoAllegato = allegaDocumentoAllaDomanda('D_jconon_comunicazione_attachment',
+                        el['cmis:objectId'],
+                        function (attachmentsData, data) {
+                            $.ajax({
+                                url: cache.baseUrl + "/rest/application-fp/message",
+                                type: 'POST',
+                                data: {
+                                  nodeRef : el['cmis:objectId'],
+                                  nodeRefDocumento : data['alfcmis:nodeRef']
+                                },
+                                success: function (data) {
+                                   $('#applyFilter').click();
+                                },
+                                error: jconon.error
+                            });
+                        }, true, function (modal) {
+                            $(window).on('shown.bs.modal', function (event) {
+                                var nome = el['jconon_application:nome'].replace(/^(.)|(\s|\-)(.)/g, function($word) {
+                                    return $word.toUpperCase();
+                                }), cognome = el['jconon_application:cognome'].replace(/^(.)|(\s|\-)(.)/g, function($word) {
+                                    return $word.toUpperCase();
+                                });
+                                modal.find('#oggetto_notifica_email').val(i18n['app.name'] + ' - ' + i18n['mail.subject.comunicazione']);
+                                var testo = i18n['mail.confirm.application.1'];
+                                    testo += el['jconon_application:sesso'] === 'M' ? ' dott.' : ' dott.ssa';
+                                    testo += ' <b style="text-transform: capitalize;">' + nome + ' ' + cognome + '</b>,';
+                                    testo += callData['jconon_call:requisiti_en'];
+
+                                var textarea = modal.find('#testo_notifica_email');
+                                textarea.val(testo);
+                                var ck = textarea.ckeditor({
+                                    toolbarGroups: [
+                                        { name: 'clipboard', groups: ['clipboard'] },
+                                        { name: 'basicstyles', groups: ['basicstyles'] },
+                                        { name: 'paragraph', groups: ['list', 'align'] }],
+                                        removePlugins: 'elementspath'
+                                });
+                                ck.editor.on('change', function () {
+                                  var html = ck.val();
+                                  textarea.parent().find('control-group widget').data('value', html || null);
+                                });
+
+                                ck.editor.on('setData', function (event) {
+                                  var html = event.data.dataValue;
+                                  textarea.parent().find('control-group widget').data('value', html || null);
+                                });
+                            });
+                        }
+                      );
+                    };
+                  if (el['jconon_application:esclusione_rinuncia'] !== 'E') {
                     customButtons.escludi = function () {
                       var bulkInfoAllegato = allegaDocumentoAllaDomanda('D_jconon_esclusione_attachment',
                         el['cmis:objectId'],
@@ -782,6 +839,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                 scheda_valutazione: 'icon-table',
                 operations: 'icon-list',
                 escludi: 'icon-arrow-down',
+                comunicazione: 'icon-envelope text-success',
                 inserisci: 'icon-arrow-up',
                 assegna_fascia: 'icon-edit'
               }, undefined, true).appendTo(target);
