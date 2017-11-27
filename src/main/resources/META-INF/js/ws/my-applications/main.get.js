@@ -519,7 +519,9 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                 type: 'POST',
                                 data: {
                                   nodeRef : el['cmis:objectId'],
-                                  nodeRefDocumento : data['alfcmis:nodeRef']
+                                  nodeRefDocumento : data['alfcmis:nodeRef'],
+                                  forbidArchives: false,
+                                  maxUploadSize: false
                                 },
                                 success: function (data) {
                                    $('#applyFilter').click();
