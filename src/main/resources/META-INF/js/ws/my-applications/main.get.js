@@ -520,7 +520,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                 type: 'POST',
                                 data: {
                                   nodeRef : el['cmis:objectId'],
-                                  nodeRefDocumento : data['alfcmis:nodeRef']
+                                  nodeRefDocumento : data !== undefined ? data['alfcmis:nodeRef'] : undefined
                                 },
                                 success: function (data) {
                                    $('#applyFilter').click();

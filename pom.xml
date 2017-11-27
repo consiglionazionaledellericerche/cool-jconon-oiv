@@ -9,7 +9,7 @@
   </parent>
 
   <properties>
-    <cool-shared.version>3.0.88</cool-shared.version>
+    <cool-shared.version>3.0.89</cool-shared.version>
     <cool-jconon.version>4.0.97</cool-jconon.version>
     <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
     <cool.mode>development</cool.mode>

@@ -518,7 +518,8 @@ public class ApplicationOIVService extends ApplicationService{
 			message.setBccRecipients(Arrays.asList(mailFromDefault));
 			message.setSubject(doc.<String>getPropertyValue(JCONON_APPLICATION_OGGETTO_NOTIFICA_EMAIL));
 			message.setBody(doc.<String>getPropertyValue(JCONON_APPLICATION_TESTO_NOTIFICA_EMAIL));
-			message.setAttachments(Arrays.asList(new AttachmentBean(doc.getName(), IOUtils.toByteArray(doc.getContentStream().getStream()))));
+			if (Optional.ofNullable(doc.getContentStream()).isPresent())
+			    message.setAttachments(Arrays.asList(new AttachmentBean(doc.getName(), IOUtils.toByteArray(doc.getContentStream().getStream()))));
 			mailService.send(message);
 		} catch (IOException e) {
 			LOGGER.error("Cannot send email for applicationId: {}", application.getId(), e);
