@@ -15,6 +15,8 @@ function main() {
   for (j = 0; j < applicationSource.children.length; j++) {
     child = applicationSource.children[j];
     if (String(child.getTypeShort()) !==  "jconon_attachment:application" &&
+        String(child.getTypeShort()) !==  "jconon_esclusione:attachment" &&
+        String(child.getTypeShort()) !==  "jconon_comunicazione:attachment" &&
         String(child.getOwner()) !== userId) {
       if (!child.hasAspect("jconon_scheda_anonima:esperienza_non_coerente")) {
         child.setOwner(userId);
