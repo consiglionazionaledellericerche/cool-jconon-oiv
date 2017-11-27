@@ -120,12 +120,12 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     search.execute();
   }
 
-  function allegaDocumentoAllaDomanda(type, objectId, successCallback, bigmodal, callbackModal) {
+  function allegaDocumentoAllaDomanda(type, objectId, successCallback, bigmodal, callbackModal, requiresFile, forbidArchives, maxUploadSize) {
     return Node.submission({
       nodeRef: objectId,
       objectType: type,
       crudStatus: "INSERT",
-      requiresFile: true,
+      requiresFile: requiresFile === undefined ? true : requiresFile,
       bigmodal: bigmodal,
       callbackModal: callbackModal,
       showFile: true,
@@ -151,7 +151,8 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
           $('#applyFilter').click();
         }
       },
-      forbidArchives: true
+      forbidArchives: forbidArchives === undefined ? true : forbidArchives,
+      maxUploadSize: maxUploadSize === undefined ? false : maxUploadSize
     });
   }
   Handlebars.registerHelper('applicationStatus', function declare(code, dataInvioDomanda, dataUltimaModifica, dataScadenza) {
@@ -519,9 +520,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                 type: 'POST',
                                 data: {
                                   nodeRef : el['cmis:objectId'],
-                                  nodeRefDocumento : data['alfcmis:nodeRef'],
-                                  forbidArchives: false,
-                                  maxUploadSize: false
+                                  nodeRefDocumento : data['alfcmis:nodeRef']
                                 },
                                 success: function (data) {
                                    $('#applyFilter').click();
@@ -561,7 +560,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                 });
                             });
                         }
-                      );
+                      , false, false, true);
                     };
                   if (el['jconon_application:esclusione_rinuncia'] !== 'E') {
                     customButtons.escludi = function () {
