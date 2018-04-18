@@ -7,4 +7,15 @@ server.context-path: /
 mail.from.default: marco.spasiano@gmail.com
 siper.sedi.url: http://localhost:8080/rest/static/json/sedi.json
 helpdesk.url:
-helpdesk.ucat.url:  
+helpdesk.ucat.url:
+
+flows:
+  resource: http://as3dock.si.cnr.it:9201
+  token: ${flows.resource}/oauth/token
+  authorize: ${flows.resource}/oauth/authorize
+  start: ${flows.resource}/api/tasks/complete
+  processDefinitionId: iscrizione-elenco-oiv:1:4
+  username: app.elenco-oiv
+  password: app.elenco-oiv
+  clientId: sprintapp
+  clientSecret: my-secret-token-to-change-in-production

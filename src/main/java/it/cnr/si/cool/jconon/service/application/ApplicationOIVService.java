@@ -24,6 +24,7 @@ import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
 import it.cnr.si.cool.jconon.repository.ProtocolRepository;
 import it.cnr.si.cool.jconon.service.QueueService;
+import it.cnr.si.cool.jconon.service.cache.CompetitionFolderService;
 import it.cnr.si.cool.jconon.service.call.CallService;
 import it.spasia.opencmis.criteria.Criteria;
 import it.spasia.opencmis.criteria.CriteriaFactory;
@@ -76,6 +77,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -157,7 +159,11 @@ public class ApplicationOIVService extends ApplicationService{
 	private ACLService aclService;	
 	@Autowired	
 	private GroupService groupService;
-    
+    @Autowired
+    private FlowsService flowsService;
+    @Autowired
+    private CompetitionFolderService competitionFolderService;
+
 	@Value("${mail.from.default}")
 	private String mailFromDefault;
 	
@@ -324,7 +330,7 @@ public class ApplicationOIVService extends ApplicationService{
 			if (interval.getStartDate().isAfter(interval.getEndDate())) {
 				throw new ClientMessageException(
 						i18nService.getLabel("message.error.date.inconsistent", Locale.ITALIAN,  
-								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.getStartDate(), ZoneId.systemDefault())), 
+								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.getStartDate(), ZoneId.systemDefault())),
 								DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ZonedDateTime.ofInstant(interval.getEndDate(), ZoneId.systemDefault()))));				
 			}
 		});
@@ -400,7 +406,8 @@ public class ApplicationOIVService extends ApplicationService{
 			Map<String, Object> propertiesFascia = new HashMap<String, Object>();
 			propertiesFascia.put(JCONON_APPLICATION_ESEGUI_CONTROLLO_FASCIA, true);
 			application.updateProperties(propertiesFascia);
-		}		
+		}
+
     	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));  
     	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
     	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
@@ -409,9 +416,23 @@ public class ApplicationOIVService extends ApplicationService{
 		objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
 		objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
 		objectPrintModel.put(PropertyIds.NAME, file.getOriginalFilename());
-    	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application, objectPrintModel, file.getInputStream(), file.getOriginalFilename(), true);
-    	
-    	Map<String, Object> mailModel = new HashMap<String, Object>();
+    	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application,
+				objectPrintModel, file.getInputStream(), file.getOriginalFilename(), true);
+
+        final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(application,
+                getQueryResultEsperienza(session, application),
+                getQueryResultsOiv(session, application),
+                file,
+                Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_CURRICULUM_VITAE))
+                    .map(id ->  session.getObject(id))
+                    .filter(Document.class::isInstance)
+                    .map(Document.class::cast)
+                    .orElse(null)
+        );
+
+        LOGGER.info(String.valueOf(startWorkflowResponseResponseEntity.getBody()));
+
+        Map<String, Object> mailModel = new HashMap<String, Object>();
 		List<String> emailList = new ArrayList<String>();
 		emailList.add(user.getEmail());
 		mailModel.put("contextURL", getContextURL(req));

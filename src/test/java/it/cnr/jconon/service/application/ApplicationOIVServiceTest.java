@@ -43,52 +43,9 @@ import static org.junit.Assert.assertTrue;
  */
 
 
-@RunWith(SpringRunner.class )
-@SpringBootTest(classes = CoolJcononApplication.class)
 public class ApplicationOIVServiceTest {
 
-    @Autowired
-    private ApplicationOIVService applicationOIVService;
-
-    @Autowired
-    private CMISService cmisService;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationOIVServiceTest.class);
-
-    @Test
-    @Ignore
-    public void eseguiCalcolo() throws Exception {
-
-        Session adminSession = cmisService.createAdminSession();
-
-        Map<String, Object> properties = new HashedMap();
-        properties.put(PropertyIds.OBJECT_ID, "???");
-
-        Map<String, Object> aspectProperties = new HashedMap();
-        Folder folder = applicationOIVService.save(adminSession, "???", Locale.ITALIAN, "foo.bar", properties, aspectProperties);
-
-
-        String objectId = "???";
-        applicationOIVService.eseguiCalcolo(objectId, aspectProperties);
-
-        assertTrue(false);
-
-    }
-
-    public void estraiAllIscritti() {
-		try {
-			applicationOIVService.extractionApplicationForAllIscritti(
-                    getRepositorySession("admin", "********"),
-                    "SELECT cmis:objectId FROM jconon_application:folder " +
-                            "WHERE IN_TREE ('a5ed6f55-f674-4925-885a-1f52307a63e0') " +
-                            "AND jconon_application:progressivo_iscrizione_elenco is not null " +
-                            "ORDER BY jconon_application:progressivo_iscrizione_elenco ASC",
-                    null,
-                    "admin");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
     private static Calendar calcolaDataProroga(String dataProroga, String oraProroga) throws ParseException {
         Calendar dataFineInvioDomandeOpt = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"), Locale.ITALY);
@@ -145,7 +102,7 @@ public class ApplicationOIVServiceTest {
     }
 
     public static void main(String[] args) {
-        controllaPermessi();
+        aggiornaEseguiControlloFascia();
     }
 
 	public static void escludiDallElenco() {
@@ -441,7 +398,23 @@ public class ApplicationOIVServiceTest {
 		}
 		
 	}
-	
+
+	public static void aggiornaEseguiControlloFascia() {
+		Session session = getRepositorySession("admin","Alf4FpPw");
+		ItemIterable<QueryResult> query = session.query("select application.cmis:objectId from jconon_application:folder application " +
+				"join jconon_application:aspect_fascia_professionale_attribuita AS fascia " +
+				"on fascia.cmis:objectId = application.cmis:objectId " +
+				"where application.jconon_application:esegui_controllo_fascia = false " +
+				"", false);
+		for (QueryResult queryResult : query.getPage(Integer.MAX_VALUE)) {
+			CmisObject domanda = session.getObject(queryResult.<String>getPropertyValueById(PropertyIds.OBJECT_ID));
+            LOGGER.info(domanda.getName());
+            Map<String, Serializable> properties = new HashMap<String, Serializable>();
+            properties.put("jconon_application:esegui_controllo_fascia", Boolean.TRUE);
+            //domanda.updateProperties(properties);
+		}
+	}
+
     public static Session getRepositorySession(String userName, String password)
     {
 

@@ -250,7 +250,11 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       }
 
       if (callId) {
-        criteria.inTree(callId);
+        if (cache['query.index.enable']) {
+            criteria.inTree(callId);
+        } else {
+            criteria.inFolder(callId);
+        }
         if (user) {
           criteria.and(new Criteria().equals('jconon_application:user', user).build());
         }
