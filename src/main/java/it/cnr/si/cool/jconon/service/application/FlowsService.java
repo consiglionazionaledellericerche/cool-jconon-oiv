@@ -40,10 +40,13 @@ public class FlowsService {
 
     private List<Esperienza> getEsperienze(ItemIterable<QueryResult> queryResultEsperienze, ItemIterable<QueryResult> queryResultOivs) {
         List<Esperienza> result = new ArrayList<>();
+        int numeroEsperienza = 0;
         for (QueryResult resultEsperienza : queryResultEsperienze) {
+            numeroEsperienza++;
             result.add(
                     new Esperienza()
-                    .setNumeroEsperienza(resultEsperienza.getPropertyValueById(PropertyIds.OBJECT_ID))
+                    .setIdEsperienza(resultEsperienza.<String>getPropertyValueById(PropertyIds.OBJECT_ID))
+                    .setNumeroEsperienza(numeroEsperienza)
                     .setDataInizio(
                             DateTimeFormatter.ofPattern(DD_MM_YYYY).format(
                                     ZonedDateTime.ofInstant(
@@ -67,9 +70,11 @@ public class FlowsService {
             );
         }
         for (QueryResult oiv : queryResultOivs) {
+            numeroEsperienza++;
             result.add(
                     new Esperienza()
-                            .setNumeroEsperienza(oiv.getPropertyValueById(PropertyIds.OBJECT_ID))
+                            .setIdEsperienza(oiv.<String>getPropertyValueById(PropertyIds.OBJECT_ID))
+                            .setNumeroEsperienza(numeroEsperienza)
                             .setDataInizio(
                                     DateTimeFormatter.ofPattern(DD_MM_YYYY).format(
                                             ZonedDateTime.ofInstant(
@@ -157,7 +162,8 @@ public class FlowsService {
     }
 
     public class Esperienza {
-        private String numeroEsperienza;
+        private String idEsperienza;
+        private Integer numeroEsperienza;
         private String dataInizio;
         private String dataFine;
         private String tipologiaEsperienza;
@@ -169,11 +175,20 @@ public class FlowsService {
         public Esperienza() {
         }
 
-        public String getNumeroEsperienza() {
+        public String getIdEsperienza() {
+            return idEsperienza;
+        }
+
+        public Esperienza setIdEsperienza(String idEsperienza) {
+            this.idEsperienza = idEsperienza;
+            return this;
+        }
+
+        public Integer getNumeroEsperienza() {
             return numeroEsperienza;
         }
 
-        public Esperienza setNumeroEsperienza(String numeroEsperienza) {
+        public Esperienza setNumeroEsperienza(Integer numeroEsperienza) {
             this.numeroEsperienza = numeroEsperienza;
             return this;
         }
