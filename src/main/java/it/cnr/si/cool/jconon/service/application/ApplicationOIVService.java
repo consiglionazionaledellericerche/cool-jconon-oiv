@@ -427,7 +427,12 @@ public class ApplicationOIVService extends ApplicationService{
                     .map(id ->  session.getObject(id))
                     .filter(Document.class::isInstance)
                     .map(Document.class::cast)
-                    .orElse(null)
+                    .orElse(null),
+                Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_DOCUMENTO_RICONOSCIMENTO))
+                        .map(id ->  session.getObject(id))
+                        .filter(Document.class::isInstance)
+                        .map(Document.class::cast)
+                        .orElse(null)
         );
 
         LOGGER.info(String.valueOf(startWorkflowResponseResponseEntity.getBody()));

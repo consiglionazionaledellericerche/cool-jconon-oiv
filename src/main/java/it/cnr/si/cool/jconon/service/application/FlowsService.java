@@ -58,12 +58,9 @@ public class FlowsService {
                                     .map(instant -> DateTimeFormatter.ofPattern(DD_MM_YYYY).format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
                                     .orElse(null)
                     )
-                    .setTipologiaEsperienza(
+                            .setTipologiaEsperienza("Esperienza professionale")
+                    .setDescrizioneIpa(
                             resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_datore_lavoro")
-                            .concat(" - ")
-                            .concat(
-                                resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_ruolo")
-                            )
                     )
                     .setAmbitoEsperienza(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_area_specializzazione"))
                     .setAttivitaSvolta(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_attivita_svolta"))
@@ -87,12 +84,9 @@ public class FlowsService {
                                             .map(instant -> DateTimeFormatter.ofPattern(DD_MM_YYYY).format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
                                             .orElse(null)
                             )
-                            .setTipologiaEsperienza(
-                                    oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_sede")
-                                            .concat(" - ")
-                                            .concat(
-                                                    oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_amministrazione")
-                                            )
+                            .setTipologiaEsperienza("Incarichi OIV/Nuclei")
+                            .setDescrizioneIpa(
+                                    oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_amministrazione")
                             )
                             .setAmbitoEsperienza(oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_numero_dipendenti"))
                             .setAttivitaSvolta(oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_ruolo"))
@@ -105,7 +99,7 @@ public class FlowsService {
                                                                ItemIterable<QueryResult> esperienze,
                                                                ItemIterable<QueryResult> oivs,
                                                                MultipartFile fileDomanda,
-                                                               Document cv) throws IOException {
+                                                               Document cv, Document documentoRiconoscimento) throws IOException {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
         params.add("processDefinitionId", processDefinitionId);
         params.add("titolo", domanda.getName());
@@ -128,7 +122,12 @@ public class FlowsService {
 
         params.add("valutazioneEsperienze_json", getEsperienze(esperienze, oivs));
         params.add("domanda",  new MultipartInputStreamFileResource(fileDomanda.getInputStream(), fileDomanda.getOriginalFilename()));
-        params.add("cv",  new MultipartInputStreamFileResource(cv.getContentStream().getStream(), cv.getName()));
+        Optional.ofNullable(cv)
+                .map(document -> new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()))
+                .ifPresent(multipartInputStreamFileResource -> params.add("cv", multipartInputStreamFileResource));
+        Optional.ofNullable(documentoRiconoscimento)
+                .map(document -> new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()))
+                .ifPresent(multipartInputStreamFileResource -> params.add("cartaIdentita", multipartInputStreamFileResource));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -165,6 +164,7 @@ public class FlowsService {
         private String ambitoEsperienza;
         private String attivitaSvolta;
         private String annotazioniValutatore;
+        private String descrizioneIpa;
 
         public Esperienza() {
         }
@@ -229,6 +229,15 @@ public class FlowsService {
 
         public Esperienza setAnnotazioniValutatore(String annotazioniValutatore) {
             this.annotazioniValutatore = annotazioniValutatore;
+            return this;
+        }
+
+        public String getDescrizioneIpa() {
+            return descrizioneIpa;
+        }
+
+        public Esperienza setDescrizioneIpa(String descrizioneIpa) {
+            this.descrizioneIpa = descrizioneIpa;
             return this;
         }
     }
