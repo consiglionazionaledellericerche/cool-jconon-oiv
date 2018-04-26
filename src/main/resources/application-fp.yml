@@ -10,7 +10,7 @@ helpdesk.url:
 helpdesk.ucat.url:
 
 flows:
-  resource: http://demoscrivaniadigitale.si.cnr.it
+  resource: http://as3dock.si.cnr.it:9201
   token: ${flows.resource}/oauth/token
   authorize: ${flows.resource}/oauth/authorize
   taskComplete: ${flows.resource}/api/tasks/complete
