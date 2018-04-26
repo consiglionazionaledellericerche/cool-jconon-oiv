@@ -10,10 +10,12 @@ helpdesk.url:
 helpdesk.ucat.url:
 
 flows:
-  resource: http://as3dock.si.cnr.it:9201
+  resource: http://demoscrivaniadigitale.si.cnr.it
   token: ${flows.resource}/oauth/token
   authorize: ${flows.resource}/oauth/authorize
-  start: ${flows.resource}/api/tasks/complete
+  taskComplete: ${flows.resource}/api/tasks/complete
+  processInstance: ${flows.resource}/api/processInstances
+  currentTask: ${flows.processInstance}/currentTask
   processDefinitionId: iscrizione-elenco-oiv:1:4
   username: app.elenco-oiv
   password: app.elenco-oiv

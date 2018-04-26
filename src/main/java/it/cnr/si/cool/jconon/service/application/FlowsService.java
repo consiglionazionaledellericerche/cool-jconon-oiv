@@ -1,24 +1,23 @@
 package it.cnr.si.cool.jconon.service.application;
 
+import it.cnr.si.cool.jconon.flows.model.ProcessInstanceResponse;
+import it.cnr.si.cool.jconon.flows.model.StartWorkflowResponse;
+import it.cnr.si.cool.jconon.flows.model.TaskResponse;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +31,12 @@ public class FlowsService {
     public static final String DD_MM_YYYY = "dd/MM/yyyy";
     @Autowired
     private OAuth2RestOperations restTemplate;
-    @Value("${flows.start}")
-    private String startWorkflowUrl;
+    @Value("${flows.taskComplete}")
+    private String taskCompleteUrl;
+    @Value("${flows.processInstance}")
+    private String processInstanceUrl;
+    @Value("${flows.currentTask}")
+    private String currentTaskUrl;
 
     @Value("${flows.processDefinitionId}")
     private String processDefinitionId;
@@ -93,11 +96,62 @@ public class FlowsService {
                             .setDescrizioneIpa(
                                     oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_amministrazione")
                             )
-                            .setAmbitoEsperienza(oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_numero_dipendenti"))
+                            .setNrDipendenti(Optional.ofNullable(oiv.<String>getPropertyValueById(ApplicationOIVService.JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI))
+                                    .filter(s -> s.equalsIgnoreCase(ApplicationOIVService.SUP250))
+                                    .map(s -> "maggioreUguale250")
+                                    .orElse("minoreDi250"))
                             .setAttivitaSvolta(oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_ruolo"))
             );
         }
         return result;
+    }
+
+    public Boolean isProcessTerminated(String processInstanceId) {
+        // Query parameters
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(processInstanceUrl)
+                .queryParam("processInstanceId", processInstanceId);
+
+        return Optional.ofNullable(restTemplate.getForEntity(builder.buildAndExpand().toUri(), ProcessInstanceResponse.class))
+                .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
+                .map(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getBody())
+                .map(processInstanceResponse -> Optional.ofNullable(processInstanceResponse.getEndTime()).isPresent())
+                .orElse(false);
+    }
+
+    public ResponseEntity<TaskResponse> getCurrentTask(String processInstanceId) {
+        // Query parameters
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(currentTaskUrl)
+                .queryParam("processInstanceId", processInstanceId);
+        return restTemplate.getForEntity(builder.buildAndExpand().toUri(), TaskResponse.class);
+    }
+
+    public ResponseEntity<StartWorkflowResponse> completeTask(Folder domanda,
+                                                              TaskResponse currentTask,
+                                                               ItemIterable<QueryResult> esperienze,
+                                                               ItemIterable<QueryResult> oivs,
+                                                               MultipartFile fileDomanda,
+                                                               Document cv, Document documentoRiconoscimento) throws IOException {
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
+        params.add("processDefinitionId", processDefinitionId);
+        params.add("taskId", currentTask.getId());
+        params.add("sceltaUtente", "invia_a_istruttoria");
+        params.add("dataInvioSoccorsoIstruttorio", DateTimeFormatter.ISO_DATE_TIME.format(ZonedDateTime.ofInstant(Calendar.getInstance().toInstant(), ZoneId.systemDefault())));
+        params.add("fasciaAppartenenzaProposta", domanda.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita"));
+
+        params.add("valutazioneEsperienze_json", getEsperienze(esperienze, oivs));
+        params.add("domanda",  new MultipartInputStreamFileResource(fileDomanda.getInputStream(), fileDomanda.getOriginalFilename()));
+        Optional.ofNullable(cv)
+                .map(document -> new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()))
+                .ifPresent(multipartInputStreamFileResource -> params.add("cv", multipartInputStreamFileResource));
+        Optional.ofNullable(documentoRiconoscimento)
+                .map(document -> new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()))
+                .ifPresent(multipartInputStreamFileResource -> params.add("cartaIdentita", multipartInputStreamFileResource));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
+        final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = restTemplate.postForEntity(taskCompleteUrl, entity, StartWorkflowResponse.class);
+        return startWorkflowResponseResponseEntity;
     }
 
     public ResponseEntity<StartWorkflowResponse> startWorkflow(Folder domanda,
@@ -107,6 +161,7 @@ public class FlowsService {
                                                                Document cv, Document documentoRiconoscimento) throws IOException {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
         params.add("processDefinitionId", processDefinitionId);
+        params.add("idDomanda", domanda.getId());
         params.add("titolo", domanda.getName());
         params.add("descrizione", domanda.getName());
         params.add("nomeRichiedente",
@@ -137,7 +192,7 @@ public class FlowsService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-        final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = restTemplate.postForEntity(startWorkflowUrl, entity, StartWorkflowResponse.class);
+        final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = restTemplate.postForEntity(taskCompleteUrl, entity, StartWorkflowResponse.class);
         return startWorkflowResponseResponseEntity;
     }
 
@@ -171,6 +226,7 @@ public class FlowsService {
         private String attivitaSvolta;
         private String annotazioniValutatore;
         private String descrizioneIpa;
+        private String nrDipendenti;
 
         public Esperienza() {
         }
@@ -253,6 +309,15 @@ public class FlowsService {
 
         public Esperienza setDescrizioneIpa(String descrizioneIpa) {
             this.descrizioneIpa = descrizioneIpa;
+            return this;
+        }
+
+        public String getNrDipendenti() {
+            return nrDipendenti;
+        }
+
+        public Esperienza setNrDipendenti(String nrDipendenti) {
+            this.nrDipendenti = nrDipendenti;
             return this;
         }
     }
