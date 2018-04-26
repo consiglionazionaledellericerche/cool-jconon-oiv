@@ -15,11 +15,14 @@ import it.cnr.cool.security.service.UserService;
 import it.cnr.cool.security.service.impl.alfresco.CMISAuthority;
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
 import it.cnr.cool.service.I18nService;
+import it.cnr.cool.util.MimeTypes;
 import it.cnr.cool.web.scripts.exception.CMISApplicationException;
 import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.cmis.model.JCONONDocumentType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
+import it.cnr.si.cool.jconon.flows.model.StartWorkflowResponse;
+import it.cnr.si.cool.jconon.flows.model.TaskResponse;
 import it.cnr.si.cool.jconon.model.ApplicationModel;
 import it.cnr.si.cool.jconon.model.PrintParameterModel;
 import it.cnr.si.cool.jconon.repository.ProtocolRepository;
@@ -33,6 +36,7 @@ import it.spasia.opencmis.criteria.restrictions.Restrictions;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -49,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +65,8 @@ import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.bindings.spi.http.Output;
+import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.client.runtime.OperationContextImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.enums.Action;
@@ -68,15 +75,18 @@ import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisVersioningException;
+import org.apache.chemistry.opencmis.commons.impl.UrlBuilder;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -112,7 +122,7 @@ public class ApplicationOIVService extends ApplicationService{
 	private static final String JCONON_APPLICATION_OGGETTO_NOTIFICA_EMAIL = "jconon_application:oggetto_notifica_email";
 	private static final String JCONON_APPLICATION_TESTO_NOTIFICA_EMAIL = "jconon_application:testo_notifica_email";
 
-	private static final String INF250 = "<250", SUP250=">=250";
+	public static final String INF250 = "<250", SUP250=">=250";
 
 	public static final String 
 		JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI = "jconon_attachment:precedente_incarico_oiv_numero_dipendenti",
@@ -408,34 +418,63 @@ public class ApplicationOIVService extends ApplicationService{
 			application.updateProperties(propertiesFascia);
 		}
 
-    	ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));  
-    	applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
-    	sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
-    	
-    	Map<String, Object> objectPrintModel = new HashMap<String, Object>();    	
-		objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
-		objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
-		objectPrintModel.put(PropertyIds.NAME, file.getOriginalFilename());
-    	printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application,
+        if (Optional.ofNullable(application.<String>getPropertyValue("jconon_application:activityId"))
+                .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
+            final Optional<TaskResponse> currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.<String>getPropertyValue("jconon_application:activityId")))
+                    .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
+                    .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody());
+
+            if (currentTask.isPresent() && currentTask.get().getName().equalsIgnoreCase(TaskResponse.PREAVVISO_RIGETTO) || currentTask.get().getName().equalsIgnoreCase(TaskResponse.SOCCORSO_ISTRUTTORIO)) {
+                LOGGER.info("Current Task Name {}", currentTask.get().getName());
+
+                final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.completeTask(application,
+                        currentTask.get(),
+                        getQueryResultEsperienza(session, application),
+                        getQueryResultsOiv(session, application),
+                        file,
+                        Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_CURRICULUM_VITAE))
+                                .map(id ->  session.getObject(id))
+                                .filter(Document.class::isInstance)
+                                .map(Document.class::cast)
+                                .orElse(null),
+                        Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_DOCUMENTO_RICONOSCIMENTO))
+                                .map(id ->  session.getObject(id))
+                                .filter(Document.class::isInstance)
+                                .map(Document.class::cast)
+                                .orElse(null)
+                );
+            } else {
+                throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile procedere con un nuovo invio!");
+            }
+        } else {
+            final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(application,
+                    getQueryResultEsperienza(session, application),
+                    getQueryResultsOiv(session, application),
+                    file,
+                    Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_CURRICULUM_VITAE))
+                            .map(id ->  session.getObject(id))
+                            .filter(Document.class::isInstance)
+                            .map(Document.class::cast)
+                            .orElse(null),
+                    Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_DOCUMENTO_RICONOSCIMENTO))
+                            .map(id ->  session.getObject(id))
+                            .filter(Document.class::isInstance)
+                            .map(Document.class::cast)
+                            .orElse(null)
+            );
+            application.updateProperties(Collections.singletonMap("jconon_application:activityId", startWorkflowResponseResponseEntity.getBody().getId()));
+            LOGGER.info(String.valueOf(startWorkflowResponseResponseEntity.getBody()));
+        }
+        ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));
+        applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
+        sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
+
+        Map<String, Object> objectPrintModel = new HashMap<String, Object>();
+        objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
+        objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
+        objectPrintModel.put(PropertyIds.NAME, file.getOriginalFilename());
+        printService.archiviaRicevutaReportModel(cmisService.createAdminSession(), application,
 				objectPrintModel, file.getInputStream(), file.getOriginalFilename(), true);
-
-        final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(application,
-                getQueryResultEsperienza(session, application),
-                getQueryResultsOiv(session, application),
-                file,
-                Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_CURRICULUM_VITAE))
-                    .map(id ->  session.getObject(id))
-                    .filter(Document.class::isInstance)
-                    .map(Document.class::cast)
-                    .orElse(null),
-                Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_DOCUMENTO_RICONOSCIMENTO))
-                        .map(id ->  session.getObject(id))
-                        .filter(Document.class::isInstance)
-                        .map(Document.class::cast)
-                        .orElse(null)
-        );
-
-        LOGGER.info(String.valueOf(startWorkflowResponseResponseEntity.getBody()));
 
         Map<String, Object> mailModel = new HashMap<String, Object>();
 		List<String> emailList = new ArrayList<String>();
@@ -460,7 +499,7 @@ public class ApplicationOIVService extends ApplicationService{
     	
 		return Collections.singletonMap("email_comunicazione", user.getEmail());
 	}
-	
+
 	public String getContextURL(HttpServletRequest req) {
 		return req.getScheme() + "://" + req.getServerName() + ":"
 				+ req.getServerPort() + req.getContextPath();
@@ -470,56 +509,60 @@ public class ApplicationOIVService extends ApplicationService{
 	protected void addToQueueForSend(String id, String contextURL, boolean email) {
 		queueService.queueAddContentToApplication().add(new PrintParameterModel(id, contextURL, email));
 	}
-	
+
+	public Integer iscriviInElenco(Session currentCMISSession, String nodeRef) {
+		Session session = cmisService.createAdminSession();
+		Folder application = loadApplicationById(session, nodeRef, null);
+		Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
+		try {
+			Integer numProgressivo = protocolRepository.getNumProtocollo(ISCRIZIONE_ELENCO, OIV).intValue();
+			try {
+				numProgressivo++;
+				Map<String, Object> properties = new HashMap<String, Object>();
+				properties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_VALIDATA,
+						Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).orElse(null));
+				properties.put(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO, numProgressivo);
+				properties.put(JCONON_APPLICATION_DATA_ISCRIZIONE_ELENCO, Calendar.getInstance());
+				application = (Folder) application.updateProperties(properties);
+				LOGGER.info("Assegnato progressivo {} alla domanda {}", numProgressivo, nodeRef);
+				CMISUser user;
+				try {
+					user = userService.loadUserForConfirm(
+							application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
+				} catch (CoolUserFactoryException e) {
+					throw new ClientMessageException("User not found of application " + nodeRef, e);
+				}
+				String email = Optional.ofNullable(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_EMAIL_COMUNICAZIONI.value())).orElse(user.getEmail());
+				try {
+					Map<String, Object> mailModel = new HashMap<String, Object>();
+					List<String> emailList = new ArrayList<String>();
+					emailList.add(email);
+					mailModel.put("folder", application);
+					mailModel.put("call", call);
+					mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
+					mailModel.put("email_comunicazione", email);
+					EmailMessage message = new EmailMessage();
+					message.setRecipients(emailList);
+					message.setBccRecipients(Arrays.asList(mailFromDefault));
+					String body = Util.processTemplate(mailModel, "/pages/application/application.iscrizione.html.ftl");
+					message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + i18nService.getLabel("mail.subject.iscrizione", Locale.ITALIAN, numProgressivo));
+					message.setBody(body);
+					mailService.send(message);
+				} catch (TemplateException | IOException e) {
+					LOGGER.error("Cannot send email for readmission applicationId: {}", nodeRef, e);
+				}
+			} finally {
+				protocolRepository.putNumProtocollo(ISCRIZIONE_ELENCO, OIV, numProgressivo.longValue());
+			}
+			return numProgressivo;
+		} catch(CmisVersioningException _ex) {
+			throw new ClientMessageException("Assegnazione progressivo in corso non è possibile procedere!");
+		}
+	}
+
 	@Override
 	public void readmission(Session currentCMISSession, String nodeRef) {
-		Session session = cmisService.createAdminSession();
-    	Folder application = loadApplicationById(session, nodeRef, null); 
-    	Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
-    	try {
-        	Integer numProgressivo = protocolRepository.getNumProtocollo(ISCRIZIONE_ELENCO, OIV).intValue();
-	    	try {
-	    		numProgressivo++;
-	        	Map<String, Object> properties = new HashMap<String, Object>();
-	        	properties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_VALIDATA, 
-	        			Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).orElse(null));	        	
-	        	properties.put(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO, numProgressivo);
-	        	properties.put(JCONON_APPLICATION_DATA_ISCRIZIONE_ELENCO, Calendar.getInstance());	        	
-	        	application = (Folder) application.updateProperties(properties);    	
-	        	LOGGER.info("Assegnato progressivo {} alla domanda {}", numProgressivo, nodeRef);
-	    		CMISUser user;
-	    		try {
-	    			user = userService.loadUserForConfirm(
-	    					application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
-	    		} catch (CoolUserFactoryException e) {
-	    			throw new ClientMessageException("User not found of application " + nodeRef, e);
-	    		}
-	        	String email = Optional.ofNullable(application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_EMAIL_COMUNICAZIONI.value())).orElse(user.getEmail());		
-	    		try {
-	    			Map<String, Object> mailModel = new HashMap<String, Object>();
-	    			List<String> emailList = new ArrayList<String>();
-	    			emailList.add(email);
-	    			mailModel.put("folder", application);
-	    			mailModel.put("call", call);
-	    			mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
-	    			mailModel.put("email_comunicazione", email);
-	    			EmailMessage message = new EmailMessage();
-	    			message.setRecipients(emailList);
-	    			message.setBccRecipients(Arrays.asList(mailFromDefault));
-	    			String body = Util.processTemplate(mailModel, "/pages/application/application.iscrizione.html.ftl");
-	    			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + i18nService.getLabel("mail.subject.iscrizione", Locale.ITALIAN, numProgressivo));
-	    			message.setBody(body);
-	    			mailService.send(message);
-	    		} catch (TemplateException | IOException e) {
-	    			LOGGER.error("Cannot send email for readmission applicationId: {}", nodeRef, e);
-	    		}
-	    	} finally {
-	    		protocolRepository.putNumProtocollo(ISCRIZIONE_ELENCO, OIV, numProgressivo.longValue());
-	    	}
-    	} catch(CmisVersioningException _ex) {
-    		throw new ClientMessageException("Assegnazione progressivo in corso non è possibile procedere!");
-    	}
-		
+		iscriviInElenco(currentCMISSession, nodeRef);
 	}
 
 	private void messageToUser(Folder application, Folder call, Document doc) {
@@ -729,9 +772,22 @@ public class ApplicationOIVService extends ApplicationService{
 		return result;
 	}
 
+	public Folder getOIVCall(Session session) {
+	    Folder call = null;
+        final ItemIterable<QueryResult> query = session.query("select cmis:objectId from jconon_call_oiv:folder", false);
+        for (QueryResult queryResult : query) {
+            call = Optional.ofNullable(session.getObject(queryResult.<String>getPropertyValueById(PropertyIds.OBJECT_ID)))
+                    .map(Folder.class::cast).orElse(null);
+        }
+        return call;
+    }
+
 	public void esperienzaNonCoerente(String userId, String objectId, String callId, String aspect, String motivazione) {
 		Session session = cmisService.createAdminSession();
-		Folder call = loadCallById(session, callId);
+        Folder call = Optional.ofNullable(callId)
+                .map(id -> loadCallById(session, callId))
+                .map(Folder.class::cast)
+                .orElseGet(() -> getOIVCall(session));
 		try {
 			CMISUser user = userService.loadUserForConfirm(userId);
 			if (!(user.isAdmin() || callService.isMemeberOfRDPGroup(user, call)))
@@ -820,12 +876,71 @@ public class ApplicationOIVService extends ApplicationService{
 		}catch (CmisPermissionDeniedException _ex) {
 			throw new ClientMessageException("user.cannot.access.to.application", _ex);
 		}
-		final Folder newApplication = loadApplicationById(currentCMISSession, applicationSourceId, null);	
+		final Folder newApplication = loadApplicationById(currentCMISSession, applicationSourceId, null);
 		if (newApplication.getPropertyValue(JCONONPropertyIds.APPLICATION_ESCLUSIONE_RINUNCIA.value()) != null &&
 				newApplication.getPropertyValue(JCONONPropertyIds.APPLICATION_ESCLUSIONE_RINUNCIA.value()).equals(StatoDomanda.ESCLUSA.getValue())) {
 			throw new ClientMessageException("La domanda è stata esclusa, non è possibile modificarla nuovamente!");
 		}
-		super.reopenApplication(currentCMISSession, applicationSourceId, contextURL,
-				locale, userId);
+		if (Optional.ofNullable(newApplication.<String>getPropertyValue("jconon_application:activityId"))
+				.filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
+            final String currentTaskName = Optional.ofNullable(flowsService.getCurrentTask(newApplication.<String>getPropertyValue("jconon_application:activityId")))
+                    .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
+                    .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody())
+                    .map(TaskResponse::getName)
+                    .orElse("");
+            LOGGER.info("Current Task Name {}", currentTaskName);
+            if (currentTaskName.equalsIgnoreCase(TaskResponse.PREAVVISO_RIGETTO) || currentTaskName.equalsIgnoreCase(TaskResponse.SOCCORSO_ISTRUTTORIO)) {
+                reopenApplicationForSoccorso(currentCMISSession, applicationSourceId, contextURL,
+                        locale, userId);
+            } else {
+                throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile modificarla!");
+            }
+		} else {
+            super.reopenApplication(currentCMISSession, applicationSourceId, contextURL,
+                    locale, userId);
+        }
 	}
+
+    public void reopenApplicationForSoccorso(Session currentCMISSession, final String applicationSourceId, final String contextURL, Locale locale, String userId) {
+        /**
+         * Load application source with user session if user cannot access to application
+         * throw an exception
+         */
+        try {
+            OperationContext oc = new OperationContextImpl(currentCMISSession.getDefaultContext());
+            oc.setFilterString(PropertyIds.OBJECT_ID);
+            currentCMISSession.getObject(applicationSourceId, oc);
+        }catch (CmisPermissionDeniedException _ex) {
+            throw new ClientMessageException("user.cannot.access.to.application", _ex);
+        }
+        final Folder newApplication = loadApplicationById(currentCMISSession, applicationSourceId, null);
+        final Folder call = loadCallById(currentCMISSession, newApplication.getParentId(), null);
+        if (newApplication.getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value()) == null ||
+                !newApplication.getPropertyValue(JCONONPropertyIds.APPLICATION_STATO_DOMANDA.value()).equals(StatoDomanda.CONFERMATA.getValue())) {
+            throw new ClientMessageException("message.error.domanda.no.confermata");
+        }
+        try {
+            callService.isBandoInCorso(call,
+                    userService.loadUserForConfirm(userId));
+        } catch (CoolUserFactoryException e) {
+            throw new CMISApplicationException("Error loading user: " + userId, e);
+        }
+        String link = cmisService.getBaseURL().concat("service/cnr/jconon/manage-application/reopen");
+        UrlBuilder url = new UrlBuilder(link);
+        Response resp = cmisService.getHttpInvoker(cmisService.getAdminSession()).invokePOST(url, MimeTypes.JSON.mimetype(),
+                new Output() {
+                    @Override
+                    public void write(OutputStream out) throws Exception {
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("applicationSourceId", newApplication.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString());
+                        jsonObject.put("groupRdP", "GROUP_" + call.getPropertyValue(JCONONPropertyIds.CALL_RDP.value()));
+                        out.write(jsonObject.toString().getBytes());
+                    }
+                }, cmisService.getAdminSession());
+        int status = resp.getResponseCode();
+        if (status == org.apache.commons.httpclient.HttpStatus.SC_NOT_FOUND|| status == org.apache.commons.httpclient.HttpStatus.SC_BAD_REQUEST|| status == org.apache.commons.httpclient.HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+            throw new CMISApplicationException("Reopen Application error. Exception: " + resp.getErrorContent());
+        }
+        cmisService.createAdminSession().getObject(newApplication).updateProperties(Collections.singletonMap(JCONON_APPLICATION_ESEGUI_CONTROLLO_FASCIA, false));
+    }
 }

@@ -1,4 +1,4 @@
-package it.cnr.si.cool.jconon.service.application;
+package it.cnr.si.cool.jconon.flows.model;
 
 import java.util.List;
 

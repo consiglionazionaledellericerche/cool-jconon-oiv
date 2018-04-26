@@ -102,7 +102,7 @@ public class ApplicationOIV {
 				aspect = formParams.getFirst("aspect"),
 				motivazione = formParams.getFirst("jconon_attachment:esperienza_non_coerente_motivazione");			
 			applicationOIVService.esperienzaNonCoerente(userId, objectId, callId, aspect, motivazione);
-			rb = Response.ok();			
+			rb = Response.ok();
 		} catch (ClientMessageException | CMISApplicationException e) {
 			LOGGER.error("esperienzaNonCoerente error", e);
 			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
@@ -182,4 +182,13 @@ public class ApplicationOIV {
         rb = Response.ok(model);
         return rb.build();
 	}
+
+    @GET
+    @Path("iscrivi-inelenco")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response iscriviInElanco(@Context HttpServletRequest req, @QueryParam("idDomanda") String idDomanda) throws IOException{
+        LOGGER.debug("Iscrizione in elenco della domanda: {}", idDomanda);
+        return Response.ok(Collections.singletonMap("progressivo",
+                applicationOIVService.iscriviInElenco(cmisService.getCurrentCMISSession(req), idDomanda))).build();
+    }
 }
