@@ -515,9 +515,12 @@ public class ApplicationOIVService extends ApplicationService{
 		Folder application = loadApplicationById(session, nodeRef, null);
 		Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
 		try {
-			Integer numProgressivo = protocolRepository.getNumProtocollo(ISCRIZIONE_ELENCO, OIV).intValue();
+			final Optional<BigInteger> progressivoIscrizione = Optional.ofNullable(application.<BigInteger>getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO));
+			Integer numProgressivo =
+					progressivoIscrizione
+						.map(BigInteger::intValue)
+						.orElseGet(() -> protocolRepository.getNumProtocollo(ISCRIZIONE_ELENCO, OIV).intValue() + 1);
 			try {
-				numProgressivo++;
 				Map<String, Object> properties = new HashMap<String, Object>();
 				properties.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_VALIDATA,
 						Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).orElse(null));
@@ -552,7 +555,8 @@ public class ApplicationOIVService extends ApplicationService{
 					LOGGER.error("Cannot send email for readmission applicationId: {}", nodeRef, e);
 				}
 			} finally {
-				protocolRepository.putNumProtocollo(ISCRIZIONE_ELENCO, OIV, numProgressivo.longValue());
+			    if (!progressivoIscrizione.isPresent())
+				    protocolRepository.putNumProtocollo(ISCRIZIONE_ELENCO, OIV, numProgressivo.longValue());
 			}
 			return numProgressivo;
 		} catch(CmisVersioningException _ex) {
