@@ -109,7 +109,7 @@ public class FlowsService {
     public Boolean isProcessTerminated(String processInstanceId) {
         // Query parameters
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(processInstanceUrl)
-                .queryParam("processInstanceId", processInstanceId);
+                .queryParam("processInstanceId", processInstanceId).queryParam("detail", Boolean.FALSE);
 
         return Optional.ofNullable(restTemplate.getForEntity(builder.buildAndExpand().toUri(), ProcessInstanceResponse.class))
                 .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
@@ -159,6 +159,7 @@ public class FlowsService {
                                                                ItemIterable<QueryResult> oivs,
                                                                MultipartFile fileDomanda,
                                                                Document cv, Document documentoRiconoscimento) throws IOException {
+        final Optional<Object> activityId = Optional.ofNullable(domanda.getPropertyValue("jconon_application:activityId"));
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
         params.add("processDefinitionId", processDefinitionId);
         params.add("idDomanda", domanda.getId());
@@ -177,7 +178,19 @@ public class FlowsService {
                 .map(Calendar::toInstant)
                 .map(instant -> DateTimeFormatter.ofPattern(DD_MM_YYYY).format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
                 .orElse(null));
-        params.add("tipologiaRichiesta", "Iscrizione");
+        params.add("tipologiaRichiesta",
+                activityId
+                    .map(o -> "modifica_fascia")
+                    .orElse("Iscrizione"));
+        if (activityId.isPresent()) {
+            params.add("dataIscrizioneElenco",
+                    Optional.ofNullable(domanda.<GregorianCalendar>getPropertyValue("jconon_application:data_iscrizione_elenco"))
+                            .map(Calendar::toInstant)
+                            .map(instant -> DateTimeFormatter.ISO_ORDINAL_DATE.format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
+                            .orElse(null)
+            );
+            params.add("codiceIscrizioneElenco", domanda.getPropertyValue("jconon_application:progressivo_iscrizione_elenco"));
+        }
         params.add("fasciaAppartenenzaProposta", domanda.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita"));
 
         params.add("valutazioneEsperienze_json", getEsperienze(esperienze, oivs));
