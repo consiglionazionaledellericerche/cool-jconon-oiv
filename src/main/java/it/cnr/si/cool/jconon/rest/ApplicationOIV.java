@@ -92,15 +92,16 @@ public class ApplicationOIV {
 
 	@POST
 	@Path("esperienza-noncoerente")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response esperienzaNonCoerente(@Context HttpServletRequest req, MultivaluedMap<String, String> formParams) throws IOException{
+	public Response esperienzaNonCoerente(@Context HttpServletRequest req,
+                                          @FormParam(PropertyIds.OBJECT_ID) String objectId,
+                                          @FormParam("callId") String callId,
+                                          @FormParam("aspect") String aspect,
+                                          @FormParam("jconon_attachment:esperienza_non_coerente_motivazione") String motivazione) throws IOException{
 		ResponseBuilder rb;
 		try {
 			String userId = cmisService.getCMISUserFromSession(req).getId();
-			String objectId = formParams.getFirst(PropertyIds.OBJECT_ID),
-				callId = formParams.getFirst("callId"),
-				aspect = formParams.getFirst("aspect"),
-				motivazione = formParams.getFirst("jconon_attachment:esperienza_non_coerente_motivazione");			
 			applicationOIVService.esperienzaNonCoerente(userId, objectId, callId, aspect, motivazione);
 			rb = Response.ok();
 		} catch (ClientMessageException | CMISApplicationException e) {
@@ -112,15 +113,16 @@ public class ApplicationOIV {
 
 	@POST
 	@Path("esperienza-coerente")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response esperienzaCoerente(@Context HttpServletRequest req, MultivaluedMap<String, String> formParams) throws IOException{
+	public Response esperienzaCoerente(@Context HttpServletRequest req,
+                                       @FormParam(PropertyIds.OBJECT_ID) String objectId,
+                                       @FormParam("callId") String callId,
+                                       @FormParam("aspect") String aspect,
+                                       @FormParam("userName") String userName) throws IOException{
 		ResponseBuilder rb;
 		try {
 			String userId = cmisService.getCMISUserFromSession(req).getId();
-			String objectId = formParams.getFirst(PropertyIds.OBJECT_ID),
-				callId = formParams.getFirst("callId"),
-				aspect = formParams.getFirst("aspect"),
-				userName = formParams.getFirst("userName");			
 			applicationOIVService.esperienzaCoerente(userId, objectId, callId, aspect, userName);
 			rb = Response.ok();			
 		} catch (ClientMessageException | CMISApplicationException e) {
@@ -132,16 +134,17 @@ public class ApplicationOIV {
 
 	@POST
 	@Path("esperienza-annotazioni")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response annotazioni(@Context HttpServletRequest req, MultivaluedMap<String, String> formParams) throws IOException{
+	public Response annotazioni(@Context HttpServletRequest req,
+                                @FormParam(PropertyIds.OBJECT_ID) String objectId,
+                                @FormParam("callId") String callId,
+                                @FormParam("applicationId") String applicationId,
+                                @FormParam("aspect") String aspect,
+                                @FormParam("jconon_attachment:esperienza_annotazione_motivazione") String motivazione) throws IOException{
 		ResponseBuilder rb;
 		try {
 			String userId = cmisService.getCMISUserFromSession(req).getId();
-			String objectId = formParams.getFirst(PropertyIds.OBJECT_ID),
-				callId = formParams.getFirst("callId"),
-				applicationId = formParams.getFirst("applicationId"),
-				aspect = formParams.getFirst("aspect"),
-				motivazione = Optional.ofNullable(formParams.getFirst("jconon_attachment:esperienza_annotazione_motivazione")).filter(x -> x.length() > 0).orElse(null);
 			applicationOIVService.esperienzaAnnotazione(userId, objectId, callId, applicationId, aspect, motivazione);
 			rb = Response.ok();			
 		} catch (ClientMessageException | CMISApplicationException e) {
