@@ -186,7 +186,7 @@ public class FlowsService {
             params.add("dataIscrizioneElenco",
                     Optional.ofNullable(domanda.<GregorianCalendar>getPropertyValue("jconon_application:data_iscrizione_elenco"))
                             .map(Calendar::toInstant)
-                            .map(instant -> DateTimeFormatter.ISO_ORDINAL_DATE.format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
+                            .map(instant -> DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
                             .orElse(null)
             );
             params.add("codiceIscrizioneElenco", domanda.getPropertyValue("jconon_application:progressivo_iscrizione_elenco"));
