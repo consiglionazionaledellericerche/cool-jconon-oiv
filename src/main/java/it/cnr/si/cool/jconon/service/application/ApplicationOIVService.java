@@ -418,6 +418,10 @@ public class ApplicationOIVService extends ApplicationService{
 			application.updateProperties(propertiesFascia);
 		}
 
+        ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));
+        applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
+        sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
+
         if (Optional.ofNullable(application.<String>getPropertyValue("jconon_application:activityId"))
                 .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
             final Optional<TaskResponse> currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.<String>getPropertyValue("jconon_application:activityId")))
@@ -465,10 +469,6 @@ public class ApplicationOIVService extends ApplicationService{
             application.updateProperties(Collections.singletonMap("jconon_application:activityId", startWorkflowResponseResponseEntity.getBody().getId()));
             LOGGER.info(String.valueOf(startWorkflowResponseResponseEntity.getBody()));
         }
-        ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));
-        applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
-        sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
-
         Map<String, Object> objectPrintModel = new HashMap<String, Object>();
         objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
         objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
