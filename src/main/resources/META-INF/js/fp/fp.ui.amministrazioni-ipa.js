@@ -37,19 +37,22 @@ define(['jquery', 'cnr/cnr.url', 'cnr/cnr.ui.select', 'cnr/cnr', 'fp/fp.applicat
 
   function widget(id, labelText, item) {
     var obj = Select.CustomWidget(id, labelText, item, {
-        minimumInputLength: 3,
+        minimumInputLength: 1,
         ajax: {
             url: "rest/ipa/amministrazioni",
             dataType: 'json',
             quietMillis: 250,
             data: function (term, page) {
                 return {
-                    q: term, // search term
+                    q: term,
+                    page: page
                 };
             },
             results: function (data, page) {
+                var more = (page * 100) < data.total_count;
                 return {
-                    results: data
+                    results: data.items,
+                    more: more
                 };
             },
             cache: true
@@ -65,10 +68,10 @@ define(['jquery', 'cnr/cnr.url', 'cnr/cnr.ui.select', 'cnr/cnr', 'fp/fp.applicat
                  '<div<h5>' + result.tipologia_amm + '</h5></div>' +
                  '<div class="annotation">' + result.nome_resp + ' ' + result.cognome_resp +'</div>';
                 if (result.sito_istituzionale) {
-                    testo += '<div><a href="'+ result.sito_istituzionale +'" target="_blank">' + result.sito_istituzionale + '</a></div>';
+                    testo += '<div><a href="http://'+ result.sito_istituzionale +'" target="_blank">' + result.sito_istituzionale + '</a></div>';
                 }
                 if (result.mail1) {
-                    testo += '<div> <a href="mailto:' + result.mail1 + '">' + result.mail1 + '</a></div>';
+                    testo += '<div><a href="mailto:' + result.mail1 + '">' + result.mail1 + '</a></div>';
                 }
             testo += '</div>';
             return testo;

@@ -1,6 +1,7 @@
 package it.cnr.si.cool.jconon.rest;
 
 import it.cnr.cool.security.SecurityChecked;
+import it.cnr.si.cool.jconon.model.IPAAmministrazione;
 import it.cnr.si.cool.jconon.service.IPAService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Path("ipa")
 @Component
@@ -23,17 +28,55 @@ public class IPA {
     @Autowired
     private IPAService ipaService;
 
+    private class ResponsePage implements Serializable {
+        private final int total_count;
+        private final List<IPAAmministrazione> items;
+
+        public ResponsePage(int total_count, List<IPAAmministrazione> items) {
+            this.total_count = total_count;
+            this.items = items;
+        }
+
+        public int getTotal_count() {
+            return total_count;
+        }
+
+        public List<IPAAmministrazione> getItems() {
+            return items;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ResponsePage that = (ResponsePage) o;
+            return total_count == that.total_count &&
+                    Objects.equals(items, that.items);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(total_count, items);
+        }
+    }
+
     @GET
     @Path("amministrazioni")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response amministrazioni(@Context HttpServletRequest request, @QueryParam("q") String q) throws IOException {
+    public Response amministrazioni(@Context HttpServletRequest request, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+        final List<IPAAmministrazione> ipaAmministrazioneList = ipaService
+                .amministrazioni()
+                .values()
+                .stream()
+                .filter(ipaAmministrazione -> ipaAmministrazione.getDes_amm().toUpperCase().contains(q.toUpperCase()))
+                .sorted((ipaAmministrazione, t1) -> ipaAmministrazione.getDes_amm().compareTo(t1.getDes_amm()))
+                .collect(Collectors.toList());
+        final int size = ipaAmministrazioneList.size();
         return Response.ok(
-                ipaService
-                        .amministrazioni()
-                        .values()
-                        .stream()
-                        .filter(ipaAmministrazione -> ipaAmministrazione.getDes_amm().toUpperCase().contains(q.toUpperCase()))
-                        .collect(Collectors.toList())
+                new ResponsePage(
+                        size,
+                        ipaAmministrazioneList.subList(0, Math.min(page * 100, size))
+                )
         ).build();
     }
 
