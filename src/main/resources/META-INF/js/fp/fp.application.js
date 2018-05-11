@@ -1,7 +1,7 @@
 /* javascript closure providing all the search functionalities */
 define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr/cnr.ui', 'cnr/cnr.jconon', 'cnr/cnr.url',
-  'cnr/cnr.search', 'cnr/cnr.criteria', 'cnr/cnr.node', 'cnr/cnr.bulkinfo', 'json!cache', 'cnr/cnr.application', 'cnr/cnr.call'
-  ], function ($, CNR, i18n, common, ActionButton, UI, jconon, URL, Search, Criteria, Node, BulkInfo, cache, Application, Call) {
+  'cnr/cnr.search', 'cnr/cnr.criteria', 'cnr/cnr.node', 'cnr/cnr.bulkinfo', 'json!cache', 'cnr/cnr.application', 'cnr/cnr.call', 'cnr/cnr.ui.widgets', 'fp/fp.ui.amministrazioni-ipa'
+  ], function ($, CNR, i18n, common, ActionButton, UI, jconon, URL, Search, Criteria, Node, BulkInfo, cache, Application, Call, Widgets, AmministrazioniIpa) {
   "use strict";
   var urls = {
     call : {
@@ -11,7 +11,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
   },
     defaults = {},
     settings = defaults;
-
+  Widgets['ui.amministrazioni-ipa'] = AmministrazioniIpa;
   function init(options) {
     settings = $.extend({}, defaults, options);
   }

@@ -1,7 +1,7 @@
 /*global params*/
 define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!common', 'cnr/cnr.jconon', 'cnr/cnr.url',
-  'cnr/cnr.application', 'cnr/cnr.attachments', 'json!cache', 'cnr/cnr.call', 'cnr/cnr', 'cnr/cnr.ui.widgets', 'fp/fp.application', 'fp/fp.ui.amministrazioni-ipa', 'cnr/cnr.ui.wysiwyg', 'cnr/cnr.ui.country',
-  'cnr/cnr.ui.city'], function ($, header, i18n, UI, BulkInfo, common, jconon, URL, Application, Attachments, cache, Call, CNR, Widgets, ApplicationFp, AmministrazioniIpa) {
+  'cnr/cnr.application', 'cnr/cnr.attachments', 'json!cache', 'cnr/cnr.call', 'cnr/cnr', 'cnr/cnr.ui.widgets', 'fp/fp.application', 'cnr/cnr.ui.wysiwyg', 'cnr/cnr.ui.country',
+  'cnr/cnr.ui.city'], function ($, header, i18n, UI, BulkInfo, common, jconon, URL, Application, Attachments, cache, Call, CNR, Widgets, ApplicationFp) {
   "use strict";
 
   var content = $('#field'), bulkinfo, forms = [], aspects = [],
@@ -153,7 +153,6 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo', 'json!comm
         group: 'Libera professione'
       }
     ];
-  Widgets['ui.amministrazioni-ipa'] = AmministrazioniIpa;
   if (content.hasClass('error-allegati-empty')) {
     UI.alert(content.data('message') || i18n['message.error.allegati.empty'], null, null, true);
   }
