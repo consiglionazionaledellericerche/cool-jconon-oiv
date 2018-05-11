@@ -53,7 +53,6 @@ public class IPAService {
                                 .setAcronimo(strings[13])
                                 .setMail1(strings[16])
                 )
-                .sorted((ipaAmministrazione, t1) -> ipaAmministrazione.getDes_amm().compareTo(t1.getDes_amm()))
                 .collect(Collectors.toMap(amministrazione -> amministrazione.getCod_amm(), amministrazione -> amministrazione));
     }
 
