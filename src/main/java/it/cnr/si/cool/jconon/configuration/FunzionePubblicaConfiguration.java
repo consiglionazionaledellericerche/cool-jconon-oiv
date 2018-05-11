@@ -11,6 +11,7 @@ import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
+import it.cnr.si.cool.jconon.rest.IPA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,7 @@ public class FunzionePubblicaConfiguration {
         this.pageService = pageService;
         jerseyConfig.register(ApplicationOIV.class);
         jerseyConfig.register(CallOIV.class);
+        jerseyConfig.register(IPA.class);
     }
 
     @PostConstruct

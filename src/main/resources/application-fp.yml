@@ -9,6 +9,11 @@ siper.sedi.url: http://localhost:8080/rest/static/json/sedi.json
 helpdesk.url:
 helpdesk.ucat.url:
 
+ipa:
+  url:
+    base: http://www.indicepa.gov.it/public-services/opendata-read-service.php
+    amministrazioni: ${ipa.url.base}?dstype=FS&filename=amministrazioni.txt
+
 flows:
   resource: http://as3dock.si.cnr.it:9201
   token: ${flows.resource}/oauth/token

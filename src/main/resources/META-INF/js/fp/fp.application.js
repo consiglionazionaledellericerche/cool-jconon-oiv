@@ -6,7 +6,8 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
   var urls = {
     call : {
       publish_esito: 'rest/call-fp/publish-esito'
-    }
+    },
+    ipaAmministrazioni: 'rest/ipa/amministrazioni'
   },
     defaults = {},
     settings = defaults;

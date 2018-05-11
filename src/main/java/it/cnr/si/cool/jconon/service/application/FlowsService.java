@@ -159,7 +159,8 @@ public class FlowsService {
                                                                ItemIterable<QueryResult> oivs,
                                                                MultipartFile fileDomanda,
                                                                Document cv, Document documentoRiconoscimento) throws IOException {
-        final Optional<Object> activityId = Optional.ofNullable(domanda.getPropertyValue("jconon_application:activityId"));
+        final Optional<Object> progressivoIscrizioneInElenco =
+                Optional.ofNullable(domanda.getPropertyValue("jconon_application:progressivo_iscrizione_elenco"));
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
         params.add("processDefinitionId", processDefinitionId);
         params.add("idDomanda", domanda.getId());
@@ -179,17 +180,17 @@ public class FlowsService {
                 .map(instant -> DateTimeFormatter.ofPattern(DD_MM_YYYY).format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
                 .orElse(null));
         params.add("tipologiaRichiesta",
-                activityId
+                progressivoIscrizioneInElenco
                     .map(o -> "modifica_fascia")
                     .orElse("Iscrizione"));
-        if (activityId.isPresent()) {
+        if (progressivoIscrizioneInElenco.isPresent()) {
             params.add("dataIscrizioneElenco",
                     Optional.ofNullable(domanda.<GregorianCalendar>getPropertyValue("jconon_application:data_iscrizione_elenco"))
                             .map(Calendar::toInstant)
                             .map(instant -> DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
                             .orElse(null)
             );
-            params.add("codiceIscrizioneElenco", domanda.getPropertyValue("jconon_application:progressivo_iscrizione_elenco"));
+            params.add("codiceIscrizioneElenco", progressivoIscrizioneInElenco.get());
         }
         params.add("fasciaAppartenenzaProposta", domanda.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita"));
 

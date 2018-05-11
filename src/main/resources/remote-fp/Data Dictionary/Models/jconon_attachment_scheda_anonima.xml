@@ -211,7 +211,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_amministrazione">
 					<title>Amministrazione pubblica</title>
-					<description>d]</description>
+					<description>d] widget:ui.amministrazioni-ipa</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
