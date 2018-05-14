@@ -125,9 +125,33 @@
 						<tokenised>both</tokenised>
 					</index>
 				</property>
+				<property name="jconon_attachment:fl_amministrazione_pubblica">
+					<title>Amministrazione Pubblica</title>
+					<description>f] ui.radio</description>
+					<type>d:boolean</type>
+					<mandatory>true</mandatory>
+					<default>false</default>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
+                <property name="jconon_attachment:esperienza_professionale_amministrazione">
+                    <title>Amministrazione</title>
+                    <description>g] class:fl_amministrazione_pubblica_true widget:ui.amministrazioni-ipa</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+
 				<property name="jconon_attachment:esperienza_professionale_datore_lavoro">
 					<title>Datore di Lavoro/Committente</title>
-					<description>f]</description>
+					<description>h] class:fl_amministrazione_pubblica_false</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -138,7 +162,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_ruolo">
 					<title>Ruolo</title>
-					<description>g]</description>
+					<description>i]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -149,7 +173,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_citta">
 					<title>Comune</title>
-					<description>h]</description>
+					<description>l]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -160,7 +184,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_stato_estero">
 					<title>Stato</title>
-					<description>i]</description>
+					<description>m] class:fl_amministrazione_pubblica_false</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">

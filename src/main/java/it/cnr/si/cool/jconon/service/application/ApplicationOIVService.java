@@ -637,7 +637,7 @@ public class ApplicationOIVService extends ApplicationService{
 	    return printService.extractionApplicationForAllIscritti(session, query, contexURL, userId);
     }
 
-    @Scheduled(cron="0 0 22 * * *")
+    @Scheduled(cron="0 0 22 * * MON-FRI")
     public void estraiExcelOIV() {
         List<String> members = cluster
                 .getMembers()
