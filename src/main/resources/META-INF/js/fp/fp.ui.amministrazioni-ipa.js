@@ -29,6 +29,7 @@ define(['jquery', 'cnr/cnr.url', 'cnr/cnr.ui.select', 'cnr/cnr', 'fp/fp.applicat
         parent.parent().find('#precedente_incarico_oiv_indirizzo').val(details.added.indirizzo);
         parent.parent().find('#precedente_incarico_oiv_comune').val(details.added.comune).trigger('change');
         parent.parent().find('#precedente_incarico_oiv_cap').val(details.added.cap);
+        parent.parent().find('#esperienza_professionale_citta').val(details.added.comune);
         $('[class*="' + id + '"]').parents('.control-group').hide();
         $('[class*="' + id + '"]:not(".' + id + '_' + parsedValue.join(',') + '")').val('').trigger('change');
         $('.' + id + '_' + parsedValue.join(',')).parents('.control-group').show();

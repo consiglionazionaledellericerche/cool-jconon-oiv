@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,15 +31,15 @@ public class IPA {
     private IPAService ipaService;
 
     private class ResponsePage implements Serializable {
-        private final int total_count;
+        private final long total_count;
         private final List<IPAAmministrazione> items;
 
-        public ResponsePage(int total_count, List<IPAAmministrazione> items) {
+        public ResponsePage(long total_count, List<IPAAmministrazione> items) {
             this.total_count = total_count;
             this.items = items;
         }
 
-        public int getTotal_count() {
+        public long getTotal_count() {
             return total_count;
         }
 
@@ -64,18 +66,26 @@ public class IPA {
     @Path("amministrazioni")
     @Produces(MediaType.APPLICATION_JSON)
     public Response amministrazioni(@Context HttpServletRequest request, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
-        final List<IPAAmministrazione> ipaAmministrazioneList = ipaService
-                .amministrazioni()
+        Supplier<Stream<IPAAmministrazione>> ipaAmministrazioni = () ->
+        {
+            try {
+                return ipaService.amministrazioni()
                 .values()
                 .stream()
-                .filter(ipaAmministrazione -> ipaAmministrazione.getDes_amm().toUpperCase().contains(q.toUpperCase()))
-                .sorted((ipaAmministrazione, t1) -> ipaAmministrazione.getDes_amm().compareTo(t1.getDes_amm()))
-                .collect(Collectors.toList());
-        final int size = ipaAmministrazioneList.size();
+                .filter(ipaAmministrazione -> ipaAmministrazione.getDes_amm().toUpperCase().contains(q.toUpperCase()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        final long size = ipaAmministrazioni.get().count();
         return Response.ok(
                 new ResponsePage(
                         size,
-                        ipaAmministrazioneList.subList(0, Math.min(page * 100, size))
+                        ipaAmministrazioni
+                                .get()
+                                .limit(Math.min(page * 100, size))
+                                .sorted((ipaAmministrazione, t1) -> ipaAmministrazione.getDes_amm().compareTo(t1.getDes_amm()))
+                                .collect(Collectors.toList())
                 )
         ).build();
     }

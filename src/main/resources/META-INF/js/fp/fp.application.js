@@ -25,6 +25,7 @@ define(['jquery', 'cnr/cnr', 'i18n', 'json!common', 'cnr/cnr.actionbutton', 'cnr
       applicationId = el.parentProp ? el.parentProp['cmis:objectId'] : undefined,
       userName = el.parentProp ? el.parentProp['jconon_application:user'] : undefined,
       title = el['jconon_attachment:esperienza_professionale_datore_lavoro'] ||
+        el['jconon_attachment:esperienza_professionale_amministrazione'] ||
         el['jconon_attachment:aspect_specializzazioni_universita'] ||
         el['jconon_attachment:precedente_incarico_oiv_amministrazione'],
       ruolo = el['jconon_attachment:esperienza_professionale_ruolo'] ||
