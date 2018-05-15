@@ -83,8 +83,7 @@ public class IPA {
                         size,
                         ipaAmministrazioni
                                 .get()
-                                .limit(Math.min(page * 100, size))
-                                .sorted((ipaAmministrazione, t1) -> ipaAmministrazione.getDes_amm().compareTo(t1.getDes_amm()))
+                                .limit(Math.min(page * 10, size))
                                 .collect(Collectors.toList())
                 )
         ).build();
