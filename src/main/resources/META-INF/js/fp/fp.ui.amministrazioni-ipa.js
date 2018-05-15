@@ -56,7 +56,7 @@ define(['jquery', 'cnr/cnr.url', 'cnr/cnr.ui.select', 'cnr/cnr', 'fp/fp.applicat
                 };
             },
             results: function (data, page) {
-                var more = (page * 100) < data.total_count;
+                var more = (page * 10) < data.total_count;
                 return {
                     results: data.items,
                     more: more
