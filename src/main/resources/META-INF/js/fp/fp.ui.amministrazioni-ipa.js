@@ -26,6 +26,9 @@ define(['jquery', 'cnr/cnr.url', 'cnr/cnr.ui.select', 'cnr/cnr', 'fp/fp.applicat
         parent.data('value', value);
       }
       if (parsedValue) {
+        parent.parent().find('#precedente_incarico_oiv_cod_amm_ipa').val(details.added.cod_amm);
+        parent.parent().find('#esperienza_professionale_cod_amm_ipa').val(details.added.cod_amm);
+
         parent.parent().find('#precedente_incarico_oiv_indirizzo').val(details.added.indirizzo);
         parent.parent().find('#precedente_incarico_oiv_comune').val(details.added.comune).trigger('change');
         parent.parent().find('#precedente_incarico_oiv_cap').val(details.added.cap);
@@ -33,6 +36,9 @@ define(['jquery', 'cnr/cnr.url', 'cnr/cnr.ui.select', 'cnr/cnr', 'fp/fp.applicat
         $('[class*="' + id + '"]').parents('.control-group').hide();
         $('[class*="' + id + '"]:not(".' + id + '_' + parsedValue.join(',') + '")').val('').trigger('change');
         $('.' + id + '_' + parsedValue.join(',')).parents('.control-group').show();
+      } else {
+        parent.parent().find('#precedente_incarico_oiv_cod_amm_ipa').val('');
+        parent.parent().find('#esperienza_professionale_cod_amm_ipa').val('');
       }
   }
 

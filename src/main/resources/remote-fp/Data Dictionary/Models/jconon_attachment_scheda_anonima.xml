@@ -137,9 +137,20 @@
 						<tokenised>both</tokenised>
 					</index>
 				</property>
+				<property name="jconon_attachment:esperienza_professionale_cod_amm_ipa">
+					<title>Codice IPA</title>
+					<description>g] inputType:ROTEXT class:fl_amministrazione_pubblica_true</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
                 <property name="jconon_attachment:esperienza_professionale_amministrazione">
                     <title>Amministrazione</title>
-                    <description>g] class:fl_amministrazione_pubblica_true widget:ui.amministrazioni-ipa</description>
+                    <description>h] class:fl_amministrazione_pubblica_true widget:ui.amministrazioni-ipa</description>
                     <type>d:text</type>
                     <mandatory>true</mandatory>
                     <index enabled="true">
@@ -151,7 +162,7 @@
 
 				<property name="jconon_attachment:esperienza_professionale_datore_lavoro">
 					<title>Datore di Lavoro/Committente</title>
-					<description>h] class:fl_amministrazione_pubblica_false</description>
+					<description>i] class:fl_amministrazione_pubblica_false</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -162,7 +173,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_ruolo">
 					<title>Ruolo</title>
-					<description>i]</description>
+					<description>l]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -173,7 +184,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_citta">
 					<title>Comune</title>
-					<description>l]</description>
+					<description>m]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -184,7 +195,7 @@
 				</property>
 				<property name="jconon_attachment:esperienza_professionale_stato_estero">
 					<title>Stato</title>
-					<description>m] class:fl_amministrazione_pubblica_false</description>
+					<description>n] class:fl_amministrazione_pubblica_false</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -233,9 +244,20 @@
 						<tokenised>both</tokenised>
 					</index>
 				</property>
+				<property name="jconon_attachment:precedente_incarico_oiv_cod_amm_ipa">
+					<title>Codice IPA</title>
+					<description>d] inputType:ROTEXT</description>
+					<type>d:text</type>
+					<mandatory>true</mandatory>
+					<index enabled="true">
+						<atomic>true</atomic>
+						<stored>false</stored>
+						<tokenised>both</tokenised>
+					</index>
+				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_amministrazione">
 					<title>Amministrazione pubblica</title>
-					<description>d] widget:ui.amministrazioni-ipa</description>
+					<description>e] widget:ui.amministrazioni-ipa</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -246,7 +268,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_sede">
 					<title>Sede</title>
-					<description>e] class:input-xxlarge</description>
+					<description>f] class:input-xxlarge</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -257,7 +279,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_comune">
 					<title>Comune</title>
-					<description>f] class:input-xlarge</description>
+					<description>g] class:input-xlarge</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -268,7 +290,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_indirizzo">
 					<title>Indirizzo</title>
-					<description>g] class:input-xxlarge</description>
+					<description>h] class:input-xxlarge</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -279,7 +301,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_cap">
 					<title>CAP</title>
-					<description>h] class:input-medium</description>
+					<description>i] class:input-medium</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -290,7 +312,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_telefono">
 					<title>Telefono</title>
-					<description>i] class:input-large</description>
+					<description>l] class:input-large</description>
 					<type>d:text</type>
 					<index enabled="true">
 						<atomic>true</atomic>
@@ -300,7 +322,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_numero_dipendenti">
 					<title>N. dipendenti</title>
-					<description>l]</description>
+					<description>m]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">
@@ -314,7 +336,7 @@
 				</property>
 				<property name="jconon_attachment:precedente_incarico_oiv_ruolo">
 					<title>Ruolo</title>
-					<description>m]</description>
+					<description>n]</description>
 					<type>d:text</type>
 					<mandatory>true</mandatory>
 					<index enabled="true">

@@ -48,28 +48,30 @@ public class FlowsService {
             numeroEsperienza++;
             result.add(
                     new Esperienza()
-                    .setIdEsperienza(resultEsperienza.<String>getPropertyValueById(PropertyIds.OBJECT_ID))
-                    .setNumeroEsperienza(numeroEsperienza)
-                    .setDataInizio(
-                            DateTimeFormatter.ofPattern(DD_MM_YYYY).format(
-                                    ZonedDateTime.ofInstant(
-                                            resultEsperienza.<GregorianCalendar>getPropertyValueById("jconon_attachment:esperienza_professionale_da").toInstant(),
-                                            ZoneId.systemDefault()
+                            .setIdEsperienza(resultEsperienza.<String>getPropertyValueById(PropertyIds.OBJECT_ID))
+                            .setNumeroEsperienza(numeroEsperienza)
+                            .setDataInizio(
+                                    DateTimeFormatter.ofPattern(DD_MM_YYYY).format(
+                                            ZonedDateTime.ofInstant(
+                                                    resultEsperienza.<GregorianCalendar>getPropertyValueById("jconon_attachment:esperienza_professionale_da").toInstant(),
+                                                    ZoneId.systemDefault()
+                                            )
                                     )
                             )
-                    )
-                    .setDataFine(
-                            Optional.ofNullable(resultEsperienza.<GregorianCalendar>getPropertyValueById("jconon_attachment:esperienza_professionale_a"))
-                                    .map(Calendar::toInstant)
-                                    .map(instant -> DateTimeFormatter.ofPattern(DD_MM_YYYY).format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
-                                    .orElse(null)
-                    )
+                            .setDataFine(
+                                    Optional.ofNullable(resultEsperienza.<GregorianCalendar>getPropertyValueById("jconon_attachment:esperienza_professionale_a"))
+                                            .map(Calendar::toInstant)
+                                            .map(instant -> DateTimeFormatter.ofPattern(DD_MM_YYYY).format(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())))
+                                            .orElse(null)
+                            )
                             .setTipologiaEsperienza("Esperienza professionale")
-                    .setDescrizioneIpa(
-                            resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_datore_lavoro")
-                    )
-                    .setAmbitoEsperienza(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_area_specializzazione"))
-                    .setAttivitaSvolta(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_attivita_svolta"))
+                            .setCodIpa(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_cod_amm_ipa"))
+                            .setDescrizioneIpa(
+                                    Optional.ofNullable(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_amministrazione"))
+                                            .orElseGet(() -> resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_datore_lavoro"))
+                            )
+                            .setAmbitoEsperienza(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_area_specializzazione"))
+                            .setAttivitaSvolta(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_attivita_svolta"))
             );
         }
         for (QueryResult oiv : queryResultOivs) {
@@ -93,6 +95,7 @@ public class FlowsService {
                                             .orElse(null)
                             )
                             .setTipologiaEsperienza("Incarichi OIV/Nuclei")
+                            .setCodIpa(oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_cod_amm_ipa"))
                             .setDescrizioneIpa(
                                     oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_amministrazione")
                             )
@@ -127,10 +130,10 @@ public class FlowsService {
 
     public ResponseEntity<StartWorkflowResponse> completeTask(Folder domanda,
                                                               TaskResponse currentTask,
-                                                               ItemIterable<QueryResult> esperienze,
-                                                               ItemIterable<QueryResult> oivs,
-                                                               MultipartFile fileDomanda,
-                                                               Document cv, Document documentoRiconoscimento) throws IOException {
+                                                              ItemIterable<QueryResult> esperienze,
+                                                              ItemIterable<QueryResult> oivs,
+                                                              MultipartFile fileDomanda,
+                                                              Document cv, Document documentoRiconoscimento) throws IOException {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
         params.add("processDefinitionId", processDefinitionId);
         params.add("taskId", currentTask.getId());
@@ -139,7 +142,7 @@ public class FlowsService {
         params.add("fasciaAppartenenzaProposta", domanda.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita"));
 
         params.add("valutazioneEsperienze_json", getEsperienze(esperienze, oivs));
-        params.add("domanda",  new MultipartInputStreamFileResource(fileDomanda.getInputStream(), fileDomanda.getOriginalFilename()));
+        params.add("domanda", new MultipartInputStreamFileResource(fileDomanda.getInputStream(), fileDomanda.getOriginalFilename()));
         Optional.ofNullable(cv)
                 .map(document -> new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()))
                 .ifPresent(multipartInputStreamFileResource -> params.add("cv", multipartInputStreamFileResource));
@@ -181,8 +184,8 @@ public class FlowsService {
                 .orElse(null));
         params.add("tipologiaRichiesta",
                 progressivoIscrizioneInElenco
-                    .map(o -> "modifica_fascia")
-                    .orElse("Iscrizione"));
+                        .map(o -> "modifica_fascia")
+                        .orElse("Iscrizione"));
         if (progressivoIscrizioneInElenco.isPresent()) {
             params.add("dataIscrizioneElenco",
                     Optional.ofNullable(domanda.<GregorianCalendar>getPropertyValue("jconon_application:data_iscrizione_elenco"))
@@ -195,7 +198,7 @@ public class FlowsService {
         params.add("fasciaAppartenenzaProposta", domanda.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita"));
 
         params.add("valutazioneEsperienze_json", getEsperienze(esperienze, oivs));
-        params.add("domanda",  new MultipartInputStreamFileResource(fileDomanda.getInputStream(), fileDomanda.getOriginalFilename()));
+        params.add("domanda", new MultipartInputStreamFileResource(fileDomanda.getInputStream(), fileDomanda.getOriginalFilename()));
         Optional.ofNullable(cv)
                 .map(document -> new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()))
                 .ifPresent(multipartInputStreamFileResource -> params.add("cv", multipartInputStreamFileResource));
@@ -239,6 +242,7 @@ public class FlowsService {
         private String ambitoEsperienza;
         private String attivitaSvolta;
         private String annotazioniValutatore;
+        private String codIpa;
         private String descrizioneIpa;
         private String nrDipendenti;
 
@@ -332,6 +336,15 @@ public class FlowsService {
 
         public Esperienza setNrDipendenti(String nrDipendenti) {
             this.nrDipendenti = nrDipendenti;
+            return this;
+        }
+
+        public String getCodIpa() {
+            return codIpa;
+        }
+
+        public Esperienza setCodIpa(String codIpa) {
+            this.codIpa = codIpa;
             return this;
         }
     }
