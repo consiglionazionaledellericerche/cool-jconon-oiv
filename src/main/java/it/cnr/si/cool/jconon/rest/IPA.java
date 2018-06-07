@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -17,7 +20,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,6 +31,48 @@ public class IPA {
     private static final Logger LOGGER = LoggerFactory.getLogger(IPA.class);
     @Autowired
     private IPAService ipaService;
+
+    @GET
+    @Path("amministrazioni")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response amministrazioni(@Context HttpServletRequest request, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
+        Supplier<Stream<IPAAmministrazione>> ipaAmministrazioni = () ->
+        {
+            try {
+                return ipaService.amministrazioni()
+                        .values()
+                        .stream()
+                        .filter(ipaAmministrazione -> ipaAmministrazione.getDes_amm().toUpperCase().contains(q.toUpperCase()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        final long size = ipaAmministrazioni.get().count();
+        return Response.ok(
+                new ResponsePage(
+                        size,
+                        ipaAmministrazioni
+                                .get()
+                                .limit(Math.min(page * 10, size))
+                                .collect(Collectors.toList())
+                )
+        ).build();
+    }
+
+    @GET
+    @Path("amministrazione")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response amministrazione(@Context HttpServletRequest request, @QueryParam("q") String q) throws IOException {
+        return Response.ok(
+                ipaService
+                        .amministrazioni()
+                        .values()
+                        .stream()
+                        .filter(ipaAmministrazione -> ipaAmministrazione.getDes_amm().equalsIgnoreCase(q))
+                        .findFirst()
+                        .orElse(null)
+        ).build();
+    }
 
     private class ResponsePage implements Serializable {
         private final long total_count;
@@ -60,47 +104,5 @@ public class IPA {
         public int hashCode() {
             return Objects.hash(total_count, items);
         }
-    }
-
-    @GET
-    @Path("amministrazioni")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response amministrazioni(@Context HttpServletRequest request, @QueryParam("q") String q, @QueryParam("page") Integer page) throws IOException {
-        Supplier<Stream<IPAAmministrazione>> ipaAmministrazioni = () ->
-        {
-            try {
-                return ipaService.amministrazioni()
-                .values()
-                .stream()
-                .filter(ipaAmministrazione -> ipaAmministrazione.getDes_amm().toUpperCase().contains(q.toUpperCase()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
-        final long size = ipaAmministrazioni.get().count();
-        return Response.ok(
-                new ResponsePage(
-                        size,
-                        ipaAmministrazioni
-                                .get()
-                                .limit(Math.min(page * 10, size))
-                                .collect(Collectors.toList())
-                )
-        ).build();
-    }
-
-    @GET
-    @Path("amministrazione")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response amministrazione(@Context HttpServletRequest request, @QueryParam("q") String q) throws IOException {
-        return Response.ok(
-                ipaService
-                        .amministrazioni()
-                        .values()
-                        .stream()
-                        .filter(ipaAmministrazione -> ipaAmministrazione.getDes_amm().equalsIgnoreCase(q))
-                        .findFirst()
-                        .orElse(null)
-        ).build();
     }
 }
