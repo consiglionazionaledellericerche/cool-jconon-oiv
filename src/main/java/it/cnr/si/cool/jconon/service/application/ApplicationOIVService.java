@@ -69,6 +69,7 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.Action;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
+import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
@@ -382,7 +383,36 @@ public class ApplicationOIVService extends ApplicationService{
 		super.delete(cmisSession, contextURL, objectId);
 	}
 
-	public Map<String, Object> soccorsoIstruttorio(Session session, HttpServletRequest req, String idDomanda, String fileName, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
+
+    public Map<String, Object> responseSoccorsoIstruttorio(Session session, HttpServletRequest req, String idDomanda, String idDocumento, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
+        Folder application = loadApplicationById(session, idDomanda, null);
+        OperationContext context = session.getDefaultContext();
+        context.setIncludeRelationships(IncludeRelationships.SOURCE);
+        final Document document = Optional.ofNullable(session.getObject(idDocumento, context))
+                .filter(Document.class::isInstance)
+                .map(Document.class::cast)
+                .orElseThrow(() -> new RuntimeException("File for soccorso istruttorio is not present in request"));
+        String testo = document.getPropertyValue("jconon_attachment:testo_response_soccorso_istruttorio");
+        final List<Document> allegati = document.getRelationships().stream()
+                .filter(relationship -> relationship.getType().getId().equals("R:jconon_attachment:response_soccorso_istruttorio"))
+                .map(relationship -> relationship.getTarget())
+                .filter(Document.class::isInstance)
+                .map(Document.class::cast)
+                .collect(Collectors.toList());
+        TaskResponse currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
+                .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
+                .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody()).orElseThrow(() -> new RuntimeException("Task corrente non trovato!"));
+
+        flowsService.completeTask(application,currentTask,testo, allegati);
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("jconon_application:fl_soccorso_istruttorio", false);
+        cmisService.createAdminSession().getObject(idDomanda).updateProperties(properties);
+
+        return Collections.emptyMap();
+    }
+
+    public Map<String, Object> soccorsoIstruttorio(Session session, HttpServletRequest req, String idDomanda, String fileName, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
 		final String userId = user.getId();
 		MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
         MultipartFile file = Optional.ofNullable(mRequest.getFile("file"))
@@ -449,33 +479,8 @@ public class ApplicationOIVService extends ApplicationService{
         sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
 
         if (Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
-                .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
-            final Optional<TaskResponse> currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
-                    .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
-                    .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody());
-
-            if (currentTask.isPresent() && currentTask.get().getName().equalsIgnoreCase(TaskResponse.PREAVVISO_RIGETTO) || currentTask.get().getName().equalsIgnoreCase(TaskResponse.SOCCORSO_ISTRUTTORIO)) {
-                LOGGER.info("Current Task Name {}", currentTask.get().getName());
-
-                final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.completeTask(application,
-                        currentTask.get(),
-                        getQueryResultEsperienza(session, application),
-                        getQueryResultsOiv(session, application),
-                        file,
-                        Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_CURRICULUM_VITAE))
-                                .map(id ->  session.getObject(id))
-                                .filter(Document.class::isInstance)
-                                .map(Document.class::cast)
-                                .orElse(null),
-                        Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_DOCUMENTO_RICONOSCIMENTO))
-                                .map(id ->  session.getObject(id))
-                                .filter(Document.class::isInstance)
-                                .map(Document.class::cast)
-                                .orElse(null)
-                );
-            } else {
-                throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile procedere con un nuovo invio!");
-            }
+                .filter(processInstanceId -> flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
+            throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile procedere con un nuovo invio!");
         } else {
             final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(application,
                     getQueryResultEsperienza(session, application),
@@ -972,5 +977,19 @@ public class ApplicationOIVService extends ApplicationService{
                 .orElse("");
         LOGGER.info("Current Task Name {}", currentTaskName);
         return currentTaskName.equalsIgnoreCase(TaskResponse.SOCCORSO_ISTRUTTORIO);
+    }
+
+    public Map<String, String> scaricaSoccorsoIstruttorio(Session currentCMISSession, final String applicationSourceId) {
+        Map<String, String> result = new HashMap<>();
+        Criteria criteria = CriteriaFactory.createCriteria("jconon_attachment:soccorso_istruttorio");
+        criteria.addColumn(PropertyIds.OBJECT_ID);
+        criteria.addColumn(PropertyIds.NAME);
+        criteria.add(Restrictions.inFolder(applicationSourceId));
+        ItemIterable<QueryResult> iterable = criteria.executeQuery(currentCMISSession, false, currentCMISSession.getDefaultContext());
+        for (QueryResult queryResult : iterable) {
+            result.put(PropertyIds.OBJECT_ID, queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
+            result.put(PropertyIds.NAME, queryResult.getPropertyValueById(PropertyIds.NAME));
+        }
+        return result;
     }
 }

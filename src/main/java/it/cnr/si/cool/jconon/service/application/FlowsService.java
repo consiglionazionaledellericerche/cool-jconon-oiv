@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class FlowsService {
@@ -130,25 +131,20 @@ public class FlowsService {
 
     public ResponseEntity<StartWorkflowResponse> completeTask(Folder domanda,
                                                               TaskResponse currentTask,
-                                                              ItemIterable<QueryResult> esperienze,
-                                                              ItemIterable<QueryResult> oivs,
-                                                              MultipartFile fileDomanda,
-                                                              Document cv, Document documentoRiconoscimento) throws IOException {
+                                                              String testoSoccorso,
+                                                              List<Document> attachment) throws IOException {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
         params.add("processDefinitionId", processDefinitionId);
         params.add("taskId", currentTask.getId());
         params.add("sceltaUtente", "invia_a_istruttoria");
         params.add("dataInvioSoccorsoIstruttorio", DateTimeFormatter.ISO_DATE_TIME.format(ZonedDateTime.ofInstant(Calendar.getInstance().toInstant(), ZoneId.systemDefault())));
         params.add("fasciaAppartenenzaProposta", domanda.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita"));
-
-        params.add("valutazioneEsperienze_json", getEsperienze(esperienze, oivs));
-        params.add("domanda", new MultipartInputStreamFileResource(fileDomanda.getInputStream(), fileDomanda.getOriginalFilename()));
-        Optional.ofNullable(cv)
-                .map(document -> new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()))
-                .ifPresent(multipartInputStreamFileResource -> params.add("cv", multipartInputStreamFileResource));
-        Optional.ofNullable(documentoRiconoscimento)
-                .map(document -> new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()))
-                .ifPresent(multipartInputStreamFileResource -> params.add("cartaIdentita", multipartInputStreamFileResource));
+        params.add("testoScoccorsoIstruttorio", testoSoccorso);
+        AtomicInteger index = new AtomicInteger();
+        attachment.stream()
+                .forEach(document -> {
+                    params.add("soccorso-istruttorio-allegato-" + index.incrementAndGet(), new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()));
+                });
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
