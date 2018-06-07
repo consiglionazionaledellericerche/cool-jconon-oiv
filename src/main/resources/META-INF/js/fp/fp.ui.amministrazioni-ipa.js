@@ -96,6 +96,7 @@ define(['jquery', 'cnr/cnr.url', 'cnr/cnr.ui.select', 'cnr/cnr', 'fp/fp.applicat
                     dataType: "json"
                 }).done(function(data) {
                     callback(data);
+                    parent.data('value', id);
                 });
             }
         }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bulkInfo xmlns="http://www.cnr.it/schema/BulkInfo_v2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          cmisQueryName="jconon_attachment:response_soccorso_istruttorio"
+          cmisTypeName="D:jconon_attachment:response_soccorso_istruttorio"
+          longDescription="Soccorso Istruttorio"
+          shortDescription="Soccorso Istruttorio"
+          xsi:schemaLocation="http://www.cnr.it/schema/BulkInfo_v2 BulkInfo_v2">
+
+    <fieldProperty
+            class="span8"
+            inputType="TEXTAREA"
+            rows="5"
+            name="testo"
+            property="jconon_attachment:testo_response_soccorso_istruttorio">
+        <jsonlabel
+                default="Testo:"
+                key="label.jconon_attachment.testo_response_soccorso_istruttorio"/>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+
+
+    <formFieldProperty name="testo"/>
+    <columnFieldProperty name="testo"/>
+
+</bulkInfo>

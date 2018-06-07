@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Path("application-fp")
 @Component
@@ -193,5 +194,36 @@ public class ApplicationOIV {
         LOGGER.debug("Iscrizione in elenco della domanda: {}", idDomanda);
         return Response.ok(Collections.singletonMap("progressivo",
                 applicationOIVService.iscriviInElenco(cmisService.getCurrentCMISSession(req), idDomanda))).build();
+    }
+
+	@POST
+	@Path("soccorso-istruttorio")
+	@Produces(MediaType.APPLICATION_JSON)
+    public Response soccorsoIstruttorio(@Context HttpServletRequest req, @QueryParam("idDomanda") String idDomanda, @QueryParam("fileName") String fileName) throws IOException{
+        ResponseBuilder rb;
+        try {
+            Session session = cmisService.getCurrentCMISSession(req);
+            Map<String, Object> model = applicationOIVService.soccorsoIstruttorio(session, req, idDomanda, fileName, cmisService.getCMISUserFromSession(req));
+            rb = Response.ok(model);
+        } catch (ClientMessageException | CMISApplicationException | TemplateException e) {
+            LOGGER.warn("send error", e);
+            rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+        }
+        return rb.build();
+	}
+
+    @GET
+    @Path("soccorso-istruttorio")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isFlussosoccorsoIstruttorio(@Context HttpServletRequest req, @QueryParam("idDomanda") String idDomanda) throws IOException{
+        ResponseBuilder rb;
+        try {
+            Session session = cmisService.getCurrentCMISSession(req);
+            rb = Response.ok(applicationOIVService.isStatoFlussoSoccorsoIstruttorio(session, idDomanda));
+        } catch (ClientMessageException | CMISApplicationException e) {
+            LOGGER.warn("send error", e);
+            rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+        }
+        return rb.build();
     }
 }

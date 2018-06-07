@@ -902,6 +902,11 @@
                     <description>Id del flusso legato alla domanda</description>
                     <type>d:text</type>
                 </property>
+                <property name="jconon_application:fl_soccorso_istruttorio">
+                    <title>Domanda in soccorso istruttorio</title>
+                    <description>Domanda in soccorso istruttorio</description>
+                    <type>d:boolean</type>
+                </property>
             </properties>
             <associations>
                 <association name="jconon_application:ass_curriculum">
