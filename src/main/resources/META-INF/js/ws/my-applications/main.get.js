@@ -120,7 +120,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
     search.execute();
   }
 
-  function allegaDocumentoAllaDomanda(type, objectId, successCallback, bigmodal, callbackModal, requiresFile, forbidArchives, maxUploadSize, title, multiple) {
+  function allegaDocumentoAllaDomanda(type, objectId, successCallback, bigmodal, callbackModal, requiresFile, forbidArchives, maxUploadSize, title, aspects, multiple, rel, successMetadataCallback) {
     return Node.submission({
       nodeRef: objectId,
       objectType: type,
@@ -130,7 +130,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       callbackModal: callbackModal,
       showFile: true,
       multiple: multiple,
-      externalData: [
+      externalData: aspects || [
         {
           name: 'aspect',
           value: 'P:jconon_attachment:generic_document'
@@ -144,12 +144,20 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
           value: common.User.id
         }
       ],
+      input: rel,
       modalTitle: title || i18n[type],
       success: function (attachmentsData, data) {
         if (successCallback) {
           successCallback(attachmentsData, data);
         } else {
           $('#applyFilter').click();
+        }
+      },
+      successMetadata : function (data) {
+        if (successMetadataCallback) {
+            successMetadataCallback(data);
+        } else {
+            $('#applyFilter').click();
         }
       },
       forbidArchives: forbidArchives === undefined ? true : forbidArchives,
@@ -517,28 +525,28 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                 }
                 if (el['jconon_application:fl_soccorso_istruttorio'] == true) {
                   customButtons.soccorso_istruttorio = function () {
-                    var bulkInfoAllegato = allegaDocumentoAllaDomanda('D_jconon_attachment_response_soccorso_istruttorio',
+                    var bulkInfoAllegato = allegaDocumentoAllaDomanda(
+                        'D_jconon_attachment_response_soccorso_istruttorio',
                         el['cmis:objectId'],
-                        function (attachmentsData, data) {
-                            $.ajax({
-                                url: cache.baseUrl + "/rest/application-fp/response-soccorso-istruttorio",
-                                type: 'POST',
-                                data: {
-                                  nodeRef : el['cmis:objectId'],
-                                  nodeRefDocumento : data !== undefined ? data['alfcmis:nodeRef'] : undefined
-                                },
-                                success: function (data) {
-                                   $('#applyFilter').click();
-                                },
-                                error: jconon.error
-                            });
-                        }, true, function (modal) {
+                        undefined,
+                        true,
+                        function (modal) {
                             $(window).on('shown.bs.modal', function (event) {
-                                modal.find('.modal-footer').prepend(
-                                    '<a class="btn btn-info" href="' +
-                                    cache.baseUrl +
-                                    '/rest/application-fp/scarica-soccorso-istruttorio' +
-                                    '">Scarica soccorso istruttorio</a>');
+                                var scaricaSoccorso = $('<a class="btn btn-info" id="scarica_soccorso">Scarica soccorso istruttorio</a>')
+                                    .off('click')
+                                    .on('click', function () {
+                                       $.ajax({
+                                         url: cache.baseUrl + '/rest/application-fp/scarica-soccorso-istruttorio?idDomanda=' + el['cmis:objectId'],
+                                         type: 'GET',
+                                         success: function (data) {
+                                           window.location = cache.baseUrl + '/rest/content?nodeRef=' + data['cmis:objectId'];
+                                         },
+                                         error: URL.errorFn
+                                       });
+                                    });
+                                if (modal.find('#scarica_soccorso').length == 0){
+                                    modal.find('.modal-footer').prepend(scaricaSoccorso);
+                                }
                                 var textarea = modal.find('#testo');
                                 var ck = textarea.ckeditor({
                                     toolbarGroups: [
@@ -557,8 +565,33 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                   textarea.parent().find('control-group widget').data('value', html || null);
                                 });
                             });
+                        },
+                        true,
+                        true,
+                        true,
+                        'Soccorso Istruttorio',
+                        [{name: 'jconon_attachment:user',value: common.User.id}],
+                        true,
+                        {
+                            rel: {
+                                "cmis:relObjectTypeId" : 'R:jconon_attachment:response_soccorso_istruttorio'
+                             }
+                        },
+                        function (data) {
+                            $.ajax({
+                                url: cache.baseUrl + "/rest/application-fp/response-soccorso-istruttorio",
+                                type: 'POST',
+                                data: {
+                                  idDomanda : el['cmis:objectId'],
+                                  idDocumento : data['cmis:objectId']
+                                },
+                                success: function (data) {
+                                   $('#applyFilter').click();
+                                },
+                                error: jconon.error
+                            });
                         }
-                      , true, true, true, 'Soccorso Istruttorio', true);
+                    );
                   };
                 }
                 if (common.User.admin || Call.isRdP(callData['jconon_call:rdp'])) {
@@ -570,7 +603,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                 url: cache.baseUrl + "/rest/application-fp/message",
                                 type: 'POST',
                                 data: {
-                                  nodeRef : el['cmis:objectId'],
+                                  idDomanda : el['cmis:objectId'],
                                   nodeRefDocumento : data !== undefined ? data['alfcmis:nodeRef'] : undefined
                                 },
                                 success: function (data) {

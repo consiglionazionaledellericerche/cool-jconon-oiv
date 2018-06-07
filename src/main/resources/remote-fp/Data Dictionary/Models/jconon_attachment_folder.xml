@@ -900,6 +900,21 @@
                     </index>
                 </property>
             </properties>
+            <associations>
+                <association name="jconon_attachment:response_soccorso_istruttorio">
+                    <source>
+                        <role>cm:partOf</role>
+                        <mandatory>false</mandatory>
+                        <many>true</many>
+                    </source>
+                    <target>
+                        <class>cm:content</class>
+                        <role>cm:hasPart</role>
+                        <mandatory>false</mandatory>
+                        <many>true</many>
+                    </target>
+                </association>
+            </associations>
         </type>
 	</types>
 	<aspects>

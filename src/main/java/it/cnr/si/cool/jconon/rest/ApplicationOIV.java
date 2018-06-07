@@ -226,4 +226,35 @@ public class ApplicationOIV {
         }
         return rb.build();
     }
+
+    @GET
+    @Path("scarica-soccorso-istruttorio")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response scaricaSoccorsoIstruttorio(@Context HttpServletRequest req, @QueryParam("idDomanda") String idDomanda) throws IOException{
+        ResponseBuilder rb;
+        try {
+            Session session = cmisService.getCurrentCMISSession(req);
+            rb = Response.ok(applicationOIVService.scaricaSoccorsoIstruttorio(session, idDomanda));
+        } catch (ClientMessageException | CMISApplicationException e) {
+            LOGGER.warn("scarica-soccorso-istruttorio error", e);
+            rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+        }
+        return rb.build();
+    }
+
+    @POST
+    @Path("response-soccorso-istruttorio")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response responseSoccorsoIstruttorio(@Context HttpServletRequest req, @FormParam("idDomanda") String idDomanda, @FormParam("idDocumento") String idDocumento) throws IOException{
+        ResponseBuilder rb;
+        try {
+            Session session = cmisService.getCurrentCMISSession(req);
+            Map<String, Object> model = applicationOIVService.responseSoccorsoIstruttorio(session, req, idDomanda, idDocumento, cmisService.getCMISUserFromSession(req));
+            rb = Response.ok(model);
+        } catch (ClientMessageException | CMISApplicationException | TemplateException e) {
+            LOGGER.warn("send error", e);
+            rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+        }
+        return rb.build();
+    }
 }
