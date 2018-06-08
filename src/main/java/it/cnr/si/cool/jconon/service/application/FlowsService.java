@@ -139,11 +139,11 @@ public class FlowsService {
         params.add("sceltaUtente", "invia_a_istruttoria");
         params.add("dataInvioSoccorsoIstruttorio", DateTimeFormatter.ISO_DATE_TIME.format(ZonedDateTime.ofInstant(Calendar.getInstance().toInstant(), ZoneId.systemDefault())));
         params.add("fasciaAppartenenzaProposta", domanda.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita"));
-        params.add("testoScoccorsoIstruttorio", testoSoccorso);
+        params.add("osservazioniSoccorsoRichiedente", testoSoccorso);
         AtomicInteger index = new AtomicInteger();
         attachment.stream()
                 .forEach(document -> {
-                    params.add("soccorso-istruttorio-allegato-" + index.incrementAndGet(), new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()));
+                    params.add("osservazioni-soccorso-richiedente-allegato-" + index.incrementAndGet(), new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()));
                 });
 
         HttpHeaders headers = new HttpHeaders();
