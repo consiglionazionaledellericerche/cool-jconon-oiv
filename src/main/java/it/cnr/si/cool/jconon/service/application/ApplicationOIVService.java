@@ -1,6 +1,7 @@
 package it.cnr.si.cool.jconon.service.application;
 
 import freemarker.template.TemplateException;
+import it.cnr.cool.cmis.model.ACLType;
 import it.cnr.cool.cmis.model.CoolPropertyIds;
 import it.cnr.cool.cmis.service.ACLService;
 import it.cnr.cool.cmis.service.CMISService;
@@ -10,6 +11,7 @@ import it.cnr.cool.mail.MailService;
 import it.cnr.cool.mail.model.AttachmentBean;
 import it.cnr.cool.mail.model.EmailMessage;
 import it.cnr.cool.rest.util.Util;
+import it.cnr.cool.security.GroupsEnum;
 import it.cnr.cool.security.service.GroupService;
 import it.cnr.cool.security.service.UserService;
 import it.cnr.cool.security.service.impl.alfresco.CMISAuthority;
@@ -409,6 +411,10 @@ public class ApplicationOIVService extends ApplicationService{
         properties.put("jconon_application:fl_soccorso_istruttorio", false);
         cmisService.createAdminSession().getObject(idDomanda).updateProperties(properties);
 
+        Map<String, ACLType> aces = new HashMap<String, ACLType>();
+        aces.put(application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()), ACLType.Contributor);
+        aclService.removeAcl(cmisService.getAdminSession(), application.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
+
         return Collections.emptyMap();
     }
 
@@ -425,6 +431,10 @@ public class ApplicationOIVService extends ApplicationService{
         properties.put("jconon_application:fl_soccorso_istruttorio", true);
         application.updateProperties(properties);
 
+        Map<String, ACLType> aces = new HashMap<String, ACLType>();
+        aces.put(application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()), ACLType.Contributor);
+        aclService.addAcl(cmisService.getAdminSession(), application.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
+
         ContentStream contentStream = new ContentStreamImpl(fileName,
                 BigInteger.valueOf(file.getInputStream().available()),
                 MimeTypes.PDF.mimetype(),
@@ -433,11 +443,47 @@ public class ApplicationOIVService extends ApplicationService{
         propertiesFile.put(PropertyIds.NAME, fileName);
         propertiesFile.put(PropertyIds.OBJECT_TYPE_ID, "D:jconon_attachment:soccorso_istruttorio");
 
-        final Document document = application.createDocument(propertiesFile, contentStream, VersioningState.MAJOR);
+        List<CmisObject> children = new ArrayList<>();
+        application
+                .getChildren()
+                .forEach(cmisObject -> children.add(cmisObject));
+        Optional<Document> document = children
 
-        return Collections.singletonMap("idDocumento", document.getId());
+                .stream()
+                .filter(cmisObject -> cmisObject.getType().getId().equalsIgnoreCase("D:jconon_attachment:soccorso_istruttorio"))
+                .filter(Document.class::isInstance)
+                .map(Document.class::cast)
+                .findAny();
+        if (document.isPresent())
+            document.get().setContentStream(contentStream, true);
+        else
+            document = Optional.ofNullable(application.createDocument(propertiesFile, contentStream, VersioningState.MAJOR));
+
+        CMISUser applicationUser;
+        try {
+            applicationUser = userService.loadUserForConfirm(
+                    application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
+            notificaMail(applicationUser, req);
+        } catch (CoolUserFactoryException e) {
+            LOGGER.error("User not found for send email", e);
+        }
+        return Collections.singletonMap("idDocumento", document.get().getId());
 	}
 
+	private void notificaMail(CMISUser user, HttpServletRequest req) throws IOException, TemplateException {
+		Map<String, Object> mailModel = new HashMap<String, Object>();
+		List<String> emailList = new ArrayList<String>();
+		emailList.add(user.getEmail());
+		mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
+		mailModel.put("user", user);
+        mailModel.put("contextURL", getContextURL(req));
+		EmailMessage message = new EmailMessage();
+		message.setRecipients(emailList);
+		String body = Util.processTemplate(mailModel, "/pages/comunicazioni.html.ftl");
+		message.setSubject("Elenco OIV - Comunicazioni");
+		message.setBody(body);
+		mailService.send(message);
+	}
 
 	public Map<String, Object> sendApplicationOIV(Session session, HttpServletRequest req, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
 		final String userId = user.getId();
@@ -479,7 +525,7 @@ public class ApplicationOIVService extends ApplicationService{
         sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
 
         if (Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
-                .filter(processInstanceId -> flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
+                .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
             throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile procedere con un nuovo invio!");
         } else {
             final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(application,
@@ -830,7 +876,11 @@ public class ApplicationOIVService extends ApplicationService{
 		} catch (CoolUserFactoryException e) {
 			throw new ClientMessageException("User not found " + userId, e);
 		}		
-		CmisObject object = session.getObject(objectId);		
+		CmisObject object = Optional.ofNullable(session.getObject(objectId))
+                .filter(Document.class::isInstance)
+                .map(Document.class::cast)
+                .map(document -> document.getObjectOfLatestVersion(false))
+                .orElseThrow(() -> new ClientMessageException("Esperienza non trovata!"));
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("jconon_attachment:esperienza_non_coerente_motivazione", motivazione);
 		object.updateProperties(properties, Collections.singletonList(aspect), Collections.emptyList());
@@ -991,5 +1041,15 @@ public class ApplicationOIVService extends ApplicationService{
             result.put(PropertyIds.NAME, queryResult.getPropertyValueById(PropertyIds.NAME));
         }
         return result;
+    }
+
+    @Override
+    public Folder load(Session currentCMISSession, String callId, String applicationId, String userId, boolean preview, String contextURL, Locale locale) {
+	    final Folder application = super.load(currentCMISSession, callId, applicationId, userId, preview, contextURL, locale);
+        if (Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
+                .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent())
+            throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile modificarla!");
+
+        return application;
     }
 }
