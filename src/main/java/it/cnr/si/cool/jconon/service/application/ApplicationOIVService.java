@@ -652,6 +652,7 @@ public class ApplicationOIVService extends ApplicationService{
 		String body = Util.processTemplate(mailModel, "/pages/comunicazioni.html.ftl");
 		message.setSubject("Elenco OIV - Comunicazioni");
 		message.setBody(body);
+
 		message.setAttachments(Arrays.asList(new AttachmentBean("logo-mail.png",
                 IOUtils.toByteArray(this.getClass().getResourceAsStream("/META-INF/img/logo-mail.png")))));
 		mailService.send(message);
