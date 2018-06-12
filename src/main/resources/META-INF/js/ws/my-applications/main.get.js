@@ -523,6 +523,83 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                     customButtons.modificaProfilo = false;
                   }
                 }
+                customButtons.comunicazioni = function () {
+                    displayAttachments(el, 'jconon_attachment:generic_comunicazioni', Application.displayTitoli, 'actions.comunicazioni');
+                };
+                if (el['jconon_application:fl_preavviso_rigetto'] == true) {
+                  customButtons.preavviso_rigetto = function () {
+                    var bulkInfoAllegato = allegaDocumentoAllaDomanda(
+                        'D_jconon_attachment_response_preavviso_rigetto',
+                        el['cmis:objectId'],
+                        undefined,
+                        true,
+                        function (modal) {
+                            $(window).on('shown.bs.modal', function (event) {
+                                var scaricaPreavvisoRigetto = $('<a class="btn btn-info" id="scarica_preavviso_rigetto">Scarica preavviso rigetto</a>')
+                                    .off('click')
+                                    .on('click', function () {
+                                       $.ajax({
+                                         url: cache.baseUrl + '/rest/application-fp/scarica-preavviso-rigetto?idDomanda=' + el['cmis:objectId'],
+                                         type: 'GET',
+                                         success: function (data) {
+                                           window.location = cache.baseUrl + '/rest/content?nodeRef=' + data['cmis:objectId'];
+                                         },
+                                         error: URL.errorFn
+                                       });
+                                    });
+                                if (modal.find('#scarica_preavviso_rigetto').length == 0){
+                                    modal.find('.modal-footer').prepend(scaricaPreavvisoRigetto);
+                                }
+                                var textarea = modal.find('#testo');
+                                var ck = textarea.ckeditor({
+                                    toolbarGroups: [
+                                        { name: 'clipboard', groups: ['clipboard'] },
+                                        { name: 'basicstyles', groups: ['basicstyles'] },
+                                        { name: 'paragraph', groups: ['list', 'align'] }],
+                                        removePlugins: 'elementspath'
+                                });
+                                ck.editor.on('change', function () {
+                                  var html = ck.val();
+                                  textarea.parent().find('control-group widget').data('value', html || null);
+                                });
+
+                                ck.editor.on('setData', function (event) {
+                                  var html = event.data.dataValue;
+                                  textarea.parent().find('control-group widget').data('value', html || null);
+                                });
+                            });
+                        },
+                        true,
+                        true,
+                        true,
+                        'Preavviso di Rigetto',
+                        [
+                            {name: 'jconon_attachment:user',value: common.User.id}
+                        ],
+                        true,
+                        {
+                            rel: {
+                                'cmis:secondaryObjectTypeIds' : ['P:jconon_attachment:generic_comunicazioni'],
+                                'cmis:relObjectTypeId' : 'R:jconon_attachment:response_preavviso_rigetto'
+                             }
+                        },
+                        function (data) {
+                            $.ajax({
+                                url: cache.baseUrl + "/rest/application-fp/response-preavviso-rigetto",
+                                type: 'POST',
+                                data: {
+                                  idDomanda : el['cmis:objectId'],
+                                  idDocumento : data['cmis:objectId']
+                                },
+                                success: function (data) {
+                                   window.location = cache.baseUrl + '/my-applications';
+                                },
+                                error: jconon.error
+                            });
+                        }
+                    );
+                  };
+                }
                 if (el['jconon_application:fl_soccorso_istruttorio'] == true) {
                   customButtons.soccorso_istruttorio = function () {
                     var bulkInfoAllegato = allegaDocumentoAllaDomanda(
@@ -570,11 +647,14 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                         true,
                         true,
                         'Soccorso Istruttorio',
-                        [{name: 'jconon_attachment:user',value: common.User.id}],
+                        [
+                            {name: 'jconon_attachment:user',value: common.User.id}
+                        ],
                         true,
                         {
                             rel: {
-                                "cmis:relObjectTypeId" : 'R:jconon_attachment:response_soccorso_istruttorio'
+                                'cmis:secondaryObjectTypeIds' : ['P:jconon_attachment:generic_comunicazioni'],
+                                'cmis:relObjectTypeId' : 'R:jconon_attachment:response_soccorso_istruttorio'
                              }
                         },
                         function (data) {
@@ -586,7 +666,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                                   idDocumento : data['cmis:objectId']
                                 },
                                 success: function (data) {
-                                   $('#applyFilter').click();
+                                   window.location = cache.baseUrl + '/my-applications';
                                 },
                                 error: jconon.error
                             });
@@ -924,9 +1004,11 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                 scheda_valutazione: 'icon-table',
                 operations: 'icon-list',
                 escludi: 'icon-arrow-down',
+                comunicazioni: 'icon-envelope text-info',
                 comunicazione: 'icon-envelope text-success',
                 inserisci: 'icon-arrow-up',
                 assegna_fascia: 'icon-edit',
+                preavviso_rigetto: 'icon-dashboard text-error',
                 soccorso_istruttorio: 'icon-dashboard text-error'
               }, undefined, true).appendTo(target);
             }

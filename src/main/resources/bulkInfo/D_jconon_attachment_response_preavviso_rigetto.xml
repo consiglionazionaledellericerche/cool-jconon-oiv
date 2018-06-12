@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bulkInfo xmlns="http://www.cnr.it/schema/BulkInfo_v2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          cmisQueryName="jconon_attachment:response_preavviso_rigetto"
+          cmisTypeName="D:jconon_attachment:response_preavviso_rigetto"
+          longDescription="Preavviso Rigetto"
+          shortDescription="Preavviso Rigetto"
+          xsi:schemaLocation="http://www.cnr.it/schema/BulkInfo_v2 BulkInfo_v2">
+
+    <fieldProperty
+            class="span8"
+            inputType="TEXTAREA"
+            rows="5"
+            name="testo"
+            property="jconon_attachment:testo_response_preavviso_rigetto">
+        <jsonlabel
+                default="Testo:"
+                key="label.jconon_attachment.testo_response_preavviso_rigetto"/>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+
+
+    <formFieldProperty name="testo"/>
+    <columnFieldProperty name="testo"/>
+
+</bulkInfo>

@@ -197,8 +197,24 @@ public class ApplicationOIV {
     }
 
 	@POST
-	@Path("soccorso-istruttorio")
+	@Path("preavviso-rigetto")
 	@Produces(MediaType.APPLICATION_JSON)
+    public Response preavvisoRigetto(@Context HttpServletRequest req, @QueryParam("idDomanda") String idDomanda, @QueryParam("fileName") String fileName) throws IOException{
+        ResponseBuilder rb;
+        try {
+            Session session = cmisService.getCurrentCMISSession(req);
+            Map<String, Object> model = applicationOIVService.preavvisoRigetto(session, req, idDomanda, fileName, cmisService.getCMISUserFromSession(req));
+            rb = Response.ok(model);
+        } catch (ClientMessageException | CMISApplicationException | TemplateException e) {
+            LOGGER.warn("send error", e);
+            rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+        }
+        return rb.build();
+	}
+
+    @POST
+    @Path("soccorso-istruttorio")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response soccorsoIstruttorio(@Context HttpServletRequest req, @QueryParam("idDomanda") String idDomanda, @QueryParam("fileName") String fileName) throws IOException{
         ResponseBuilder rb;
         try {
@@ -210,7 +226,7 @@ public class ApplicationOIV {
             rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
         }
         return rb.build();
-	}
+    }
 
     @GET
     @Path("soccorso-istruttorio")
@@ -242,6 +258,21 @@ public class ApplicationOIV {
         return rb.build();
     }
 
+    @GET
+    @Path("scarica-preavviso-rigetto")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response scaricaPreavvisoRigetto(@Context HttpServletRequest req, @QueryParam("idDomanda") String idDomanda) throws IOException{
+        ResponseBuilder rb;
+        try {
+            Session session = cmisService.getCurrentCMISSession(req);
+            rb = Response.ok(applicationOIVService.scaricaPreavvisoRigetto(session, idDomanda));
+        } catch (ClientMessageException | CMISApplicationException e) {
+            LOGGER.warn("scarica-preavviso-rigetto error", e);
+            rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+        }
+        return rb.build();
+    }
+
     @POST
     @Path("response-soccorso-istruttorio")
     @Produces(MediaType.APPLICATION_JSON)
@@ -257,4 +288,36 @@ public class ApplicationOIV {
         }
         return rb.build();
     }
+
+    @POST
+    @Path("response-preavviso-rigetto")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response responsePreavvisoRigetto(@Context HttpServletRequest req, @FormParam("idDomanda") String idDomanda, @FormParam("idDocumento") String idDocumento) throws IOException{
+        ResponseBuilder rb;
+        try {
+            Session session = cmisService.getCurrentCMISSession(req);
+            Map<String, Object> model = applicationOIVService.responsePreavvisoRigetto(session, req, idDomanda, idDocumento, cmisService.getCMISUserFromSession(req));
+            rb = Response.ok(model);
+        } catch (ClientMessageException | CMISApplicationException | TemplateException e) {
+            LOGGER.warn("send error", e);
+            rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+        }
+        return rb.build();
+    }
+
+	@POST
+	@Path("comunicazioni")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response comunicazioni(@Context HttpServletRequest req, @QueryParam("idDomanda") String idDomanda, @QueryParam("fileName") String fileName, @QueryParam("type") ApplicationOIVService.PdfType type) throws IOException{
+		ResponseBuilder rb;
+		try {
+			Session session = cmisService.getCurrentCMISSession(req);
+			Map<String, Object> model = applicationOIVService.comunicazioni(session, req, idDomanda, fileName, type, cmisService.getCMISUserFromSession(req));
+			rb = Response.ok(model);
+		} catch (ClientMessageException | CMISApplicationException | TemplateException e) {
+			LOGGER.warn("send error", e);
+			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
+		}
+		return rb.build();
+	}
 }
