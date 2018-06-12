@@ -5,7 +5,7 @@
 <br>
 <p>Cordiali saluti</p>
 <br>
-<image src="cid:logo-mail.png"/>
+<img src="cid:logo-mail.png"></img>
 <p style="color: #0066cc; font-weight: bold; font-style: italic">UVP - Ufficio per la Valutazione della Performance</p>
 <p style="color: #0066cc; font-weight: bold; font-style: italic">Via del Sudario, n. 49 - 00186 Roma</p>
 <p style="color: #0066cc; font-weight: bold; font-style: italic">Tel. 06 68997584</p>
