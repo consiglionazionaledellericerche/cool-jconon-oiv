@@ -652,6 +652,8 @@ public class ApplicationOIVService extends ApplicationService{
 		String body = Util.processTemplate(mailModel, "/pages/comunicazioni.html.ftl");
 		message.setSubject("Elenco OIV - Comunicazioni");
 		message.setBody(body);
+		message.setAttachments(Arrays.asList(new AttachmentBean("logo-mail.png",
+                IOUtils.toByteArray(this.getClass().getResourceAsStream("/META-INF/img/logo-mail.png")))));
 		mailService.send(message);
 	}
 
@@ -676,7 +678,9 @@ public class ApplicationOIVService extends ApplicationService{
 			}			
 			Document latestDocumentVersion = (Document) session.getObject(session.getLatestDocumentVersion(docId, true, session.getDefaultContext()));
 	    	Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
-	    		if (eseguiControlloFascia && fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA))) {
+	    		if (eseguiControlloFascia &&
+						fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)) &&
+						Optional.ofNullable(application.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).isPresent()) {
 	    			throw new ClientMessageException(
 	    					i18nService.getLabel("message.error.domanda.fascia.equals", Locale.ITALIAN, fascia));
 	    		}
