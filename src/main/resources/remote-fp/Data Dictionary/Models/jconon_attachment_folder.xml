@@ -884,6 +884,21 @@
 			<description>Soccorso Istruttorio</description>
 			<parent>cm:content</parent>
 		</type>
+        <type name="jconon_attachment:preavviso_rigetto">
+            <title>Preavviso Rigetto</title>
+            <description>Preavviso Rigetto</description>
+            <parent>cm:content</parent>
+        </type>
+		<type name="jconon_attachment:rigetto">
+			<title>Rigetto</title>
+			<description>Rigetto</description>
+			<parent>cm:content</parent>
+		</type>
+        <type name="jconon_attachment:improcedibile">
+            <title>Domanda Improcedibile</title>
+            <description>Domanda Improcedibile</description>
+            <parent>cm:content</parent>
+        </type>
         <type name="jconon_attachment:response_soccorso_istruttorio">
             <title>Risposta al Soccorso Istruttorio</title>
             <description>Risposta al Soccorso Istruttorio</description>
@@ -916,6 +931,38 @@
                 </association>
             </associations>
         </type>
+        <type name="jconon_attachment:response_preavviso_rigetto">
+            <title>Risposta al Preavviso di Rigetto</title>
+            <description>Risposta al Ppreavviso di Rigetto</description>
+            <parent>cm:content</parent>
+            <properties>
+                <property name="jconon_attachment:testo_response_preavviso_rigetto">
+                    <title>testo response preavviso rigetto</title>
+                    <description>testo response preavviso rigetto</description>
+                    <type>d:text</type>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+            </properties>
+            <associations>
+                <association name="jconon_attachment:response_preavviso_rigetto">
+                    <source>
+                        <role>cm:partOf</role>
+                        <mandatory>false</mandatory>
+                        <many>true</many>
+                    </source>
+                    <target>
+                        <class>cm:content</class>
+                        <role>cm:hasPart</role>
+                        <mandatory>false</mandatory>
+                        <many>true</many>
+                    </target>
+                </association>
+            </associations>
+        </type>
 	</types>
 	<aspects>
 		<aspect name="jconon_attachment:generic_document">
@@ -926,6 +973,9 @@
 		</aspect>
 		<aspect name="jconon_attachment:document_from_rdp">
 			<title>Documento allegato dal Responsabile del Procedimento.</title>
+		</aspect>
+		<aspect name="jconon_attachment:generic_comunicazioni">
+			<title>Comunicazioni</title>
 		</aspect>
 		<aspect name="jconon_attachment:aspect_specializzazioni">
 			<title>Aspect specializzazioni</title>

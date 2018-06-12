@@ -142,6 +142,13 @@ public class ApplicationOIVService extends ApplicationService{
 	public static final String FASCIA1 = "1", FASCIA2 = "2", FASCIA3 = "3";
 	public static final String EMAIL_DOMANDE_OIV = "EMAIL_DOMANDE_OIV";
     public static final String JCONON_APPLICATION_ACTIVITY_ID = "jconon_application:activityId";
+    public static final String JCONON_ATTACHMENT_PREAVVISO_RIGETTO = "jconon_attachment:preavviso_rigetto";
+    public static final String JCONON_ATTACHMENT_SOCCORSO_ISTRUTTORIO = "jconon_attachment:soccorso_istruttorio";
+    public static final String P_JCONON_ATTACHMENT_GENERIC_COMUNICAZIONI = "P:jconon_attachment:generic_comunicazioni";
+    public static final String D_JCONON_ATTACHMENT_SOCCORSO_ISTRUTTORIO = "D:jconon_attachment:soccorso_istruttorio";
+    public static final String D_JCONON_ATTACHMENT_PREAVVISO_RIGETTO = "D:jconon_attachment:preavviso_rigetto";
+    public static final String JCONON_APPLICATION_FL_PREAVVISO_RIGETTO = "jconon_application:fl_preavviso_rigetto";
+    public static final String JCONON_APPLICATION_FL_SOCCORSO_ISTRUTTORIO = "jconon_application:fl_soccorso_istruttorio";
 
     @Autowired
 	private CMISService cmisService;
@@ -401,15 +408,20 @@ public class ApplicationOIVService extends ApplicationService{
                 .filter(Document.class::isInstance)
                 .map(Document.class::cast)
                 .collect(Collectors.toList());
+
         TaskResponse currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
                 .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
                 .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody()).orElseThrow(() -> new RuntimeException("Task corrente non trovato!"));
 
-        flowsService.completeTask(application,currentTask,testo, allegati);
+        flowsService.completeTask(application,currentTask,testo, allegati, TaskResponse.SOCCORSO_ISTRUTTORIO);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("jconon_application:fl_soccorso_istruttorio", false);
+        properties.put(JCONON_APPLICATION_FL_SOCCORSO_ISTRUTTORIO, false);
         cmisService.createAdminSession().getObject(idDomanda).updateProperties(properties);
+
+        allegati.stream()
+                .forEach(object -> aclService.changeOwnership(cmisService.getAdminSession(), object.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
+                        adminUserName, false, Collections.emptyList()));
 
         Map<String, ACLType> aces = new HashMap<String, ACLType>();
         aces.put(application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()), ACLType.Contributor);
@@ -418,17 +430,54 @@ public class ApplicationOIVService extends ApplicationService{
         return Collections.emptyMap();
     }
 
-    public Map<String, Object> soccorsoIstruttorio(Session session, HttpServletRequest req, String idDomanda, String fileName, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
-		final String userId = user.getId();
-		MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
-        MultipartFile file = Optional.ofNullable(mRequest.getFile("file"))
-                .orElseThrow(() -> new RuntimeException("File for soccorso istruttorio is not present in request"));
+    public Map<String, Object> responsePreavvisoRigetto(Session session, HttpServletRequest req, String idDomanda, String idDocumento, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
+        Folder application = loadApplicationById(session, idDomanda, null);
+        OperationContext context = session.getDefaultContext();
+        context.setIncludeRelationships(IncludeRelationships.SOURCE);
+        final Document document = Optional.ofNullable(session.getObject(idDocumento, context))
+                .filter(Document.class::isInstance)
+                .map(Document.class::cast)
+                .orElseThrow(() -> new RuntimeException("File for preavviso rigetto is not present in request"));
+        String testo = document.getPropertyValue("jconon_attachment:testo_response_preavviso_rigetto");
+        final List<Document> allegati = document.getRelationships().stream()
+                .filter(relationship -> relationship.getType().getId().equals("R:jconon_attachment:response_preavviso_rigetto"))
+                .map(relationship -> relationship.getTarget())
+                .filter(Document.class::isInstance)
+                .map(Document.class::cast)
+                .collect(Collectors.toList());
 
-		LOGGER.debug("soccorso istruttorio application : {}", idDomanda);
+        TaskResponse currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
+                .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
+                .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody()).orElseThrow(() -> new RuntimeException("Task corrente non trovato!"));
+
+        flowsService.completeTask(application,currentTask,testo, allegati, TaskResponse.PREAVVISO_RIGETTO);
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(JCONON_APPLICATION_FL_PREAVVISO_RIGETTO, false);
+        cmisService.createAdminSession().getObject(idDomanda).updateProperties(properties);
+
+        allegati.stream()
+                .forEach(object -> aclService.changeOwnership(cmisService.getAdminSession(), object.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
+                        adminUserName, false, Collections.emptyList()));
+
+        Map<String, ACLType> aces = new HashMap<String, ACLType>();
+        aces.put(application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()), ACLType.Contributor);
+        aclService.removeAcl(cmisService.getAdminSession(), application.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
+
+        return Collections.emptyMap();
+    }
+
+    public Map<String, Object> preavvisoRigetto(Session session, HttpServletRequest req, String idDomanda, String fileName, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
+        final String userId = user.getId();
+        MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
+        MultipartFile file = Optional.ofNullable(mRequest.getFile("file"))
+                .orElseThrow(() -> new RuntimeException("File for preavviso di rigetto is not present in request"));
+
+        LOGGER.debug("preavviso di rigetto application : {}", idDomanda);
         Folder application = loadApplicationById(session, idDomanda, null);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("jconon_application:fl_soccorso_istruttorio", true);
+        properties.put(JCONON_APPLICATION_FL_PREAVVISO_RIGETTO, true);
         application.updateProperties(properties);
 
         Map<String, ACLType> aces = new HashMap<String, ACLType>();
@@ -441,7 +490,60 @@ public class ApplicationOIVService extends ApplicationService{
                 file.getInputStream());
         Map<String, Object> propertiesFile = new HashMap<String, Object>();
         propertiesFile.put(PropertyIds.NAME, fileName);
-        propertiesFile.put(PropertyIds.OBJECT_TYPE_ID, "D:jconon_attachment:soccorso_istruttorio");
+        propertiesFile.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, Collections.singletonList(P_JCONON_ATTACHMENT_GENERIC_COMUNICAZIONI));
+        propertiesFile.put(PropertyIds.OBJECT_TYPE_ID, D_JCONON_ATTACHMENT_PREAVVISO_RIGETTO);
+
+        List<CmisObject> children = new ArrayList<>();
+        application
+                .getChildren()
+                .forEach(cmisObject -> children.add(cmisObject));
+        Optional<Document> document = children
+                .stream()
+                .filter(cmisObject -> cmisObject.getType().getId().equalsIgnoreCase(D_JCONON_ATTACHMENT_PREAVVISO_RIGETTO))
+                .filter(Document.class::isInstance)
+                .map(Document.class::cast)
+                .findAny();
+        if (document.isPresent())
+            document.get().setContentStream(contentStream, true);
+        else
+            document = Optional.ofNullable(application.createDocument(propertiesFile, contentStream, VersioningState.MAJOR));
+
+        CMISUser applicationUser;
+        try {
+            applicationUser = userService.loadUserForConfirm(
+                    application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
+            notificaMail(applicationUser, req);
+        } catch (CoolUserFactoryException e) {
+            LOGGER.error("User not found for send email", e);
+        }
+        return Collections.singletonMap("idDocumento", document.get().getId());
+    }
+
+    public Map<String, Object> soccorsoIstruttorio(Session session, HttpServletRequest req, String idDomanda, String fileName, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
+		final String userId = user.getId();
+		MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
+        MultipartFile file = Optional.ofNullable(mRequest.getFile("file"))
+                .orElseThrow(() -> new RuntimeException("File for soccorso istruttorio is not present in request"));
+
+		LOGGER.debug("soccorso istruttorio application : {}", idDomanda);
+        Folder application = loadApplicationById(session, idDomanda, null);
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(JCONON_APPLICATION_FL_SOCCORSO_ISTRUTTORIO, true);
+        application.updateProperties(properties);
+
+        Map<String, ACLType> aces = new HashMap<String, ACLType>();
+        aces.put(application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()), ACLType.Contributor);
+        aclService.addAcl(cmisService.getAdminSession(), application.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
+
+        ContentStream contentStream = new ContentStreamImpl(fileName,
+                BigInteger.valueOf(file.getInputStream().available()),
+                MimeTypes.PDF.mimetype(),
+                file.getInputStream());
+        Map<String, Object> propertiesFile = new HashMap<String, Object>();
+        propertiesFile.put(PropertyIds.NAME, fileName);
+        propertiesFile.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, Collections.singletonList(P_JCONON_ATTACHMENT_GENERIC_COMUNICAZIONI));
+        propertiesFile.put(PropertyIds.OBJECT_TYPE_ID, D_JCONON_ATTACHMENT_SOCCORSO_ISTRUTTORIO);
 
         List<CmisObject> children = new ArrayList<>();
         application
@@ -450,7 +552,7 @@ public class ApplicationOIVService extends ApplicationService{
         Optional<Document> document = children
 
                 .stream()
-                .filter(cmisObject -> cmisObject.getType().getId().equalsIgnoreCase("D:jconon_attachment:soccorso_istruttorio"))
+                .filter(cmisObject -> cmisObject.getType().getId().equalsIgnoreCase(D_JCONON_ATTACHMENT_SOCCORSO_ISTRUTTORIO))
                 .filter(Document.class::isInstance)
                 .map(Document.class::cast)
                 .findAny();
@@ -469,6 +571,74 @@ public class ApplicationOIVService extends ApplicationService{
         }
         return Collections.singletonMap("idDocumento", document.get().getId());
 	}
+
+    public enum PdfType {
+        rigetto("D:jconon_attachment:rigetto"),
+        rigettoMotivato("D:jconon_attachment:rigetto"),
+        rigettoDopoPreavviso("D:jconon_attachment:rigetto"),
+        rigettoDopo10Giorni("D:jconon_attachment:rigetto"),
+        RigettoDef10Giorni("D:jconon_attachment:rigetto"),
+        improcedibile("D:jconon_attachment:improcedibile"),
+        preavvisoRigetto("D:jconon_attachment:preavviso_rigetto"),
+        soccorsoIstruttorio(""),
+        preavvisoRigettoDef10Giorni(""),
+        preavvisoRigettoCambioFascia("");
+        private String value;
+
+        PdfType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+    }
+
+    public Map<String, Object> comunicazioni(Session session, HttpServletRequest req, String idDomanda, String fileName, PdfType type, CMISUser user) throws CMISApplicationException, IOException, TemplateException {
+        final String userId = user.getId();
+        MultipartHttpServletRequest mRequest = resolver.resolveMultipart(req);
+        MultipartFile file = Optional.ofNullable(mRequest.getFile("file"))
+                .orElseThrow(() -> new RuntimeException("File for comunicazioni is not present in request"));
+
+        LOGGER.debug("comunicazioni application : {} & type {}", idDomanda, type);
+        Folder application = loadApplicationById(session, idDomanda, null);
+
+        ContentStream contentStream = new ContentStreamImpl(fileName,
+                BigInteger.valueOf(file.getInputStream().available()),
+                MimeTypes.PDF.mimetype(),
+                file.getInputStream());
+        Map<String, Object> propertiesFile = new HashMap<String, Object>();
+        propertiesFile.put(PropertyIds.NAME, fileName);
+        propertiesFile.put(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, Collections.singletonList(P_JCONON_ATTACHMENT_GENERIC_COMUNICAZIONI));
+        propertiesFile.put(PropertyIds.OBJECT_TYPE_ID, type.value);
+
+        List<CmisObject> children = new ArrayList<>();
+        application
+                .getChildren()
+                .forEach(cmisObject -> children.add(cmisObject));
+        Optional<Document> document = children
+
+                .stream()
+                .filter(cmisObject -> cmisObject.getType().getId().equalsIgnoreCase(type.value))
+                .filter(Document.class::isInstance)
+                .map(Document.class::cast)
+                .findAny();
+        if (document.isPresent())
+            document.get().setContentStream(contentStream, true);
+        else
+            document = Optional.ofNullable(application.createDocument(propertiesFile, contentStream, VersioningState.MAJOR));
+
+        CMISUser applicationUser;
+        try {
+            applicationUser = userService.loadUserForConfirm(
+                    application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
+            notificaMail(applicationUser, req);
+        } catch (CoolUserFactoryException e) {
+            LOGGER.error("User not found for send email", e);
+        }
+        return Collections.singletonMap("idDocumento", document.get().getId());
+    }
 
 	private void notificaMail(CMISUser user, HttpServletRequest req) throws IOException, TemplateException {
 		Map<String, Object> mailModel = new HashMap<String, Object>();
@@ -1031,7 +1201,21 @@ public class ApplicationOIVService extends ApplicationService{
 
     public Map<String, String> scaricaSoccorsoIstruttorio(Session currentCMISSession, final String applicationSourceId) {
         Map<String, String> result = new HashMap<>();
-        Criteria criteria = CriteriaFactory.createCriteria("jconon_attachment:soccorso_istruttorio");
+        Criteria criteria = CriteriaFactory.createCriteria(JCONON_ATTACHMENT_SOCCORSO_ISTRUTTORIO);
+        criteria.addColumn(PropertyIds.OBJECT_ID);
+        criteria.addColumn(PropertyIds.NAME);
+        criteria.add(Restrictions.inFolder(applicationSourceId));
+        ItemIterable<QueryResult> iterable = criteria.executeQuery(currentCMISSession, false, currentCMISSession.getDefaultContext());
+        for (QueryResult queryResult : iterable) {
+            result.put(PropertyIds.OBJECT_ID, queryResult.getPropertyValueById(PropertyIds.OBJECT_ID));
+            result.put(PropertyIds.NAME, queryResult.getPropertyValueById(PropertyIds.NAME));
+        }
+        return result;
+    }
+
+    public Map<String, String> scaricaPreavvisoRigetto(Session currentCMISSession, final String applicationSourceId) {
+        Map<String, String> result = new HashMap<>();
+        Criteria criteria = CriteriaFactory.createCriteria(JCONON_ATTACHMENT_PREAVVISO_RIGETTO);
         criteria.addColumn(PropertyIds.OBJECT_ID);
         criteria.addColumn(PropertyIds.NAME);
         criteria.add(Restrictions.inFolder(applicationSourceId));

@@ -15,7 +15,7 @@ ipa:
     amministrazioni: ${ipa.url.base}?dstype=FS&filename=amministrazioni.txt
 
 flows:
-  resource: http://as3dock.si.cnr.it:9201
+  resource: http://localhost:8082
   token: ${flows.resource}/oauth/token
   authorize: ${flows.resource}/oauth/authorize
   taskComplete: ${flows.resource}/api/tasks/complete

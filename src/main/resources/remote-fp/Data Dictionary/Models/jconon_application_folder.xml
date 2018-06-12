@@ -907,6 +907,11 @@
                     <description>Domanda in soccorso istruttorio</description>
                     <type>d:boolean</type>
                 </property>
+                <property name="jconon_application:fl_preavviso_rigetto">
+                    <title>Domanda in preavviso rigetto</title>
+                    <description>Domanda in preavviso rigetto</description>
+                    <type>d:boolean</type>
+                </property>
             </properties>
             <associations>
                 <association name="jconon_application:ass_curriculum">

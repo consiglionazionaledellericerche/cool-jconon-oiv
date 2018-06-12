@@ -132,18 +132,20 @@ public class FlowsService {
     public ResponseEntity<StartWorkflowResponse> completeTask(Folder domanda,
                                                               TaskResponse currentTask,
                                                               String testoSoccorso,
-                                                              List<Document> attachment) throws IOException {
+                                                              List<Document> attachment, String task) throws IOException {
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
         params.add("processDefinitionId", processDefinitionId);
         params.add("taskId", currentTask.getId());
         params.add("sceltaUtente", "invia_a_istruttoria");
-        params.add("dataInvioSoccorsoIstruttorio", DateTimeFormatter.ISO_DATE_TIME.format(ZonedDateTime.ofInstant(Calendar.getInstance().toInstant(), ZoneId.systemDefault())));
+        params.add(task.equals(TaskResponse.SOCCORSO_ISTRUTTORIO) ? "dataInvioSoccorsoIstruttorio" : "dataInvioNuovaDomanda", DateTimeFormatter.ISO_DATE_TIME.format(ZonedDateTime.ofInstant(Calendar.getInstance().toInstant(), ZoneId.systemDefault())));
+
         params.add("fasciaAppartenenzaProposta", domanda.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita"));
-        params.add("osservazioniSoccorsoRichiedente", testoSoccorso);
+        params.add(task.equals(TaskResponse.SOCCORSO_ISTRUTTORIO) ? "osservazioniSoccorsoRichiedente" : "osservazioniRichiedente", testoSoccorso);
+        String variableFileName = task.equals(TaskResponse.SOCCORSO_ISTRUTTORIO) ? "osservazioni-soccorso-richiedente-allegato-" : "osservazioni-preavviso-rigetto-allegato-";
         AtomicInteger index = new AtomicInteger();
         attachment.stream()
                 .forEach(document -> {
-                    params.add("osservazioni-soccorso-richiedente-allegato-" + index.incrementAndGet(), new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()));
+                    params.add(variableFileName + index.incrementAndGet(), new MultipartInputStreamFileResource(document.getContentStream().getStream(), document.getName()));
                 });
 
         HttpHeaders headers = new HttpHeaders();
