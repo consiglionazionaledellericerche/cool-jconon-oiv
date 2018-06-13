@@ -512,7 +512,7 @@ public class ApplicationOIVService extends ApplicationService{
         try {
             applicationUser = userService.loadUserForConfirm(
                     application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
-            notificaMail(applicationUser, req);
+            notificaMail(applicationUser);
         } catch (CoolUserFactoryException e) {
             LOGGER.error("User not found for send email", e);
         }
@@ -565,7 +565,7 @@ public class ApplicationOIVService extends ApplicationService{
         try {
             applicationUser = userService.loadUserForConfirm(
                     application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
-            notificaMail(applicationUser, req);
+            notificaMail(applicationUser);
         } catch (CoolUserFactoryException e) {
             LOGGER.error("User not found for send email", e);
         }
@@ -633,28 +633,27 @@ public class ApplicationOIVService extends ApplicationService{
         try {
             applicationUser = userService.loadUserForConfirm(
                     application.getPropertyValue(JCONONPropertyIds.APPLICATION_USER.value()));
-            notificaMail(applicationUser, req);
+            notificaMail(applicationUser);
         } catch (CoolUserFactoryException e) {
             LOGGER.error("User not found for send email", e);
         }
         return Collections.singletonMap("idDocumento", document.get().getId());
     }
 
-	private void notificaMail(CMISUser user, HttpServletRequest req) throws IOException, TemplateException {
+	public void notificaMail(CMISUser user) throws IOException, TemplateException {
 		Map<String, Object> mailModel = new HashMap<String, Object>();
 		List<String> emailList = new ArrayList<String>();
 		emailList.add(user.getEmail());
 		mailModel.put("message", context.getBean("messageMethod", Locale.ITALIAN));
 		mailModel.put("user", user);
-        mailModel.put("contextURL", getContextURL(req));
-		EmailMessage message = new EmailMessage();
+        EmailMessage message = new EmailMessage();
 		message.setRecipients(emailList);
 		String body = Util.processTemplate(mailModel, "/pages/comunicazioni.html.ftl");
 		message.setSubject("Elenco OIV - Comunicazioni");
 		message.setBody(body);
 
 		message.setAttachments(Arrays.asList(new AttachmentBean("logo-mail.png",
-                IOUtils.toByteArray(this.getClass().getResourceAsStream("/META-INF/img/logo-mail.png")))));
+                IOUtils.toByteArray(this.getClass().getResourceAsStream("/META-INF/img/logo-mail.png"))).setInline(true).setContentType("image/x-png")));
 		mailService.send(message);
 	}
 
