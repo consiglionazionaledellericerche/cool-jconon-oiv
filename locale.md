@@ -1,2 +1,2 @@
-it_I
+it_IT
 en_US
