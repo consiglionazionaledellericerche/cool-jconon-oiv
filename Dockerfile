@@ -1,5 +1,6 @@
 # DOCKER-VERSION 1.12
 FROM anapsix/alpine-java:jdk8
+RUN apt-get install language-pack-it
 MAINTAINER Francesco Uliana <francesco.uliana@cnr.it>
 
 COPY target/*.war /opt/jconon.war
