@@ -5,9 +5,9 @@ jcononfunzionepubblica:
   ports:
   - 8980:8080
   environment:
-  - LANG=en_US.UTF-8
-  - LANGUAGE=en_US:en
-  - LC_ALL=en_US.UTF-8
+  - LANG=it_IT.UTF-8
+  - LANGUAGE=it_IT:it
+  - LC_ALL=it_IT.UTF-8
   - SERVICE_TAGS=webapp
   - SERVICE_NAME=##{SERVICE_NAME}##
   labels:
