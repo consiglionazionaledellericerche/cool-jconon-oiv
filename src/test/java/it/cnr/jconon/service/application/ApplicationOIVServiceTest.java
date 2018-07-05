@@ -102,13 +102,24 @@ public class ApplicationOIVServiceTest {
     }
 
     public static void main(String[] args) {
-        aggiornaEseguiControlloFascia();
+        riammettiNellElenco();
     }
 
+	public static void riammettiNellElenco() {
+		Session session = getRepositorySession("admin","Alf4FpPw");
+		final CmisObject object = session.getObject("11c408f8-55da-4a81-b11d-d3fd76458fbe");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("jconon_application:esclusione_rinuncia", null);
+		map.put("jconon_application:fl_rimosso_elenco", false);
+		map.put("jconon_application:data_rimozione_elenco", null);
+		object.updateProperties(map);
+	}
+
 	public static void escludiDallElenco() {
-        Session session = getRepositorySession("admin","***********");
+        Session session = getRepositorySession("admin","Alf4FpPw");
         final CmisObject object = session.getObject("b7356c91-1cfd-40eb-ac35-d43bfcfef416");
         Map<String, Object> map = new HashMap<String, Object>();
+		map.put("jconon_application:esclusione_rinuncia", "R");
         map.put("jconon_application:fl_rimosso_elenco", true);
         map.put("jconon_application:data_rimozione_elenco", new GregorianCalendar(2017,Calendar.SEPTEMBER,6));
         object.updateProperties(map);
