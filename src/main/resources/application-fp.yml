@@ -15,6 +15,7 @@ ipa:
     amministrazioni: ${ipa.url.base}?dstype=FS&filename=amministrazioni.txt
 
 flows:
+  enable: false
   resource: http://demoscrivaniadigitale.si.cnr.it
   token: ${flows.resource}/oauth/token
   authorize: ${flows.resource}/oauth/authorize
