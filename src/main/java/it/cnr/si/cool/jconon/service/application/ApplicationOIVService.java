@@ -188,7 +188,10 @@ public class ApplicationOIVService extends ApplicationService{
 	
 	@Value("${user.admin.username}")
 	private String adminUserName;
-	
+
+	@Value("${flows.anable}")
+	private Boolean flowsEnable;
+
 	@Override
 	public Folder save(Session currentCMISSession,
 			String contextURL, Locale locale,
@@ -697,29 +700,30 @@ public class ApplicationOIVService extends ApplicationService{
         ApplicationModel applicationModel = new ApplicationModel(application, session.getDefaultContext(), i18nService.loadLabels(Locale.ITALIAN), getContextURL(req));
         applicationModel.getProperties().put(PropertyIds.OBJECT_ID, idApplication);
         sendApplication(cmisService.createAdminSession(), idApplication, getContextURL(req), Locale.ITALIAN, userId, applicationModel.getProperties(), applicationModel.getProperties());
-
-        if (Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
-                .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
-            throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile procedere con un nuovo invio!");
-        } else {
-            final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(application,
-                    getQueryResultEsperienza(session, application),
-                    getQueryResultsOiv(session, application),
-                    file,
-                    Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_CURRICULUM_VITAE))
-                            .map(id ->  session.getObject(id))
-                            .filter(Document.class::isInstance)
-                            .map(Document.class::cast)
-                            .orElse(null),
-                    Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_DOCUMENTO_RICONOSCIMENTO))
-                            .map(id ->  session.getObject(id))
-                            .filter(Document.class::isInstance)
-                            .map(Document.class::cast)
-                            .orElse(null)
-            );
-            application.updateProperties(Collections.singletonMap(JCONON_APPLICATION_ACTIVITY_ID, startWorkflowResponseResponseEntity.getBody().getId()));
-            LOGGER.info(String.valueOf(startWorkflowResponseResponseEntity.getBody()));
-        }
+		if (flowsEnable) {
+			if (Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
+					.filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
+				throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile procedere con un nuovo invio!");
+			} else {
+				final ResponseEntity<StartWorkflowResponse> startWorkflowResponseResponseEntity = flowsService.startWorkflow(application,
+						getQueryResultEsperienza(session, application),
+						getQueryResultsOiv(session, application),
+						file,
+						Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_CURRICULUM_VITAE))
+								.map(id ->  session.getObject(id))
+								.filter(Document.class::isInstance)
+								.map(Document.class::cast)
+								.orElse(null),
+						Optional.ofNullable(competitionFolderService.findAttachmentId(session, application.getId(), JCONONDocumentType.JCONON_ATTACHMENT_DOCUMENTO_RICONOSCIMENTO))
+								.map(id ->  session.getObject(id))
+								.filter(Document.class::isInstance)
+								.map(Document.class::cast)
+								.orElse(null)
+				);
+				application.updateProperties(Collections.singletonMap(JCONON_APPLICATION_ACTIVITY_ID, startWorkflowResponseResponseEntity.getBody().getId()));
+				LOGGER.info(String.valueOf(startWorkflowResponseResponseEntity.getBody()));
+			}
+		}
         Map<String, Object> objectPrintModel = new HashMap<String, Object>();
         objectPrintModel.put(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA, application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
         objectPrintModel.put(PropertyIds.OBJECT_TYPE_ID, JCONONDocumentType.JCONON_ATTACHMENT_APPLICATION.value());
@@ -1140,7 +1144,7 @@ public class ApplicationOIVService extends ApplicationService{
 				newApplication.getPropertyValue(JCONONPropertyIds.APPLICATION_ESCLUSIONE_RINUNCIA.value()).equals(StatoDomanda.ESCLUSA.getValue())) {
 			throw new ClientMessageException("La domanda è stata esclusa, non è possibile modificarla nuovamente!");
 		}
-		if (Optional.ofNullable(newApplication.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
+		if (flowsEnable && Optional.ofNullable(newApplication.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
 				.filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
                 throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile modificarla!");
 		} else {
@@ -1234,7 +1238,7 @@ public class ApplicationOIVService extends ApplicationService{
     @Override
     public Folder load(Session currentCMISSession, String callId, String applicationId, String userId, boolean preview, String contextURL, Locale locale) {
 	    final Folder application = super.load(currentCMISSession, callId, applicationId, userId, preview, contextURL, locale);
-        if (Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
+        if (flowsEnable && Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
                 .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent())
             throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile modificarla!");
 
