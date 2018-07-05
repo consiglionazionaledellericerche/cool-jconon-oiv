@@ -64,6 +64,7 @@ import org.apache.chemistry.opencmis.client.api.ItemIterable;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.bindings.spi.BindingSession;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Output;
 import org.apache.chemistry.opencmis.client.bindings.spi.http.Response;
 import org.apache.chemistry.opencmis.client.runtime.OperationContextImpl;
@@ -106,6 +107,7 @@ public class ApplicationOIVService extends ApplicationService{
 	private static final String JCONON_APPLICATION_FASCIA_PROFESSIONALE_VALIDATA = "jconon_application:fascia_professionale_validata";
 	public static final String P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE = "P:jconon_scheda_anonima:esperienza_non_coerente";
 	private static final String ELENCO_OIV_XLS = "elenco-oiv.xls";
+	private static final String ELENCO_OIV_DOMANDE_XLS = "elenco-oiv-domande.xls";
 	private static final String NUMERO_OIV_JSON = "elenco-oiv.json";
 
 	private static final String OIV = "OIV";
@@ -910,8 +912,9 @@ public class ApplicationOIVService extends ApplicationService{
     		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
         	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
         		try {
-            		Folder call = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));        		
-            		List<String> emailList = groupService.children(EMAIL_DOMANDE_OIV, cmisService.getAdminSession())
+            		Folder call = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
+					final BindingSession adminSession = cmisService.getAdminSession();
+					List<String> emailList = groupService.children(EMAIL_DOMANDE_OIV, adminSession)
             				.stream()
             				.filter(x -> !x.getShortName().equals("app.performance"))
             				.map(CMISAuthority::getShortName)
@@ -921,12 +924,33 @@ public class ApplicationOIVService extends ApplicationService{
             				.collect(Collectors.toList());        		
             		HSSFWorkbook wb = printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder where NOT jconon_application:stato_domanda = 'I' AND IN_TREE('" + call.getId() +"')" , true);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            		wb.write(stream);			        		
+            		wb.write(stream);
+
+					ContentStreamImpl contentStream = new ContentStreamImpl();
+					contentStream.setMimeType("application/vnd.ms-excel");
+					contentStream.setStream(new ByteArrayInputStream(stream.toByteArray()));
+					String docId = callService.findAttachmentName(session, call.getId(), ELENCO_OIV_DOMANDE_XLS);
+					if (docId == null) {
+						Map<String, Object> properties = new HashMap<String, Object>();
+						properties.put(PropertyIds.NAME, ELENCO_OIV_DOMANDE_XLS);
+						properties.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
+						Document createDocument = call.createDocument(properties, contentStream, VersioningState.MAJOR);
+						aclService.setInheritedPermission(adminSession, createDocument.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), false);
+
+						Map<String, ACLType> aces = new HashMap<String, ACLType>();
+						aces.put("GROUP_" + ELENCO_OIV_DOMANDE_XLS, ACLType.Consumer);
+						aclService.addAcl(adminSession, createDocument.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
+
+						nodeVersionService.addAutoVersion(createDocument, false);
+					} else {
+						((Document)session.getObject(docId)).setContentStream(contentStream, true);
+					}
+
+
         			EmailMessage message = new EmailMessage();
         			message.setRecipients(emailList);
         			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + "Estrazione domande");
-        			message.setBody("In allegato l'estrazione delle domande");
-        			message.setAttachments(Arrays.asList(new AttachmentBean("DOMANDE_OIV.xls", stream.toByteArray())));
+        			message.setBody("L'estrazione delle domande, si è conclusa correttamente");
         			mailService.send(message);
         		}catch (IOException e) {
         			LOGGER.error("Cannot estraiExcelOIV", e);
