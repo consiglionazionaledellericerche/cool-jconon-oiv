@@ -189,7 +189,7 @@ public class ApplicationOIVService extends ApplicationService{
 	@Value("${user.admin.username}")
 	private String adminUserName;
 
-	@Value("${flows.anable}")
+	@Value("${flows.enable}")
 	private Boolean flowsEnable;
 
 	@Override
