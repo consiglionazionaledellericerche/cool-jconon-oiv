@@ -1,6 +1,6 @@
 jcononfunzionepubblica:
   image: docker.si.cnr.it/##{CONTAINER_ID}##
-  mem_limit: 1g
+  mem_limit: 2g
   read_only: true
   ports:
   - 8980:8080
