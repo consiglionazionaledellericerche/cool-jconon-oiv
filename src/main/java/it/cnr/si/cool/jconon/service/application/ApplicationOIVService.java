@@ -951,7 +951,7 @@ public class ApplicationOIVService extends ApplicationService{
 								aclService.setInheritedPermission(adminSession, createDocument.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), false);
 
 								Map<String, ACLType> aces = new HashMap<String, ACLType>();
-								aces.put("GROUP_" + ELENCO_OIV_DOMANDE_XLS, ACLType.Consumer);
+								aces.put("GROUP_" + EMAIL_DOMANDE_OIV, ACLType.Consumer);
 								aclService.addAcl(adminSession, createDocument.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
 
 								nodeVersionService.addAutoVersion(createDocument, false);
