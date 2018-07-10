@@ -1,6 +1,6 @@
 jcononfunzionepubblica:
   image: docker.si.cnr.it/##{CONTAINER_ID}##
-  mem_limit: 2g
+  mem_limit: 1g
   read_only: true
   ports:
   - 8980:8080
@@ -16,4 +16,4 @@ jcononfunzionepubblica:
   - ./webapp_logs:/logs
   - /tmp
   - /work/
-  command: java -Dspring.profiles.active=fp -Xmx1024m -Xss512k -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787 -Duser.language=it -Djava.security.egd=file:/dev/./urandom -jar /opt/jconon.war
+  command: java -Dspring.profiles.active=fp -Xmx256m -Xss512k -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787 -Duser.language=it -Djava.security.egd=file:/dev/./urandom -jar /opt/jconon.war
