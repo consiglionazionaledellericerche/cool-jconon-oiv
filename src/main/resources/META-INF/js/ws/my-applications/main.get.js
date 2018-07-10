@@ -273,7 +273,22 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       settings.lastCriteria = criteria.and(baseCriteria.build()).build();
 
       $('#export-xls').off('click').on('click', function () {
-        window.location.href = cache.baseUrl + "/rest/content?path=" + cache.competition.path + "/BANDO%20OIV/elenco-oiv-domande.xls";
+        var close = UI.progress();
+        jconon.Data.call.applications_single_call({
+          type: 'GET',
+          data:  getUrlParams(page),
+          success: function (data) {
+            var url = URL.template(jconon.URL.call.downloadXLS, {
+              objectId: data.objectId,
+              fileName: data.fileName,
+              exportData: true,
+              mimeType: 'application/vnd.ms-excel;charset=UTF-8'
+            });
+            window.location = url;
+          },
+          complete: close,
+          error: URL.errorFn
+        });
       });
       $('#export-elenco').off('click').on('click', function () {
         var close = UI.progress(), data = getUrlParams(page);
