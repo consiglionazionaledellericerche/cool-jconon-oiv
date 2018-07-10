@@ -139,7 +139,7 @@ public class CallOIVService extends CallService {
         final Folder call = (Folder) cmisSession.getObject(objectId);
         Calendar today = Calendar.getInstance(TimeZone.getTimeZone(EUROPE_ROME), Locale.ITALY);
         CMISUser user = userService.loadUserForConfirm(userId);    	
-        if (!publish && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
+        if (!publish && !(user.isAdmin() || isMemberOfConcorsiGroup(user))) {
         	throw new ClientMessageException("message.error.call.cannnot.modify");
         }
         List<CmisObject> children = new ArrayList<CmisObject>();
@@ -176,7 +176,7 @@ public class CallOIVService extends CallService {
         if (call.getType().getId().equalsIgnoreCase(F_JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER)) {
 
 	        CMISUser user = userService.loadUserForConfirm(userId);    	
-	        if (!publish && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
+	        if (!publish && !(user.isAdmin() || isMemberOfConcorsiGroup(user))) {
 	        	throw new ClientMessageException("message.error.call.cannnot.modify");
 	        }
 
@@ -226,7 +226,7 @@ public class CallOIVService extends CallService {
     		String objectTypeId, String userId) {
         Folder call = (Folder) cmisSession.getObject(objectId);    	
     	CMISUser user = userService.loadUserForConfirm(userId);    	
-        if ((Boolean)call.getPropertyValue(JCONONPropertyIds.CALL_PUBBLICATO.value()) && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
+        if ((Boolean)call.getPropertyValue(JCONONPropertyIds.CALL_PUBBLICATO.value()) && !(user.isAdmin() || isMemberOfConcorsiGroup(user))) {
         	throw new ClientMessageException("message.error.call.cannnot.modify");
         }    	
         Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());
@@ -331,11 +331,11 @@ public class CallOIVService extends CallService {
 	        	call = (Folder) cmisSession.getObject((String) properties.get(PropertyIds.OBJECT_ID));
 	        	CMISUser user = userService.loadUserForConfirm(userId); 
 	        	if (isBandoInCorso(call)) {
-		            if ((Boolean)call.getPropertyValue(JCONONPropertyIds.CALL_PUBBLICATO.value()) && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
+		            if ((Boolean)call.getPropertyValue(JCONONPropertyIds.CALL_PUBBLICATO.value()) && !(user.isAdmin() || isMemberOfConcorsiGroup(user))) {
 		            	throw new ClientMessageException("message.error.call.cannnot.modify");
 		            }            	        		
 	        	} else {
-		            if ((Boolean)call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_PUBBLICATO_ESITO) && !(user.isAdmin() || isMemeberOfConcorsiGroup(user))) {
+		            if ((Boolean)call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_PUBBLICATO_ESITO) && !(user.isAdmin() || isMemberOfConcorsiGroup(user))) {
 		            	throw new ClientMessageException("message.error.call.cannnot.modify");
 		            }            	        			        		
 	        	}

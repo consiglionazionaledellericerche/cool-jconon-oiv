@@ -10,7 +10,7 @@ define(['jquery', 'json!common', 'i18n', 'ws/header.common', 'cnr/cnr.url', 'cnr
 
   headerCommon.resizeNavbar(50);
 
-  if (common.profile === 'fp') {
+  if (common.profile.indexOf('dev') !== -1) {
     $('#wrap').append('<div class="development"></div>');
   }
 });
