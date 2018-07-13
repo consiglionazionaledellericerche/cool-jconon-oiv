@@ -5,6 +5,7 @@ jcononfunzionepubblica:
   ports:
   - 8980:8080
   environment:
+  - FLOWS_ENABLE=true
   - LANG=it_IT.UTF-8
   - LANGUAGE=it_IT:it
   - LC_ALL=it_IT.UTF-8
