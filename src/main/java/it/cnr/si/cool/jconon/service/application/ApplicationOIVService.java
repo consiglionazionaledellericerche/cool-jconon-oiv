@@ -958,9 +958,7 @@ public class ApplicationOIVService extends ApplicationService{
             				.collect(Collectors.toList());
                     HSSFWorkbook wbAllEsperienze = printService.createHSSFWorkbookAllEsperienze();
                     HSSFWorkbook wbLastEsperienze = printService.createHSSFWorkbookLastEsperienze();
-                    printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder " +
-                            "where NOT jconon_application:stato_domanda = 'I' " +
-                            "AND IN_TREE('" + call.getId() +"')" , wbAllEsperienze, wbLastEsperienze);
+                    printService.generateXLS(cmisService.createAdminSession(), wbAllEsperienze, wbLastEsperienze);
 
                     ByteArrayOutputStream streamAllEsperienze = new ByteArrayOutputStream();
                     wbAllEsperienze.write(streamAllEsperienze);

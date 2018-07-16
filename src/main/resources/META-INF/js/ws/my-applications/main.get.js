@@ -523,9 +523,11 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                     customButtons.modificaProfilo = false;
                   }
                 }
-                customButtons.comunicazioni = function () {
-                    displayAttachments(el, 'jconon_attachment:generic_comunicazioni', Application.displayTitoli, 'actions.comunicazioni');
-                };
+                if (cache['flows.enable']) {
+                    customButtons.comunicazioni = function () {
+                        displayAttachments(el, 'jconon_attachment:generic_comunicazioni', Application.displayTitoli, 'actions.comunicazioni');
+                    };
+                }
                 if (el['jconon_application:fl_preavviso_rigetto'] == true) {
                   customButtons.preavviso_rigetto = function () {
                     var bulkInfoAllegato = allegaDocumentoAllaDomanda(
