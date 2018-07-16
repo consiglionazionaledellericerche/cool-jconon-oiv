@@ -248,52 +248,93 @@ public class PrintOIVService extends PrintService {
 				data +
 				".pdf";
 	}
-	
+
+	private OperationContext getMinimalContext(Session session){
+        OperationContext context = new OperationContextImpl(session.getDefaultContext());
+        context.setIncludeAcls(false);
+        context.setIncludeAllowableActions(false);
+        context.setIncludePathSegments(false);
+        return context;
+    }
+
+	private Stream<Folder> getAllApplication(Session session, String query) {
+        ItemIterable<QueryResult> applications = session.query(query, false);
+        List<Folder> applicationList = new ArrayList<Folder>();
+        OperationContext context = getMinimalContext(session);
+        for (QueryResult application : applications.getPage(Integer.MAX_VALUE)) {
+            Folder applicationObject = (Folder) session.getObject(String.valueOf(application.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()), context);
+            applicationList.add(applicationObject);
+        }
+        return applicationList.stream().sorted((app1, app2) ->
+                Optional.ofNullable(app1.<Calendar>getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value())).orElse(Calendar.getInstance()).compareTo(
+                        Optional.ofNullable(app2.<Calendar>getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value())).orElse(Calendar.getInstance())));
+    }
+
+    private int generateAllEsperienze(Session session, Folder applicationObject, int applicationNumber, int index, CMISUser user, HSSFSheet sheet) {
+        Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_DOCUMENT);
+        criteriaOIV.add(Restrictions.inTree(applicationObject.getId()));
+        ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(session, false, getMinimalContext(session));
+        for (QueryResult oiv : iterableOIV.getPage(Integer.MAX_VALUE)) {
+            Document oivObject = (Document) session.getObject(String.valueOf(oiv.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()), getMinimalContext(session));
+            getRecordCSV(session, applicationObject, oivObject, applicationNumber, user, sheet, null, null, index++);
+        }
+        return index;
+    }
+
+    private int generateLastEsperienze(Session session, Folder applicationObject, int applicationNumber, int index, CMISUser user, HSSFSheet sheet) {
+        QueryResult lastEsperienza = getLastEsperienza(session, applicationObject, getMinimalContext(session));
+        getRecordCSV(session, applicationObject, null, applicationNumber, user, sheet,
+                Optional.ofNullable(lastEsperienza).map(x -> x.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO)).orElse(""),
+                Optional.ofNullable(lastEsperienza).map(x -> x.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO)).orElse(""),
+                index++);
+        return index;
+    }
+
 	public HSSFWorkbook generateXLS(Session session, String query, boolean detail, boolean withEsperienze) {
     	HSSFWorkbook wb = createHSSFWorkbook(detail ? headDetailCSVApplication : headCSVApplication);
     	HSSFSheet sheet = wb.getSheet(SHEET_DOMANDE);
     	int index = 1;
-        ItemIterable<QueryResult> applications = session.query(query, false);
-        List<Folder> applicationList = new ArrayList<Folder>();
-        OperationContext context = new OperationContextImpl(session.getDefaultContext());
-        context.setIncludeAcls(false);
-		context.setIncludeAllowableActions(false);
-		context.setIncludePathSegments(false);
-        for (QueryResult application : applications.getPage(Integer.MAX_VALUE)) {
-        	Folder applicationObject = (Folder) session.getObject(String.valueOf(application.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()), context);
-        	applicationList.add(applicationObject);
-		}
-        
-        Stream<Folder> sorted = applicationList.stream().sorted((app1, app2) -> 
-        	Optional.ofNullable(app1.<Calendar>getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value())).orElse(Calendar.getInstance()).compareTo(
-        			Optional.ofNullable(app2.<Calendar>getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value())).orElse(Calendar.getInstance())));
+        Stream<Folder> sorted = getAllApplication(session, query);
         if (withEsperienze) {
 			int applicationNumber = 0;
 			for (Folder applicationObject : sorted.collect(Collectors.toList())) {
 				CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue("jconon_application:user"));
 				applicationNumber++;
 				if (detail) {
-					Criteria criteriaOIV = CriteriaFactory.createCriteria(JCONON_SCHEDA_ANONIMA_DOCUMENT);
-					criteriaOIV.add(Restrictions.inTree(applicationObject.getId()));
-					ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(session, false, context);
-					for (QueryResult oiv : iterableOIV.getPage(Integer.MAX_VALUE)) {
-						Document oivObject = (Document) session.getObject(String.valueOf(oiv.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()), context);
-						getRecordCSV(session, applicationObject, oivObject, applicationNumber, user, sheet, null, null, index++);
-					}
+                    index = generateAllEsperienze(session, applicationObject, applicationNumber, index, user, sheet);
 				} else {
-					QueryResult lastEsperienza = getLastEsperienza(session, applicationObject, context);
-					getRecordCSV(session, applicationObject, null, applicationNumber, user, sheet,
-							Optional.ofNullable(lastEsperienza).map(x -> x.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO)).orElse(""),
-							Optional.ofNullable(lastEsperienza).map(x -> x.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO)).orElse(""),
-							index++);
+                    index = generateLastEsperienze(session, applicationObject, applicationNumber, index, user, sheet);
 				}
-
 			}
 		}
         autoSizeColumns(wb);
         return wb;
 	}
 
+	public HSSFWorkbook createHSSFWorkbookAllEsperienze() {
+        return createHSSFWorkbook(headDetailCSVApplication);
+    }
+
+    public HSSFWorkbook createHSSFWorkbookLastEsperienze() {
+        return createHSSFWorkbook(headCSVApplication);
+    }
+
+    public void generateXLS(Session session, String query, HSSFWorkbook wbAllEsperienze, HSSFWorkbook wbLastEsperienze) {
+        HSSFSheet sheetAllEsperienze = wbAllEsperienze.getSheet(SHEET_DOMANDE);
+        HSSFSheet sheetLastEsperienze = wbLastEsperienze.getSheet(SHEET_DOMANDE);
+        int indexAllEsperienze = 1;
+        int indexLastEsperienze = 1;
+        Stream<Folder> sorted = getAllApplication(session, query);
+        int applicationNumber = 0;
+        for (Folder applicationObject : sorted.collect(Collectors.toList())) {
+            CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue("jconon_application:user"));
+            applicationNumber++;
+            indexAllEsperienze = generateAllEsperienze(session, applicationObject, applicationNumber, indexAllEsperienze, user, sheetAllEsperienze);
+            indexLastEsperienze = generateLastEsperienze(session, applicationObject, applicationNumber, indexLastEsperienze, user, sheetLastEsperienze);
+        }
+        autoSizeColumns(wbAllEsperienze);
+        autoSizeColumns(wbLastEsperienze);
+    }
 
     public Map<String, Object> extractionApplicationForAllIscritti(
             Session session, String query, String contexURL, String userId)

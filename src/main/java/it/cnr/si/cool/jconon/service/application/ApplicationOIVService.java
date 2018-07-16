@@ -109,6 +109,7 @@ public class ApplicationOIVService extends ApplicationService{
 	public static final String P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE = "P:jconon_scheda_anonima:esperienza_non_coerente";
 	private static final String ELENCO_OIV_XLS = "elenco-oiv.xls";
 	private static final String ELENCO_OIV_DOMANDE_XLS = "elenco-oiv-domande.xls";
+    private static final String ELENCO_OIV_SINGLE_DOMANDE_XLS = "elenco-oiv-single-domande.xls";
 	private static final String NUMERO_OIV_JSON = "elenco-oiv.json";
 
 	private static final String OIV = "OIV";
@@ -897,6 +898,36 @@ public class ApplicationOIVService extends ApplicationService{
 	    return printService.extractionApplicationForAllIscritti(session, query, contexURL, userId);
     }
 
+    private Document createXLSDocument(Session session, Folder call, ByteArrayOutputStream stream, String name) {
+        final BindingSession adminSession = cmisService.getAdminSession();
+        ContentStreamImpl contentStream = new ContentStreamImpl();
+        contentStream.setMimeType("application/vnd.ms-excel");
+        contentStream.setStream(new ByteArrayInputStream(stream.toByteArray()));
+        String docId = callService.findAttachmentName(session, call.getId(), name);
+        return Optional.ofNullable(docId)
+                .map(s -> {
+                    final Document doc = Optional.ofNullable(session.getObject(docId))
+                            .filter(Document.class::isInstance)
+                            .map(Document.class::cast)
+                            .orElseThrow(() -> new RuntimeException("Document for estraiExcelOIV not fount id:"+ s));
+                    doc.setContentStream(contentStream, true);
+                    return doc;
+                }).orElseGet(() -> {
+                    Map<String, Object> properties = new HashMap<String, Object>();
+                    properties.put(PropertyIds.NAME, name);
+                    properties.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
+                    Document createDocument = call.createDocument(properties, contentStream, VersioningState.MAJOR);
+                    aclService.setInheritedPermission(adminSession, createDocument.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), false);
+
+                    Map<String, ACLType> aces = new HashMap<String, ACLType>();
+                    aces.put("GROUP_" + EMAIL_DOMANDE_OIV, ACLType.Consumer);
+                    aclService.addAcl(adminSession, createDocument.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
+
+                    nodeVersionService.addAutoVersion(createDocument, false);
+                    return createDocument;
+                });
+    }
+
     @Scheduled(cron="0 0 22 * * MON-FRI")
     public void estraiExcelOIV() {
         List<String> members = cluster
@@ -924,47 +955,31 @@ public class ApplicationOIVService extends ApplicationService{
             				.collect(Collectors.toList())
             				.stream()
             				.map(user -> userService.loadUserForConfirm(user).getEmail())
-            				.collect(Collectors.toList());        		
-            		HSSFWorkbook wb = printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder " +
+            				.collect(Collectors.toList());
+                    HSSFWorkbook wbAllEsperienze = printService.createHSSFWorkbookAllEsperienze();
+                    HSSFWorkbook wbLastEsperienze = printService.createHSSFWorkbookLastEsperienze();
+                    printService.generateXLS(cmisService.createAdminSession(), "select cmis:objectId from jconon_application:folder " +
                             "where NOT jconon_application:stato_domanda = 'I' " +
-                            "AND IN_TREE('" + call.getId() +"')" , true, true);
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            		wb.write(stream);
+                            "AND IN_TREE('" + call.getId() +"')" , wbAllEsperienze, wbLastEsperienze);
 
-					ContentStreamImpl contentStream = new ContentStreamImpl();
-					contentStream.setMimeType("application/vnd.ms-excel");
-					contentStream.setStream(new ByteArrayInputStream(stream.toByteArray()));
-					String docId = callService.findAttachmentName(session, call.getId(), ELENCO_OIV_DOMANDE_XLS);
-					final Document document = Optional.ofNullable(docId)
-							.map(s -> {
-								final Document doc = Optional.ofNullable(session.getObject(docId))
-										.filter(Document.class::isInstance)
-										.map(Document.class::cast)
-										.orElseThrow(() -> new RuntimeException("Document for estraiExcelOIV not fount id:"+ s));
-								doc.setContentStream(contentStream, true);
-								return doc;
-							}).orElseGet(() -> {
-								Map<String, Object> properties = new HashMap<String, Object>();
-								properties.put(PropertyIds.NAME, ELENCO_OIV_DOMANDE_XLS);
-								properties.put(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
-								Document createDocument = call.createDocument(properties, contentStream, VersioningState.MAJOR);
-								aclService.setInheritedPermission(adminSession, createDocument.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), false);
+                    ByteArrayOutputStream streamAllEsperienze = new ByteArrayOutputStream();
+                    wbAllEsperienze.write(streamAllEsperienze);
 
-								Map<String, ACLType> aces = new HashMap<String, ACLType>();
-								aces.put("GROUP_" + EMAIL_DOMANDE_OIV, ACLType.Consumer);
-								aclService.addAcl(adminSession, createDocument.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
+                    ByteArrayOutputStream streamLastEsperienze = new ByteArrayOutputStream();
+                    wbLastEsperienze.write(streamLastEsperienze);
 
-								nodeVersionService.addAutoVersion(createDocument, false);
-								return createDocument;
-					});
+                    Document documentAllEsperienze = createXLSDocument(session, call, streamAllEsperienze, ELENCO_OIV_DOMANDE_XLS);
+                    Document documentLastEsperienze = createXLSDocument(session, call, streamLastEsperienze, ELENCO_OIV_SINGLE_DOMANDE_XLS);
 
-					EmailMessage message = new EmailMessage();
+                    final String link = applicationBaseURL + "rest/content?path=" + call.getPath() + "/";
+                    EmailMessage message = new EmailMessage();
         			message.setRecipients(emailList);
         			message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + "Estrazione domande");
         			message.setBody(
         			            i18nService.getLabel("message.mail.body.estrazione.domande",
                                 Locale.ITALIAN, LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
-                                        applicationBaseURL + "rest/content?path=" + call.getPath() + "/" + document.getName()
+                                        link.concat(documentLastEsperienze.getName()),
+                                        link.concat(documentAllEsperienze.getName())
                             )
                     );
         			mailService.send(message);
