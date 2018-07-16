@@ -12,6 +12,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundExcept
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Repository;
 @Primary
 public class CacheFPRepository extends CacheRepository {
 	private static final String JCONON_ATTACHMENT_CALL_FP_ABSTRACT = "D:jconon_attachment:call_fp_abstract";
+	private static final String FLOWS_ENABLE = "flows.enable";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(CacheFPRepository.class);
 
@@ -26,7 +28,10 @@ public class CacheFPRepository extends CacheRepository {
 	private CMISService cmisService;
 	@Autowired
 	private CacheFPEsitoRepository cacheFPEsitoRepository;
-	
+
+	@Value("${flows.enable}")
+	private Boolean flowsEnable;
+
 	@Cacheable(JSONLIST_CALL_ATTACHMENTS)
 	public List<ObjectTypeCache> getCallAttachments() {
 		try {
@@ -45,7 +50,10 @@ public class CacheFPRepository extends CacheRepository {
 	public Map<? extends String, ? extends Object> getExtraModel() {
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put(CacheFPEsitoRepository.JSONLIST_CALL_ESITO_ATTACHMENTS, cacheFPEsitoRepository.getCallEsitoAttachments());
-		result.put(CacheFPEsitoRepository.JSONLIST_CALL_ESITO_PARTECIPANTI_ATTACHMENTS, cacheFPEsitoRepository.getCallEsitoPartecipantiAttachments());		
+		result.put(CacheFPEsitoRepository.JSONLIST_CALL_ESITO_PARTECIPANTI_ATTACHMENTS, cacheFPEsitoRepository.getCallEsitoPartecipantiAttachments());
+		result.put(FLOWS_ENABLE, flowsEnable);
 		return result;
 	}
+
+
 }

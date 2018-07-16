@@ -37,13 +37,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.chemistry.opencmis.client.api.Document;
-import org.apache.chemistry.opencmis.client.api.Folder;
-import org.apache.chemistry.opencmis.client.api.ItemIterable;
-import org.apache.chemistry.opencmis.client.api.OperationContext;
-import org.apache.chemistry.opencmis.client.api.Property;
-import org.apache.chemistry.opencmis.client.api.QueryResult;
-import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.OperationContextImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
@@ -257,13 +251,13 @@ public class PrintOIVService extends PrintService {
         return context;
     }
 
-	private Stream<Folder> getAllApplication(Session session, String query) {
-        ItemIterable<QueryResult> applications = session.query(query, false);
+	private Stream<Folder> getAllApplication(Session session) {
+	    final ItemIterable<CmisObject> cmisObjects = session.queryObjects(JCONONFolderType.JCONON_APPLICATION.value(),
+                "NOT jconon_application:stato_domanda = 'I' AND IN_TREE('" + session.getRootFolder().getId() + "')",
+                false, getMinimalContext(session));
         List<Folder> applicationList = new ArrayList<Folder>();
-        OperationContext context = getMinimalContext(session);
-        for (QueryResult application : applications.getPage(Integer.MAX_VALUE)) {
-            Folder applicationObject = (Folder) session.getObject(String.valueOf(application.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()), context);
-            applicationList.add(applicationObject);
+        for (CmisObject application : cmisObjects.getPage(Integer.MAX_VALUE)) {
+            applicationList.add((Folder)application);
         }
         return applicationList.stream().sorted((app1, app2) ->
                 Optional.ofNullable(app1.<Calendar>getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value())).orElse(Calendar.getInstance()).compareTo(
@@ -290,20 +284,19 @@ public class PrintOIVService extends PrintService {
         return index;
     }
 
-	public HSSFWorkbook generateXLS(Session session, String query, boolean detail, boolean withEsperienze) {
+	public HSSFWorkbook generateXLS(Session session, boolean detail, boolean withEsperienze) {
     	HSSFWorkbook wb = createHSSFWorkbook(detail ? headDetailCSVApplication : headCSVApplication);
     	HSSFSheet sheet = wb.getSheet(SHEET_DOMANDE);
     	int index = 1;
-        Stream<Folder> sorted = getAllApplication(session, query);
+        Stream<Folder> sorted = getAllApplication(session);
         if (withEsperienze) {
 			int applicationNumber = 0;
 			for (Folder applicationObject : sorted.collect(Collectors.toList())) {
-				CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue("jconon_application:user"));
 				applicationNumber++;
 				if (detail) {
-                    index = generateAllEsperienze(session, applicationObject, applicationNumber, index, user, sheet);
+                    index = generateAllEsperienze(session, applicationObject, applicationNumber, index, null, sheet);
 				} else {
-                    index = generateLastEsperienze(session, applicationObject, applicationNumber, index, user, sheet);
+                    index = generateLastEsperienze(session, applicationObject, applicationNumber, index, null, sheet);
 				}
 			}
 		}
@@ -319,12 +312,12 @@ public class PrintOIVService extends PrintService {
         return createHSSFWorkbook(headCSVApplication);
     }
 
-    public void generateXLS(Session session, String query, HSSFWorkbook wbAllEsperienze, HSSFWorkbook wbLastEsperienze) {
+    public void generateXLS(Session session, HSSFWorkbook wbAllEsperienze, HSSFWorkbook wbLastEsperienze) {
         HSSFSheet sheetAllEsperienze = wbAllEsperienze.getSheet(SHEET_DOMANDE);
         HSSFSheet sheetLastEsperienze = wbLastEsperienze.getSheet(SHEET_DOMANDE);
         int indexAllEsperienze = 1;
         int indexLastEsperienze = 1;
-        Stream<Folder> sorted = getAllApplication(session, query);
+        Stream<Folder> sorted = getAllApplication(session);
         int applicationNumber = 0;
         for (Folder applicationObject : sorted.collect(Collectors.toList())) {
             CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue("jconon_application:user"));
@@ -393,7 +386,7 @@ public class PrintOIVService extends PrintService {
 			Session session, String query, String contexURL, String userId)
 			throws IOException {
     	Map<String, Object> model = new HashMap<String, Object>();
-    	HSSFWorkbook wb = generateXLS(session, query, false, true);
+    	HSSFWorkbook wb = generateXLS(session, false, true);
         Document doc = createXLSDocument(session, wb, userId);
         model.put("objectId", doc.getId());
         model.put("nameBando", "OIV");        
@@ -520,7 +513,9 @@ public class PrintOIVService extends PrintService {
     					Optional.ofNullable(applicationObject.getProperty("jconon_application:num_civico_residenza")).map(Property::getValueAsString).orElse("")));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cap_residenza"));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:codice_fiscale"));
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:email_comunicazioni")).filter(s -> !s.isEmpty()).orElse(user.getEmail()));   	
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:email_comunicazioni"))
+                .filter(s -> !s.isEmpty())
+                .orElse(Optional.ofNullable(user).map(CMISUser::getEmail).orElse("")));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:email_pec_comunicazioni"));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nazione_comunicazioni"));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:provincia_comunicazioni"));
