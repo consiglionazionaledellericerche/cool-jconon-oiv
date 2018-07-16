@@ -3,13 +3,15 @@ repository.base.url: http://alfresco-community.test.si.cnr.it/alfresco/
 org.apache.chemistry.opencmis.binding.spi.type: browser
 
 user.admin.password: admin
-rrd.path: remote-shared,remote-fp
-rrdservice.skipmd5: true
 server.context-path: /
 mail.from.default: marco.spasiano@gmail.com
 siper.sedi.url: http://localhost:8080/rest/static/json/sedi.json
 helpdesk.url:
 helpdesk.ucat.url:
+
+rrd:
+  path: remote-shared,remote-fp
+  skipmd5: true
 
 ipa:
   url:
