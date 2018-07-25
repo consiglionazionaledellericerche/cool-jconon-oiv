@@ -90,7 +90,7 @@
 
     <fieldProperty class="input-xxlarge" inputType="SELECT" label="label.jconon_call_elenco_aspects" multiple="multiple"
                    name="elenco_aspects" property="jconon_call:elenco_aspects" widget="ui.select"/>
-    <fieldProperty class="input-xxlarge" inputType="SELECT" label="label.jconon_call_elenco_aspects_sezione_cnr"
+    <fieldProperty class="input-xxlarge" inputType="SELECT" label="Sezione Lavorativa"
                    multiple="multiple" name="elenco_aspects_sezione_cnr"
                    property="jconon_call:elenco_aspects_sezione_cnr" widget="ui.select"/>
     <fieldProperty class="input-xxlarge" inputType="SELECT" label="label.jconon_call_elenco_aspects_ulteriori_dati"
