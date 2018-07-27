@@ -275,7 +275,7 @@ public class PrintOIVService extends PrintService {
                                 .map(o -> !o.equals(esclusioneRinuncia))
                                 .orElse(true))
                     continue;
-                if (Optional.ofNullable(attive).isPresent() && application.getPropertyValue("jconon_application:progressivo_iscrizione_elenco") != null)
+                if (Optional.ofNullable(attive).isPresent() && application.getPropertyValue("jconon_application:progressivo_iscrizione_elenco") == null)
                     continue;
 
                 applicationList.add((Folder)application);
