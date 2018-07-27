@@ -41,6 +41,7 @@ import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.OperationContextImpl;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExistsException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
@@ -251,13 +252,34 @@ public class PrintOIVService extends PrintService {
         return context;
     }
 
-	private Stream<Folder> getAllApplication(Session session) {
-	    final ItemIterable<CmisObject> cmisObjects = session.queryObjects(JCONONFolderType.JCONON_APPLICATION.value(),
-                "NOT jconon_application:stato_domanda = 'I' AND IN_TREE('" + session.getRootFolder().getId() + "')",
-                false, getMinimalContext(session));
+	private Stream<Folder> getAllApplication(Session session, String stato, String esclusioneRinuncia, Boolean attive) {
+        Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_CALL.queryName());
+        criteria.addColumn(PropertyIds.OBJECT_ID);
+        criteria.add(Restrictions.eq(JCONONPropertyIds.CALL_CODICE.value(), "OIV"));
+        ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
         List<Folder> applicationList = new ArrayList<Folder>();
-        for (CmisObject application : cmisObjects.getPage(Integer.MAX_VALUE)) {
-            applicationList.add((Folder)application);
+        for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
+            Folder call = (Folder) session.getObject(String.valueOf(queryResult.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()));
+            final ItemIterable<CmisObject> cmisObjects = call.getChildren(getMinimalContext(session));
+            for (CmisObject application : cmisObjects.getPage(Integer.MAX_VALUE)) {
+                if (!application.getBaseTypeId().equals(BaseTypeId.CMIS_FOLDER))
+                    continue;
+                if (!application.getType().getId().equals(JCONONFolderType.JCONON_APPLICATION.value()))
+                    continue;
+                if (application.getPropertyValue(JCONONPropertyIds.APPLICATION_STATO_DOMANDA.value()).equals("I"))
+                    continue;
+                if (Optional.ofNullable(stato).isPresent() && !application.getPropertyValue(JCONONPropertyIds.APPLICATION_STATO_DOMANDA.value()).equals(stato))
+                    continue;
+                if (Optional.ofNullable(esclusioneRinuncia).isPresent() &&
+                        Optional.ofNullable(application.getPropertyValue(JCONONPropertyIds.APPLICATION_ESCLUSIONE_RINUNCIA.value()))
+                                .map(o -> !o.equals(esclusioneRinuncia))
+                                .orElse(true))
+                    continue;
+                if (Optional.ofNullable(attive).isPresent() && application.getPropertyValue("jconon_application:progressivo_iscrizione_elenco") != null)
+                    continue;
+
+                applicationList.add((Folder)application);
+            }
         }
         return applicationList.stream().sorted((app1, app2) ->
                 Optional.ofNullable(app1.<Calendar>getPropertyValue(JCONONPropertyIds.APPLICATION_DATA_DOMANDA.value())).orElse(Calendar.getInstance()).compareTo(
@@ -284,11 +306,11 @@ public class PrintOIVService extends PrintService {
         return index;
     }
 
-	public HSSFWorkbook generateXLS(Session session, boolean detail, boolean withEsperienze) {
+	public HSSFWorkbook generateXLS(Session session, String stato, String esclusioneRinuncia, Boolean attive, boolean detail, boolean withEsperienze) {
     	HSSFWorkbook wb = createHSSFWorkbook(detail ? headDetailCSVApplication : headCSVApplication);
     	HSSFSheet sheet = wb.getSheet(SHEET_DOMANDE);
     	int index = 1;
-        Stream<Folder> sorted = getAllApplication(session);
+        Stream<Folder> sorted = getAllApplication(session, stato, esclusioneRinuncia, attive);
         if (withEsperienze) {
 			int applicationNumber = 0;
 			for (Folder applicationObject : sorted.collect(Collectors.toList())) {
@@ -317,7 +339,7 @@ public class PrintOIVService extends PrintService {
         HSSFSheet sheetLastEsperienze = wbLastEsperienze.getSheet(SHEET_DOMANDE);
         int indexAllEsperienze = 1;
         int indexLastEsperienze = 1;
-        Stream<Folder> sorted = getAllApplication(session);
+        Stream<Folder> sorted = getAllApplication(session, null, null, null);
         int applicationNumber = 0;
         for (Folder applicationObject : sorted.collect(Collectors.toList())) {
             CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue("jconon_application:user"));
@@ -386,7 +408,9 @@ public class PrintOIVService extends PrintService {
 			Session session, String query, String contexURL, String userId)
 			throws IOException {
     	Map<String, Object> model = new HashMap<String, Object>();
-    	HSSFWorkbook wb = generateXLS(session, false, true);
+    	Boolean attive = query.indexOf("jconon_application:progressivo_iscrizione_elenco") != -1 ? true : null;
+        String stato = query.indexOf("jconon_application:stato_domanda = 'C'") != -1 ? "C" : null;
+    	HSSFWorkbook wb = generateXLS(session, stato, null, attive, false, true);
         Document doc = createXLSDocument(session, wb, userId);
         model.put("objectId", doc.getId());
         model.put("nameBando", "OIV");        
