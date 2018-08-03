@@ -175,14 +175,14 @@ public class ApplicationOIV {
 	@Path("message")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response message(@Context HttpServletRequest req,
-									  @FormParam("nodeRef") String nodeRef, @FormParam("nodeRefDocumento") String nodeRefDocumento) throws IOException{
+									  @FormParam("idDomanda") String idDomanda, @FormParam("nodeRefDocumento") String nodeRefDocumento) throws IOException{
         ResponseBuilder rb;
-	    LOGGER.debug("Message for application:" + nodeRef);
+	    LOGGER.debug("Message for application:" + idDomanda);
 
 		applicationOIVService.message(cmisService.getCurrentCMISSession(req),
-				nodeRef, nodeRefDocumento);
+				idDomanda, nodeRefDocumento);
 		Map<String, Object> model = new HashMap<String, Object>();
-		model.put("nodeRef", nodeRef);
+		model.put("idDomanda", idDomanda);
         rb = Response.ok(model);
         return rb.build();
 	}
