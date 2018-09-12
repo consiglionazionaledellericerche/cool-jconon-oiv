@@ -1,6 +1,7 @@
 package it.cnr.jconon.service.application;
 
 import it.cnr.cool.cmis.service.CMISService;
+import it.cnr.cool.cmis.service.impl.ObjectTypeCacheImpl;
 import it.cnr.cool.util.StringUtil;
 import it.cnr.si.cool.jconon.CoolJcononApplication;
 import it.cnr.si.cool.jconon.service.application.ApplicationOIVService;
@@ -444,11 +445,15 @@ public class ApplicationOIVServiceTest {
     {
 
         Map<String, String> sessionParameters = new HashMap<String, String>();
-        sessionParameters.put(SessionParameter.ATOMPUB_URL, "http://alfresco.ecaasdfp.cloudspc.it/alfresco/api/-default-/public/cmis/versions/1.1/atom");
-        sessionParameters.put("org.apache.chemistry.opencmis.binding.spi.type","atompub");
+        sessionParameters.put(SessionParameter.BROWSER_URL, "http://alfresco.ecaasdfp.cloudspc.it/alfresco/api/-default-/public/cmis/versions/1.1/browser");
+        sessionParameters.put("org.apache.chemistry.opencmis.binding.spi.type","browser");
         sessionParameters.put(SessionParameter.USER, userName);
         sessionParameters.put(SessionParameter.PASSWORD, password);
         sessionParameters.put(SessionParameter.REPOSITORY_ID, "-default-");
+        sessionParameters.put("org.apache.chemistry.opencmis.cache.types.classname", ObjectTypeCacheImpl.class.getName());
+        sessionParameters.put("org.apache.chemistry.opencmis.locale.iso3166", Locale.ITALY.getCountry());
+        sessionParameters.put("org.apache.chemistry.opencmis.locale.iso639", Locale.ITALY.getLanguage());
+        sessionParameters.put("org.apache.chemistry.opencmis.locale.variant", Locale.ITALY.getVariant());
         Session session = SessionFactoryImpl.newInstance().createSession(sessionParameters);
         return session;
     }
