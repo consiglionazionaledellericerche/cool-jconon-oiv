@@ -107,13 +107,13 @@ public class ApplicationOIVServiceTest {
     	String protocolPath = "/Data Dictionary/Web Applications/jconon/WEB-INF/classes/protocollo.json";
 		Session session = getRepositorySession("marco.spasiano","0508jada");
 		Document document = (Document) session.getObjectByPath(protocolPath);
+		document.refresh();
 		if (true) {
 			document.checkOut();
 		}
 		InputStream is = document.getContentStream().getStream();
 		try {
 			LOGGER.info(IOUtils.toString(is));
-            document.cancelCheckOut();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
