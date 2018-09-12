@@ -16,6 +16,7 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlEntry
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlPrincipalDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,10 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.ZoneId;
@@ -102,8 +100,23 @@ public class ApplicationOIVServiceTest {
     }
 
     public static void main(String[] args) {
-        riammettiNellElenco();
+        checkoutProtocollo();
     }
+
+    public static void checkoutProtocollo() {
+    	String protocolPath = "/Data Dictionary/Web Applications/jconon/WEB-INF/classes/protocollo.json";
+		Session session = getRepositorySession("marco.spasiano","0508jada");
+		Document document = (Document) session.getObjectByPath(protocolPath);
+		if (true) {
+			document.checkOut();
+		}
+		InputStream is = document.getContentStream().getStream();
+		try {
+			LOGGER.info(IOUtils.toString(is));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static void riammettiNellElenco() {
 		Session session = getRepositorySession("admin","Alf4FpPw");
@@ -430,7 +443,7 @@ public class ApplicationOIVServiceTest {
     {
 
         Map<String, String> sessionParameters = new HashMap<String, String>();
-        sessionParameters.put(SessionParameter.ATOMPUB_URL, "http://alf4fp.cedrc.cnr.it:8080/alfresco/api/-default-/public/cmis/versions/1.1/atom");
+        sessionParameters.put(SessionParameter.ATOMPUB_URL, "http://alfresco.ecaasdfp.cloudspc.it/alfresco/api/-default-/public/cmis/versions/1.1/atom");
         sessionParameters.put("org.apache.chemistry.opencmis.binding.spi.type","atompub");
         sessionParameters.put(SessionParameter.USER, userName);
         sessionParameters.put(SessionParameter.PASSWORD, password);
