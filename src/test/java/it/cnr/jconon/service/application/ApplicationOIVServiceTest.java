@@ -113,6 +113,7 @@ public class ApplicationOIVServiceTest {
 		InputStream is = document.getContentStream().getStream();
 		try {
 			LOGGER.info(IOUtils.toString(is));
+            document.cancelCheckOut();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
