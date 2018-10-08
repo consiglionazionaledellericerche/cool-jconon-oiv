@@ -9,6 +9,7 @@ import it.cnr.cool.web.scripts.exception.ClientMessageException;
 import it.cnr.si.cool.jconon.service.application.ApplicationOIVService;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Path("application-fp")
@@ -40,6 +42,14 @@ public class ApplicationOIV {
 	@Autowired
 	private NodeMetadataService nodeMetadataService;
 
+	private String readableFileSize(long size) {
+		if(size <= 0) return "0";
+		final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+		int digitGroups = (int) (Math.log10(size)/Math.log10(1000));
+		double number = size / Math.pow(1000, digitGroups);
+		return new DecimalFormat("#,##0.#").format(number) + " " + units[digitGroups];
+	}
+
 	@POST
 	@Path("send-application")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -49,6 +59,12 @@ public class ApplicationOIV {
 			Session session = cmisService.getCurrentCMISSession(req);		
 			Map<String, Object> model = applicationOIVService.sendApplicationOIV(session, req, cmisService.getCMISUserFromSession(req));
 			rb = Response.ok(model);			
+		} catch(MaxUploadSizeExceededException _ex) {
+			LOGGER.error("max size exceeded", _ex);
+			String readableFileSize = readableFileSize(req.getContentLength());
+			String maxFileSize = readableFileSize(_ex.getMaxUploadSize());
+			String message = "Il file ( " + readableFileSize + ") supera la dimensione massima consentita (" + maxFileSize + ")";
+			throw new ClientMessageException(message);
 		} catch (ClientMessageException | CMISApplicationException | TemplateException e) {
 			LOGGER.warn("send error", e);
 			rb = Response.status(Status.INTERNAL_SERVER_ERROR).entity(Collections.singletonMap("message", e.getMessage()));
