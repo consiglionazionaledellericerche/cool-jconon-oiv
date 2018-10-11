@@ -101,7 +101,70 @@ public class ApplicationOIVServiceTest {
     }
 
     public static void main(String[] args) {
-        checkoutProtocollo();
+        createBandoOIV();
+    }
+
+    private static void createBandoOIV() {
+        Session session = getRepositorySession("admin", "admin");
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("jconon_call:elenco_sezioni_domanda", Arrays.asList(
+        "affix_tabAnagrafica"
+                , "affix_tabResidenza"
+                , "affix_tabDatiCNR"
+                , "affix_tabDichiarazioni"
+                , "affix_tabSchedaAnonima"
+                , "affix_tabUlterioriDati"
+                , "affix_tabTitoli"
+                , "affix_tabReperibilita"
+                , "affix_tabCurriculum"));
+
+        properties.put("cmis:objectTypeId","F:jconon_call_oiv:folder");
+        properties.put("jconon_call:data_fine_invio_domande",Calendar.getInstance());
+        properties.put("jconon_call:descrizione_ridotta","<p><b>Dipartimento della funzione pubblica<\\b><\\p>");
+        properties.put("jconon_call:pubblicato",true);
+        properties.put("jconon_call:data_inizio_invio_domande",Calendar.getInstance());
+        properties.put("jconon_call:elenco_field_not_required", Arrays.asList("jconon_application:email_pec_comunicazioni"));
+        properties.put("cmis:secondaryObjectTypeIds",Arrays.asList(
+                "P:jconon_call:can_submit_application"
+                , "P:sys:localized"
+                , "P:jconon_call:aspect_lingue_da_conoscere"));
+        properties.put("jconon_call:elenco_schede_anonime", Arrays.asList(
+                "D:jconon_scheda_anonima:esperienza_professionale"
+                , "D:jconon_scheda_anonima:precedente_incarico_oiv"));
+        properties.put("jconon_call:descrizione","<p>richiesta di iscrizione ai sensi dell&rsquo;art. 3 del Decreto Ministeriale del 2 dicembre 2016 nell&rsquo;" +
+                "Elenco nazionale dei componenti degli Organismi indipendenti di valutazione istituito presso il Dipartimento della " +
+                "funzione pubblica (art. 6, commi 3 e 4, del decreto del Presidente della Repubblica del 9 maggio 2016, n. 105)<\\p>");
+        properties.put("jconon_call:codice","OIV");
+        properties.put("jconon_call:has_macro_call",false);
+        properties.put("jconon_call:elenco_sezioni_curriculum", Arrays.asList(
+        "D:jconon_attachment:specializzazioni_post_lauream"
+                , "D:jconon_attachment:altre_specializzazioni"));
+        properties.put("jconon_call:elenco_aspects_ulteriori_dati",Arrays.asList("P:jconon_application:aspect_fascia_professionale_attribuita"));
+        properties.put("jconon_call:elenco_association", Arrays.asList(
+                "D:jconon_documento_riconoscimento:attachment"
+                , "D:jconon_curriculum_vitae:attachment"
+                ));
+        properties.put("cmis:name","BANDO OIV");
+        properties.put("jconon_call:elenco_aspects_sezione_cnr", Arrays.asList("P:jconon_application:aspect_situazione_lavorativa"));
+        properties.put("jconon_call:elenco_aspects",Arrays.asList(
+                "P:jconon_application:aspect_possesso_cittadinanza_italiana"
+                , "P:jconon_application:aspect_godimento_diritti_ue"
+                , "P:jconon_application:aspect_condanne_penali_required"
+                , "P:jconon_application:aspect_laurea"
+                , "P:jconon_application:aspect_esperienza_professionale"
+                , "P:jconon_application:aspect_sentenza_giudicato"
+                , "P:jconon_application:aspect_condanne_contabili"
+                , "P:jconon_application:aspect_rimosso_incarico_oiv"
+                , "P:jconon_application:aspect_incarichi_pubblici_apicali"
+                , "P:jconon_application:aspect_precedente_incarico_oiv"));
+        Folder folder = Optional.ofNullable(session.getObject("8e3ed593-7aee-4cb3-9354-77abdff18a5f"))
+                .filter(Folder.class::isInstance)
+                .map(Folder.class::cast)
+                .orElse(null);
+        if (Optional.ofNullable(folder).isPresent()) {
+            folder.createFolder(properties);
+        }
+
     }
 
     public static void checkoutProtocollo() {
@@ -445,7 +508,7 @@ public class ApplicationOIVServiceTest {
     {
 
         Map<String, String> sessionParameters = new HashMap<String, String>();
-        sessionParameters.put(SessionParameter.BROWSER_URL, "http://alfresco.ecaasdfp.cloudspc.it/alfresco/api/-default-/public/cmis/versions/1.1/browser");
+        sessionParameters.put(SessionParameter.BROWSER_URL, "http://alfresco-community.test.si.cnr.it/alfresco/api/-default-/public/cmis/versions/1.1/browser");
         sessionParameters.put("org.apache.chemistry.opencmis.binding.spi.type","browser");
         sessionParameters.put(SessionParameter.USER, userName);
         sessionParameters.put(SessionParameter.PASSWORD, password);
