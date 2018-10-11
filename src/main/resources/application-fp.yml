@@ -15,7 +15,7 @@ rrd:
 
 ipa:
   url:
-    base: http://www.indicepa.gov.it/public-services/opendata-read-service.php
+    base: https://www.indicepa.gov.it/public-services/opendata-read-service.php
     amministrazioni: ${ipa.url.base}?dstype=FS&filename=amministrazioni.txt
 
 flows:
