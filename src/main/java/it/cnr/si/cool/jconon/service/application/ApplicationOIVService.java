@@ -689,7 +689,7 @@ public class ApplicationOIVService extends ApplicationService{
 	    	Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
 	    		if (eseguiControlloFascia &&
 						fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)) &&
-						Optional.ofNullable(application.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).isPresent()) {
+						((flowsEnable && Optional.ofNullable(application.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).isPresent()) || !flowsEnable)) {
 	    			throw new ClientMessageException(
 	    					i18nService.getLabel("message.error.domanda.fascia.equals", Locale.ITALIAN, fascia));
 	    		}

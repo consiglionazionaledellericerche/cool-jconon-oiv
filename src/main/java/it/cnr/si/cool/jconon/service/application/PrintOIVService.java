@@ -58,57 +58,104 @@ import org.springframework.stereotype.Component;
 @Component
 @Primary
 public class PrintOIVService extends PrintService {
-	private static final String NO = "No";
+    private static final Logger LOGGER = LoggerFactory.getLogger(PrintService.class);
+    private static final String NO = "No";
+    private static final String SI = "Si";
 
-	private static final String SI = "Si";
+    public static final String JCONON_SCHEDA_ANONIMA_DOCUMENT = "jconon_scheda_anonima:document";
+    public static final String P_JCONON_APPLICATION_ASPECT_FASCIA_PROFESSIONALE_ATTRIBUITA = "P:jconon_application:aspect_fascia_professionale_attribuita";
+    public static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A = "jconon_attachment:esperienza_professionale_a";
+    public static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO = "jconon_attachment:esperienza_professionale_ruolo";
+    public static final String JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE = "jconon_scheda_anonima:esperienza_professionale";
+    public static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO = "jconon_attachment:esperienza_professionale_datore_lavoro";
 
-	private static final String DATA_DI_INIZIO_RAPPORTO_DI_LAVORO = "Data di inizio rapporto di lavoro";
+    public static final String EMAIL = "Email";
+    public static final String INDIRIZZO_DI_REPERIBILITA = "Indirizzo di Reperibilita'";
+    public static final String LAUREA = "Laurea";
+    public static final String UNIVERSITA = "Università";
+    public static final String DATA_DI_INIZIO_RAPPORTO_DI_LAVORO = "Data di inizio rapporto di lavoro";
+    public static final String DATORE_DI_LAVORO_ATTUALE = "Datore di lavoro attuale";
+    public static final String RUOLO = "Ruolo";
+    public static final String SETTORE = "Settore";
+    public static final String DIPENDENTE_PUBBLICO = "Dipendente Pubblico";
+    public static final String POSIZIONE = "Posizione";
+    public static final String OCCUPATO = "Occupato";
+    public static final String FASCIA_PROFESSIONALE_VALIDATA = "Fascia Professionale Validata";
+    public static final String DATORE_DI_LAVORO = "Datore di Lavoro";
+    public static final String ANNOTAZIONE = "Annotazione";
+	public static final String DATA_DI_NASCITA = "Data di nascita";
+	public static final String SESSO = "Sesso";
+	public static final String NAZIONE_DI_NASCITA = "Nazione di nascita";
+	public static final String LUOGO_DI_NASCITA = "Luogo di nascita";
+	public static final String PROV_DI_NASCITA = "Prov. di nascita";
+	public static final String NAZIONE_DI_RESIDENZA = "Nazione di Residenza";
+	public static final String PROVINCIA_DI_RESIDENZA = "Provincia di Residenza";
+	public static final String COMUNE_DI_RESIDENZA = "Comune di Residenza";
+	public static final String INDIRIZZO_DI_RESIDENZA = "Indirizzo di Residenza";
+	public static final String CAP_DI_RESIDENZA = "CAP di Residenza";
+	public static final String CODICE_FISCALE = "Codice Fiscale";
+	public static final String EMAIL_PEC = "Email PEC";
+	public static final String NAZIONE_REPERIBILITA = "Nazione Reperibilita'";
+	public static final String PROVINCIA_DI_REPERIBILITA = "Provincia di Reperibilita'";
+	public static final String COMUNE_DI_REPERIBILITA = "Comune di Reperibilita'";
+	public static final String CAP_DI_REPERIBILITA = "CAP di Reperibilita'";
+    public static final String TELEFONO = "Telefono";
+	public static final String DATA_INVIO_DOMANDA = "Data Invio Domanda";
+	public static final String FASCIA_PROFESSIONALE_ATTRIBUITA = "Fascia Professionale Attribuita";
+	public static final String NOME = "Nome";
+	public static final String COGNOME = "Cognome";
+	public static final String DATA_ISCRIZIONE_IN_ELENCO = "Data Iscrizione in Elenco";
+    public static final String TIPOLOGIA_ESPERIENZA_PROFESSIONALE_OIV = "Tipologia esperienza (Professionale/OIV)";
+    public static final String AREA_DI_SPECIALIZZAZIONE = "Area di specializzazione";
+    public static final String ATTIVITÀ_SVOLTA_NELL_AREA_DI_SPECIALIZZAZIONE_INDICATA = "Attività svolta nell’area di specializzazione indicata";
+    public static final String DATA_INIZIO_TIPOLOGIA_ESPERIENZA = "Data inizio(Tipologia esperienza)";
+    public static final String DATA_FINE_TIPOLOGIA_ESPERIENZA = "Data fine(Tipologia esperienza)";
+    public static final String NON_COERENTE = "Non coerente";
+    public static final String MOTIVAZIONE = "Motivazione";
+    public static final String DA = "Da";
+    public static final String A = "A";
+    public static final String AMMINISTRAZIONE_PUBBLICA = "Amministrazione pubblica";
+    public static final String SEDE = "Sede";
+    public static final String COMUNE = "Comune";
+    public static final String INDIRIZZO = "Indirizzo";
+    public static final String CAP = "CAP";
+    public static final String N_DIPENDENTI = "N. dipendenti";
+    public static final String DATORE_DI_LAVORO_COMMITTENTE = "Datore di Lavoro/Committente";
+    public static final String STATO = "Stato";
+    public static final String ANNOTAZIONI = "Annotazioni";
+    public static final String JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO = "jconon_application:progressivo_iscrizione_elenco";
+    public static final String JCONON_APPLICATION_USER = "jconon_application:user";
 
-	private static final String DATORE_DI_LAVORO_ATTUALE = "Datore di lavoro attuale";
-
-	private static final String RUOLO2 = "Ruolo";
-
-	private static final String SETTORE = "Settore";
-
-	private static final String DIPENDENTE_PUBBLICO = "Dipendente Pubblico";
-
-	private static final String POSIZIONE = "Posizione";
-
-	private static final String OCCUPATO = "Occupato";
-
-	private static final String FASCIA_PROFESSIONALE_VALIDATA = "Fascia Professionale Validata";
-
-	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO = "jconon_attachment:esperienza_professionale_datore_lavoro";
-
-	private static final String DATORE_DI_LAVORO = "Datore di Lavoro";
-
-	private static final String ANNOTAZIONE = "Annotazione";
-
-	private static final String RUOLO = RUOLO2;
-
-	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A = "jconon_attachment:esperienza_professionale_a";
-
-	private static final String JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO = "jconon_attachment:esperienza_professionale_ruolo";
-
-	private static final String JCONON_SCHEDA_ANONIMA_ESPERIENZA_PROFESSIONALE = "jconon_scheda_anonima:esperienza_professionale";
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(PrintService.class);
-	
-	private static final String JCONON_SCHEDA_ANONIMA_DOCUMENT = "jconon_scheda_anonima:document";
-	public static final String P_JCONON_APPLICATION_ASPECT_FASCIA_PROFESSIONALE_ATTRIBUITA = "P:jconon_application:aspect_fascia_professionale_attribuita";
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"), 
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy"),
 			dateTimeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");	
 	private List<String> headCSVApplication = Arrays.asList(
-			"Id","Data Iscrizione in Elenco", "Cognome","Nome","Data di nascita","Sesso","Nazione di nascita",
-			"Luogo di nascita","Prov. di nascita","Nazione di Residenza","Provincia di Residenza",
-			"Comune di Residenza","Indirizzo di Residenza","CAP di Residenza","Codice Fiscale",
-			"Email","Email PEC","Nazione Reperibilita'","Provincia di Reperibilita'",
-			"Comune di Reperibilita'","Indirizzo di Reperibilita'",
-			"CAP di Reperibilita'","Telefono","Data Invio Domanda",
-			"Laurea", "Università",
-			"Fascia Professionale Attribuita",
-			"Stato",
-			"Stato Corrente",
+			"Id",
+			DATA_ISCRIZIONE_IN_ELENCO,
+			COGNOME,
+			NOME,
+			DATA_DI_NASCITA,
+			SESSO,
+			NAZIONE_DI_NASCITA,
+			LUOGO_DI_NASCITA,
+			PROV_DI_NASCITA,
+			NAZIONE_DI_RESIDENZA,
+			PROVINCIA_DI_RESIDENZA,
+			COMUNE_DI_RESIDENZA,
+			INDIRIZZO_DI_RESIDENZA,
+			CAP_DI_RESIDENZA,
+			CODICE_FISCALE,
+			EMAIL,
+			EMAIL_PEC,
+			NAZIONE_REPERIBILITA,
+			PROVINCIA_DI_REPERIBILITA,
+			COMUNE_DI_REPERIBILITA,
+			INDIRIZZO_DI_REPERIBILITA,
+			CAP_DI_REPERIBILITA,
+			TELEFONO,
+			DATA_INVIO_DOMANDA,
+			LAUREA,
+            UNIVERSITA,
+			FASCIA_PROFESSIONALE_ATTRIBUITA,
 			RUOLO,
 			DATORE_DI_LAVORO,
 			ANNOTAZIONE,
@@ -117,83 +164,118 @@ public class PrintOIVService extends PrintService {
 			POSIZIONE,
 			DIPENDENTE_PUBBLICO,
 			SETTORE,
-			RUOLO2,
+            RUOLO,
 			DATORE_DI_LAVORO_ATTUALE,
 			DATA_DI_INIZIO_RAPPORTO_DI_LAVORO
 			);
 	
 	private List<String> headDetailCSVApplication = Stream.concat(headCSVApplication.stream()
-				.filter(x -> !x.equalsIgnoreCase(RUOLO))
-				.filter(x -> !x.equalsIgnoreCase(ANNOTAZIONE))
-				.filter(x -> !x.equalsIgnoreCase(FASCIA_PROFESSIONALE_VALIDATA))
-				.filter(x -> !x.equalsIgnoreCase(DATORE_DI_LAVORO))
-				.filter(x -> !x.equalsIgnoreCase(OCCUPATO))
-				.filter(x -> !x.equalsIgnoreCase(POSIZIONE))
-				.filter(x -> !x.equalsIgnoreCase(DIPENDENTE_PUBBLICO))
-				.filter(x -> !x.equalsIgnoreCase(SETTORE))
-				.filter(x -> !x.equalsIgnoreCase(RUOLO2))
-				.filter(x -> !x.equalsIgnoreCase(DATORE_DI_LAVORO_ATTUALE))
-				.filter(x -> !x.equalsIgnoreCase(DATA_DI_INIZIO_RAPPORTO_DI_LAVORO)), Arrays.asList(
-			"Tipologia esperienza (Professionale/OIV)",
-			"Area di specializzazione",
-			"Attività svolta nell’area di specializzazione indicata",
-			RUOLO,
-			"Data inizio(Tipologia esperienza)",
-			"Data fine(Tipologia esperienza)",
-			"Non coerente", 
-			"Motivazione", 
-			ANNOTAZIONE,
-			FASCIA_PROFESSIONALE_VALIDATA,
-			OCCUPATO,
-			POSIZIONE,
-			DIPENDENTE_PUBBLICO,
-			SETTORE,
-			RUOLO2,
-			DATORE_DI_LAVORO_ATTUALE,
-			DATA_DI_INIZIO_RAPPORTO_DI_LAVORO).stream()).collect(Collectors.toList());
+            .filter(x -> !Arrays.asList(
+                    DATA_DI_NASCITA,
+                    SESSO,
+                    NAZIONE_DI_NASCITA,
+                    LUOGO_DI_NASCITA,
+                    PROV_DI_NASCITA,
+                    NAZIONE_DI_RESIDENZA,
+                    PROVINCIA_DI_RESIDENZA,
+                    COMUNE_DI_RESIDENZA,
+                    INDIRIZZO_DI_RESIDENZA,
+                    CAP_DI_RESIDENZA,
+                    CODICE_FISCALE,
+                    EMAIL,
+                    EMAIL_PEC,
+                    NAZIONE_REPERIBILITA,
+                    COMUNE_DI_REPERIBILITA,
+                    PROVINCIA_DI_REPERIBILITA,
+                    INDIRIZZO_DI_REPERIBILITA,
+                    CAP_DI_REPERIBILITA,
+                    TELEFONO,
+                    LAUREA,
+                    UNIVERSITA,
+                    RUOLO,
+                    ANNOTAZIONE,
+                    FASCIA_PROFESSIONALE_VALIDATA,
+                    DATORE_DI_LAVORO,
+                    OCCUPATO,
+                    POSIZIONE,
+                    DIPENDENTE_PUBBLICO,
+                    SETTORE,
+                    RUOLO,
+                    DATORE_DI_LAVORO_ATTUALE,
+                    DATA_DI_INIZIO_RAPPORTO_DI_LAVORO
+            ).contains(x)),
+            Arrays.asList(
+                TIPOLOGIA_ESPERIENZA_PROFESSIONALE_OIV,
+                AREA_DI_SPECIALIZZAZIONE,
+                ATTIVITÀ_SVOLTA_NELL_AREA_DI_SPECIALIZZAZIONE_INDICATA,
+                RUOLO,
+                DATA_INIZIO_TIPOLOGIA_ESPERIENZA,
+                DATA_FINE_TIPOLOGIA_ESPERIENZA,
+                MOTIVAZIONE,
+                ANNOTAZIONE,
+                FASCIA_PROFESSIONALE_VALIDATA
+            ).stream()).collect(Collectors.toList());
 	private List<String> headCSVElenco = Arrays.asList(
-			"Id","Nome", "Cognome","Data iscrizione");
+			"Id",NOME, COGNOME,DATA_ISCRIZIONE_IN_ELENCO);
 
     private final static String PRECEDENTE_INCARICO_OIV = "Precedente Incarico OIV\n";
     private final static String ESPERIENZA_PROFESSIONALE = "Esperienza professionale\n";
+
     private List<String> headCSVApplicationAllIscritti = Arrays.asList(
-            "Id","Data Iscrizione in Elenco", "Cognome","Nome","Data di nascita","Sesso","Nazione di nascita",
-            "Luogo di nascita","Prov. di nascita","Nazione di Residenza","Provincia di Residenza",
-            "Comune di Residenza","Indirizzo di Residenza","CAP di Residenza","Codice Fiscale",
-            "Email","Email PEC","Nazione Reperibilita'","Provincia di Reperibilita'",
-            "Comune di Reperibilita'","Indirizzo di Reperibilita'",
-            "CAP di Reperibilita'","Telefono","Data Invio Domanda",
-            "Laurea", "Università",
-            "Fascia Professionale Attribuita",
+            "Id",
+			DATA_ISCRIZIONE_IN_ELENCO,
+			COGNOME,
+			NOME,
+			DATA_DI_NASCITA,
+			SESSO,
+			NAZIONE_DI_NASCITA,
+            LUOGO_DI_NASCITA,
+			PROV_DI_NASCITA,
+			NAZIONE_DI_RESIDENZA,
+			PROVINCIA_DI_RESIDENZA,
+            COMUNE_DI_RESIDENZA,
+			INDIRIZZO_DI_RESIDENZA,
+			CAP_DI_RESIDENZA,
+			CODICE_FISCALE,
+            EMAIL,
+			EMAIL_PEC,
+			NAZIONE_REPERIBILITA,
+			PROVINCIA_DI_REPERIBILITA,
+            COMUNE_DI_REPERIBILITA,
+			INDIRIZZO_DI_REPERIBILITA,
+            CAP_DI_REPERIBILITA,
+			TELEFONO,
+			DATA_INVIO_DOMANDA,
+            LAUREA,
+            UNIVERSITA,
+            FASCIA_PROFESSIONALE_ATTRIBUITA,
             FASCIA_PROFESSIONALE_VALIDATA,
             OCCUPATO,
             POSIZIONE,
             DIPENDENTE_PUBBLICO,
             SETTORE,
-            RUOLO2,
+            RUOLO,
             DATORE_DI_LAVORO_ATTUALE,
             DATA_DI_INIZIO_RAPPORTO_DI_LAVORO,
-            "Stato",
-            "Stato Corrente",
-            PRECEDENTE_INCARICO_OIV + "Da",
-            PRECEDENTE_INCARICO_OIV + "A",
-            PRECEDENTE_INCARICO_OIV + "Amministrazione pubblica",
-            PRECEDENTE_INCARICO_OIV + "Sede",
-            PRECEDENTE_INCARICO_OIV + "Comune",
-            PRECEDENTE_INCARICO_OIV + "Indirizzo",
-            PRECEDENTE_INCARICO_OIV + "CAP",
-            PRECEDENTE_INCARICO_OIV + "Telefono",
-            PRECEDENTE_INCARICO_OIV + "N. dipendenti",
-            PRECEDENTE_INCARICO_OIV + "Ruolo",
-            ESPERIENZA_PROFESSIONALE + "Da",
-            ESPERIENZA_PROFESSIONALE + "A",
-            ESPERIENZA_PROFESSIONALE + "Area di specializzazione",
-            ESPERIENZA_PROFESSIONALE + "Attività svolta nell’area di specializzazione indicata",
-            ESPERIENZA_PROFESSIONALE + "Datore di Lavoro/Committente",
-            ESPERIENZA_PROFESSIONALE + "Ruolo",
-            ESPERIENZA_PROFESSIONALE + "Comune",
-            ESPERIENZA_PROFESSIONALE + "Stato",
-            "Annotazioni"
+            PRECEDENTE_INCARICO_OIV + DA,
+            PRECEDENTE_INCARICO_OIV + A,
+            PRECEDENTE_INCARICO_OIV + AMMINISTRAZIONE_PUBBLICA,
+            PRECEDENTE_INCARICO_OIV + SEDE,
+            PRECEDENTE_INCARICO_OIV + COMUNE,
+            PRECEDENTE_INCARICO_OIV + INDIRIZZO,
+            PRECEDENTE_INCARICO_OIV + CAP,
+            PRECEDENTE_INCARICO_OIV + TELEFONO,
+            PRECEDENTE_INCARICO_OIV + N_DIPENDENTI,
+            PRECEDENTE_INCARICO_OIV + RUOLO,
+            ESPERIENZA_PROFESSIONALE + DA,
+            ESPERIENZA_PROFESSIONALE + A,
+            ESPERIENZA_PROFESSIONALE + AREA_DI_SPECIALIZZAZIONE,
+            ESPERIENZA_PROFESSIONALE + ATTIVITÀ_SVOLTA_NELL_AREA_DI_SPECIALIZZAZIONE_INDICATA,
+            ESPERIENZA_PROFESSIONALE + DATORE_DI_LAVORO_COMMITTENTE,
+            ESPERIENZA_PROFESSIONALE + RUOLO,
+            ESPERIENZA_PROFESSIONALE + COMUNE,
+            ESPERIENZA_PROFESSIONALE + STATO,
+            ANNOTAZIONI
     );
 
 	public static final String SHEET_DOMANDE = "domande";
@@ -275,7 +357,7 @@ public class PrintOIVService extends PrintService {
                                 .map(o -> !o.equals(esclusioneRinuncia))
                                 .orElse(true))
                     continue;
-                if (Optional.ofNullable(attive).isPresent() && application.getPropertyValue("jconon_application:progressivo_iscrizione_elenco") == null)
+                if (Optional.ofNullable(attive).isPresent() && application.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO) == null)
                     continue;
 
                 applicationList.add((Folder)application);
@@ -292,7 +374,7 @@ public class PrintOIVService extends PrintService {
         ItemIterable<QueryResult> iterableOIV = criteriaOIV.executeQuery(session, false, getMinimalContext(session));
         for (QueryResult oiv : iterableOIV.getPage(Integer.MAX_VALUE)) {
             Document oivObject = (Document) session.getObject(String.valueOf(oiv.getPropertyById(PropertyIds.OBJECT_ID).getFirstValue()), getMinimalContext(session));
-            getRecordCSV(session, applicationObject, oivObject, applicationNumber, user, sheet, null, null, index++);
+            getRecordCSV(session, applicationObject, oivObject, applicationNumber, user, sheet, null, null, index++, true);
         }
         return index;
     }
@@ -302,7 +384,7 @@ public class PrintOIVService extends PrintService {
         getRecordCSV(session, applicationObject, null, applicationNumber, user, sheet,
                 Optional.ofNullable(lastEsperienza).map(x -> x.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_RUOLO)).orElse(""),
                 Optional.ofNullable(lastEsperienza).map(x -> x.<String>getPropertyValueById(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_DATORE_LAVORO)).orElse(""),
-                index++);
+                index++, false);
         return index;
     }
 
@@ -339,10 +421,10 @@ public class PrintOIVService extends PrintService {
         HSSFSheet sheetLastEsperienze = wbLastEsperienze.getSheet(SHEET_DOMANDE);
         int indexAllEsperienze = 1;
         int indexLastEsperienze = 1;
-        Stream<Folder> sorted = getAllApplication(session, null, null, null);
+        Stream<Folder> sorted = getAllApplication(session, ApplicationService.StatoDomanda.CONFERMATA.getValue(), null, null);
         int applicationNumber = 0;
         for (Folder applicationObject : sorted.collect(Collectors.toList())) {
-            CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue("jconon_application:user"));
+            CMISUser user = userService.loadUserForConfirm(applicationObject.getPropertyValue(JCONON_APPLICATION_USER));
             applicationNumber++;
             indexAllEsperienze = generateAllEsperienze(session, applicationObject, applicationNumber, indexAllEsperienze, user, sheetAllEsperienze);
             indexLastEsperienze = generateLastEsperienze(session, applicationObject, applicationNumber, indexLastEsperienze, user, sheetLastEsperienze);
@@ -408,7 +490,7 @@ public class PrintOIVService extends PrintService {
 			Session session, String query, String contexURL, String userId)
 			throws IOException {
     	Map<String, Object> model = new HashMap<String, Object>();
-    	Boolean attive = query.indexOf("jconon_application:progressivo_iscrizione_elenco") != -1 ? true : null;
+    	Boolean attive = query.indexOf(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO) != -1 ? true : null;
         String stato = query.indexOf("jconon_application:stato_domanda = 'C'") != -1 ? "C" : null;
     	HSSFWorkbook wb = generateXLS(session, stato, null, attive, false, true);
         Document doc = createXLSDocument(session, wb, userId);
@@ -423,8 +505,8 @@ public class PrintOIVService extends PrintService {
     	Criteria criteria = CriteriaFactory.createCriteria(JCONONFolderType.JCONON_APPLICATION.queryName());    	
 		criteria.addColumn(PropertyIds.OBJECT_ID);
 		criteria.add(Restrictions.inTree(callId));
-		criteria.add(Restrictions.isNotNull("jconon_application:progressivo_iscrizione_elenco"));
-		criteria.addOrder(Order.asc("jconon_application:progressivo_iscrizione_elenco"));
+		criteria.add(Restrictions.isNotNull(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO));
+		criteria.addOrder(Order.asc(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO));
 		ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
 		int index = 1;
     	for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
@@ -453,7 +535,7 @@ public class PrintOIVService extends PrintService {
 	private void getRecordElencoCSV(Session session, Folder application, HSSFSheet sheet, int index) {
     	int column = 0;
     	HSSFRow row = sheet.createRow(index);
-    	row.createCell(column++).setCellValue(Optional.ofNullable(application.getPropertyValue("jconon_application:progressivo_iscrizione_elenco")).
+    	row.createCell(column++).setCellValue(Optional.ofNullable(application.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).
     			map(numero -> String.valueOf(numero)).orElse(""));
     	row.createCell(column++).setCellValue(application.<String>getPropertyValue("jconon_application:nome").toUpperCase());    	
     	row.createCell(column++).setCellValue(application.<String>getPropertyValue("jconon_application:cognome").toUpperCase());
@@ -515,60 +597,50 @@ public class PrintOIVService extends PrintService {
 		return doc.getId();
 	}	
 
-    private void getRecordCSV(Session session, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, HSSFSheet sheet, String lastRuolo, String lastDatoreLavoro, int index) {
+    private void getRecordCSV(Session session, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, HSSFSheet sheet, String lastRuolo, String lastDatoreLavoro, int index, boolean all) {
     	int column = 0;
     	HSSFRow row = sheet.createRow(index);
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:progressivo_iscrizione_elenco")).
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).
     			map(numero -> String.valueOf(numero)).orElse(""));
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:data_iscrizione_elenco")).map(map -> 
 			dateFormat.format(((Calendar)applicationObject.getPropertyValue("jconon_application:data_iscrizione_elenco")).getTime())).orElse(""));
     	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cognome").toUpperCase());
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nome").toUpperCase());    	
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:data_nascita").getValue()).map(
-    			map -> dateFormat.format(((Calendar)map).getTime())).orElse(""));    	
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:sesso"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nazione_nascita"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:comune_nascita"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:provincia_nascita"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nazione_residenza"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:provincia_residenza"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:comune_residenza"));   			
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:indirizzo_residenza")).map(Property::getValueAsString).orElse("").concat(" - ").concat(
-    					Optional.ofNullable(applicationObject.getProperty("jconon_application:num_civico_residenza")).map(Property::getValueAsString).orElse("")));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cap_residenza"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:codice_fiscale"));
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:email_comunicazioni"))
-                .filter(s -> !s.isEmpty())
-                .orElse(Optional.ofNullable(user).map(CMISUser::getEmail).orElse("")));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:email_pec_comunicazioni"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nazione_comunicazioni"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:provincia_comunicazioni"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:comune_comunicazioni"));
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:indirizzo_comunicazioni")).map(Property::getValueAsString).orElse("").concat(" - ").concat(
-    					Optional.ofNullable(applicationObject.getProperty("jconon_application:num_civico_comunicazioni")).map(Property::getValueAsString).orElse("")));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cap_comunicazioni"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:telefono_comunicazioni"));
-    	
+    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nome").toUpperCase());
+    	if (!all) {
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:data_nascita").getValue()).map(
+                    map -> dateFormat.format(((Calendar)map).getTime())).orElse(""));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:sesso"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nazione_nascita"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:comune_nascita"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:provincia_nascita"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nazione_residenza"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:provincia_residenza"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:comune_residenza"));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:indirizzo_residenza")).map(Property::getValueAsString).orElse("").concat(" - ").concat(
+                    Optional.ofNullable(applicationObject.getProperty("jconon_application:num_civico_residenza")).map(Property::getValueAsString).orElse("")));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cap_residenza"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:codice_fiscale"));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:email_comunicazioni"))
+                    .filter(s -> !s.isEmpty())
+                    .orElse(Optional.ofNullable(user).map(CMISUser::getEmail).orElse("")));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:email_pec_comunicazioni"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:nazione_comunicazioni"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:provincia_comunicazioni"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:comune_comunicazioni"));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getProperty("jconon_application:indirizzo_comunicazioni")).map(Property::getValueAsString).orElse("").concat(" - ").concat(
+                    Optional.ofNullable(applicationObject.getProperty("jconon_application:num_civico_comunicazioni")).map(Property::getValueAsString).orElse("")));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:cap_comunicazioni"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:telefono_comunicazioni"));
+        }
     	Calendar data = Optional.ofNullable(applicationObject.<Calendar>getPropertyValue("jconon_application:data_domanda")).orElse(
     			applicationObject.<Calendar>getPropertyValue("jconon_application:data_ultimo_invio"));    	
     	row.createCell(column++).setCellValue(Optional.ofNullable(data).map(map -> 
     			dateTimeFormat.format((data).getTime())).orElse(""));
-    	
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:tipo_laurea"));
-    	row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:istituto_laurea"));
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita")).orElse("")); 
-    	row.createCell(column++).setCellValue(ApplicationService.StatoDomanda.fromValue(applicationObject.getPropertyValue("jconon_application:stato_domanda")).displayValue());
-    	if (applicationObject.getAcl() != null && applicationObject.getAcl().getAces().stream().anyMatch(
-    			x -> x.isDirect() && x.getPermissions().stream().anyMatch(permission -> permission.contains(ACLType.Consumer.name()))
-    					&& x.getPrincipal().getId().equals(applicationObject.<String>getPropertyValue("jconon_application:user")))) {
-    		if (applicationObject.<String>getPropertyValue("jconon_application:esclusione_rinuncia") != null){
-        		row.createCell(column++).setCellValue("ESCLUSA");        			        			
-    		} else {
-        		row.createCell(column++).setCellValue("INVIATA");        			
-    		}
-    	} else {
-    		row.createCell(column++).setCellValue("MODIFICA PROFILO");
-    	}
+    	if (!all) {
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:tipo_laurea"));
+            row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:istituto_laurea"));
+        }
+    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_attribuita")).orElse(""));
     	if (oivObject != null) {
         	row.createCell(column++).setCellValue(oivObject.getType().getDisplayName());
         	if (oivObject.getType().getId().equalsIgnoreCase("D:jconon_scheda_anonima:precedente_incarico_oiv")) {
@@ -588,7 +660,6 @@ public class PrintOIVService extends PrintService {
             	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.getPropertyValue(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A)).map(map -> 
         			dateFormat.format(((Calendar)oivObject.getPropertyValue(JCONON_ATTACHMENT_ESPERIENZA_PROFESSIONALE_A)).getTime())).orElse(""));    		    		
         	}
-        	row.createCell(column++).setCellValue(oivObject.getSecondaryTypes().stream().anyMatch(x -> x.getId().equals(ApplicationOIVService.P_JCONON_SCHEDA_ANONIMA_ESPERIENZA_NON_COERENTE)));
         	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_non_coerente_motivazione")).orElse(""));
         	row.createCell(column++).setCellValue(Optional.ofNullable(oivObject.<String>getPropertyValue("jconon_attachment:esperienza_annotazione_motivazione")).orElse(""));
     	} else {
@@ -597,20 +668,22 @@ public class PrintOIVService extends PrintService {
         	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_attachment:esperienza_annotazione_motivazione")).orElse(""));
     	}
     	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:fascia_professionale_validata")).orElse(""));
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<Boolean>getPropertyValue("jconon_application:fl_occupato")).map(x -> x ? SI : NO).orElse(""));
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:non_occupato")).orElse(""));    	
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<Boolean>getPropertyValue("jconon_application:fl_dipendente_pubblico")).map(x -> x ? SI : NO).orElse(""));
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_settore")).orElse(""));    	    	
-       	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_ruolo")).orElse(""));    	    	
-       	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_datore_lavoro")).orElse(""));    	    	
-    	row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:situazione_lavorativa_data_inizio_lavoro")).map(map -> 
-			dateFormat.format(((Calendar)applicationObject.getPropertyValue("jconon_application:situazione_lavorativa_data_inizio_lavoro")).getTime())).orElse(""));    		   	
+        if (!all) {
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<Boolean>getPropertyValue("jconon_application:fl_occupato")).map(x -> x ? SI : NO).orElse(""));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:non_occupato")).orElse(""));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<Boolean>getPropertyValue("jconon_application:fl_dipendente_pubblico")).map(x -> x ? SI : NO).orElse(""));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_settore")).orElse(""));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_ruolo")).orElse(""));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.<String>getPropertyValue("jconon_application:situazione_lavorativa_datore_lavoro")).orElse(""));
+            row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:situazione_lavorativa_data_inizio_lavoro")).map(map ->
+                    dateFormat.format(((Calendar)applicationObject.getPropertyValue("jconon_application:situazione_lavorativa_data_inizio_lavoro")).getTime())).orElse(""));
+        }
    }
 
     private void getRecordCSVAllIscritti(Session session, Folder applicationObject, Document oivObject, int applicationNumber, CMISUser user, HSSFSheet sheet, String lastRuolo, String lastDatoreLavoro, int index) {
         int column = 0;
         HSSFRow row = sheet.createRow(index);
-        row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:progressivo_iscrizione_elenco")).
+        row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).
                 map(numero -> String.valueOf(numero)).orElse(""));
         row.createCell(column++).setCellValue(Optional.ofNullable(applicationObject.getPropertyValue("jconon_application:data_iscrizione_elenco")).map(map ->
                 dateFormat.format(((Calendar)applicationObject.getPropertyValue("jconon_application:data_iscrizione_elenco")).getTime())).orElse(""));
@@ -661,7 +734,7 @@ public class PrintOIVService extends PrintService {
         row.createCell(column++).setCellValue(ApplicationService.StatoDomanda.fromValue(applicationObject.getPropertyValue("jconon_application:stato_domanda")).displayValue());
         if (applicationObject.getAcl() != null && applicationObject.getAcl().getAces().stream().anyMatch(
                 x -> x.isDirect() && x.getPermissions().stream().anyMatch(permission -> permission.contains(ACLType.Consumer.name()))
-                        && x.getPrincipal().getId().equals(applicationObject.<String>getPropertyValue("jconon_application:user")))) {
+                        && x.getPrincipal().getId().equals(applicationObject.<String>getPropertyValue(JCONON_APPLICATION_USER)))) {
             if (applicationObject.<String>getPropertyValue("jconon_application:esclusione_rinuncia") != null){
                 row.createCell(column++).setCellValue("ESCLUSA");
             } else {
