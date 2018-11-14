@@ -89,7 +89,7 @@ define(['jquery', 'header', 'cnr/cnr.bulkinfo', 'cnr/cnr', 'cnr/cnr.url', 'cnr/c
                     $('#intestazione').html(i18n['message.helpdesk.send.success'].replace(/<\/br>/g, "</br></br>")).addClass('alert alert-success').css("font-weight", "Bold");
                   },
                   error: function(data) {
-                    UI.error(i18n['message.helpdesk.send.failed']);
+                    UI.error(i18n['message.helpdesk.oiv.send.failed']);
                   }
                 });
               } else {
