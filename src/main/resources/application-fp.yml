@@ -8,7 +8,7 @@ mail.from.default: marco.spasiano@gmail.com
 siper.sedi.url: http://localhost:8080/rest/static/json/sedi.json
 helpdesk.url:
 helpdesk.ucat.url:
-helpdesk.istanza:
+helpdesk.istanza: HDTrasparenza
 
 rrd:
   path: remote-shared,remote-fp
