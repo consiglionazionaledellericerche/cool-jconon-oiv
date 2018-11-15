@@ -1,4 +1,8 @@
-define(['jquery', 'header', 'cnr/cnr.bulkinfo', 'cnr/cnr', 'cnr/cnr.url', 'cnr/cnr.jconon', 'json!common', 'cnr/cnr.ui', 'i18n', 'json!cache', 'cnr/cnr.call', 'cnr/cnr.search'], function($, header, BulkInfo, CNR, URL, jconon, common, UI, i18n, cache, Call, Search) {
+/*global params*/
+define(['jquery', 'header', 'cnr/cnr.bulkinfo', 'cnr/cnr', 'cnr/cnr.url', 'cnr/cnr.jconon',
+    'json!common', 'cnr/cnr.ui', 'i18n', 'json!cache', 'cnr/cnr.call', 'cnr/cnr.search'],
+  function($, header, BulkInfo, CNR, URL, jconon,
+    common, UI, i18n, cache, Call, Search) {
   "use strict";
 
   var bulkinfoReopen,
