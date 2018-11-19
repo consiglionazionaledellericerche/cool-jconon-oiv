@@ -4,11 +4,11 @@ org.apache.chemistry.opencmis.binding.spi.type: browser
 
 user.admin.password: admin
 server.context-path: /
-mail.from.default: marco.spasiano@gmail.com
 siper.sedi.url: http://localhost:8080/rest/static/json/sedi.json
-helpdesk.url:
+helpdesk.url: https://helpdesk-coll.ecaasdfp.cloudspc.it/rest
 helpdesk.ucat.url:
-helpdesk.istanza: HDTrasparenza
+helpdesk.istanza: /HDTrasparenza
+helpdesk.password: PdtAdmin
 
 rrd:
   path: remote-shared,remote-fp
