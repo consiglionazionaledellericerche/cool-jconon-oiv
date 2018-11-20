@@ -16,6 +16,7 @@
         <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
         <junit.version>4.12</junit.version>
         <spring.version>4.3.3.RELEASE</spring.version>
+        <mail.version>1.6.0</mail.version>
     </properties>
 
     <packaging>war</packaging>
@@ -29,6 +30,12 @@
             <groupId>it.cnr.si.cool.jconon</groupId>
             <artifactId>cool-jconon-webapp-resources</artifactId>
             <version>${cool-jconon.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
@@ -60,11 +67,28 @@
             <groupId>it.cnr.si.cool</groupId>
             <artifactId>cool-common-web</artifactId>
             <version>${cool-shared.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.cool</groupId>
             <artifactId>cool-common-web-js</artifactId>
             <version>${cool-shared.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>${mail.version}</version>
         </dependency>
     </dependencies>
 
