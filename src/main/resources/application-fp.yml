@@ -10,6 +10,10 @@ helpdesk.ucat.url:
 helpdesk.istanza: /HDTrasparenza
 helpdesk.password: PdtAdmin
 
+mail.smtp.auth: true
+mail.smtp.starttls.enable: true
+mail.smtp.socketFactory.fallback: false
+
 rrd:
   path: remote-shared,remote-fp
   skipmd5: true
