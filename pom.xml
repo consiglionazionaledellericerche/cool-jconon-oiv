@@ -16,7 +16,7 @@
         <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
         <junit.version>4.12</junit.version>
         <spring.version>4.3.3.RELEASE</spring.version>
-        <mail.version>1.6.0</mail.version>
+        <mail.version>1.4.7</mail.version>
     </properties>
 
     <packaging>war</packaging>
@@ -87,7 +87,7 @@
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
-            <artifactId>javax.mail-api</artifactId>
+            <artifactId>mail</artifactId>
             <version>${mail.version}</version>
         </dependency>
     </dependencies>
