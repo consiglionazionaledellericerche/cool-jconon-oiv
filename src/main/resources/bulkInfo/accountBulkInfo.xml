@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bulkInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.cnr.it/schema/BulkInfo_v2"
+          longDescription="Account" shortDescription="Account"
+          xsi:schemaLocation="http://www.cnr.it/schema/BulkInfo_v2 BulkInfo_v2">
+    <fieldProperty inputType="TEXT" label="label.account.firstName" name="firstName" property="firstName">
+        <jsonvalidator required="true"/>
+    </fieldProperty>
+    <fieldProperty inputType="TEXT" label="label.account.lastName" labelClass="control-label" name="lastName"
+                   property="lastName">
+        <jsonvalidator required="true"/>
+    </fieldProperty>
+    <fieldProperty inputType="TEXT" label="label.account.email" name="email" nullable="false" property="email"
+                   tooltip="tooltip.account.email">
+        <jsonvalidator email="true" required="true"/>
+    </fieldProperty>
+    <fieldProperty inputType="TEXT" label="label.account.confirm.email" name="confirmEmail" nullable="false"
+                   property="email" tooltip="tooltip.account.email">
+        <jsonvalidator email="true" required="true" equalTo="#email"/>
+    </fieldProperty>
+
+    <fieldProperty class="input-xlarge" inputType="TEXT" name="emailForgotPass" placeholder="label.account.email"
+                   property="email">
+        <jsonvalidator email="true" required="true"/>
+    </fieldProperty>
+    <fieldProperty inputType="TEXT" label="label.account.userName" name="userName" property="userName"
+                   tooltip="tooltip.account.userName">
+        <jsonvalidator controlloUserIdFP="true" maxlength="18" minlength="6" required="true"/>
+    </fieldProperty>
+    <fieldProperty inputType="HIDDEN" name="hiddenUsername" property="userName"/>
+    <fieldProperty inputType="PASSWORD" label="label.account.oldpassword" labelClass="control-label" name="oldpassword"
+                   property="oldpassword">
+        <jsonvalidator required="true"/>
+    </fieldProperty>
+    <fieldProperty inputType="PASSWORD" label="label.account.password" labelClass="control-label" name="password"
+                   nullable="false" property="password">
+        <jsonvalidator minlength="3"/>
+    </fieldProperty>
+    <fieldProperty inputType="PASSWORD" label="label.account.confirmPassword" labelClass="control-label"
+                   name="confirmPassword" nullable="false" property="confirmPassword">
+        <jsonvalidator equalTo="#password" required="true"/>
+    </fieldProperty>
+    <fieldProperty class="uppercase" inputType="TEXT" label="label.account.codicefiscale" labelClass="control-label"
+                   name="codicefiscale" property="codicefiscale">
+        <jsonvalidator controlloCodicefiscale="true" required="true"/>
+    </fieldProperty>
+
+    <fieldProperty class="check" default="false" inputType="RADIOGROUP" label="label.account.nazionalita"
+                   labelClass="control-label" name="nazionalita" property="straniero" widget="ui.radio">
+        <jsonlist>
+            <listElement defaultLabel="Italiana" id="italy" key="false" label="label.account.nationality.italian"/>
+            <listElement defaultLabel="Estera" id="foreign" key="true" label="label.account.nationality.foreign"/>
+        </jsonlist>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+
+    <fieldProperty class="check" inputType="RADIOGROUP" label="label.account.sesso" labelClass="control-label"
+                   name="sesso" property="sesso" widget="ui.radio">
+        <jsonlist>
+            <listElement defaultLabel="M" key="M" label="label.account.sesso.M"/>
+            <listElement defaultLabel="F" key="F" label="label.account.sesso.M"/>
+        </jsonlist>
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty class="input-small" format="DD/MM/YYYY" inputType="TEXT" label="label.account.data.nascita"
+                   name="dataDiNascita" nullable="false" property="dataDiNascita" widget="ui.datepicker">
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty class="input-large" inputType="TEXT" label="label.account.statoestero" name="statoestero"
+                   property="statoestero" widget="ui.country">
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+
+    <formFieldProperty name="firstName"/>
+    <formFieldProperty name="lastName"/>
+    <formFieldProperty name="email"/>
+    <formFieldProperty name="emailForgotPass"/>
+    <formFieldProperty name="userName"/>
+    <formFieldProperty name="password"/>
+    <formFieldProperty name="confirmPassword"/>
+    <formFieldProperty name="codicefiscale"/>
+    <formFieldProperty name="nazionalita"/>
+    <formFieldProperty name="sesso"/>
+    <formFieldProperty name="dataDiNascita"/>
+    <formFieldProperty name="statoestero"/>
+
+    <form name="infoUser">
+        <formFieldProperty name="lastName"/>
+        <formFieldProperty name="email"/>
+    </form>
+    <form name="forgotPassword">
+        <formFieldProperty name="password"/>
+        <formFieldProperty name="confirmPassword"/>
+    </form>
+    <form name="changePassword">
+        <formFieldProperty name="oldpassword"/>
+        <formFieldProperty name="password"/>
+        <formFieldProperty name="confirmPassword"/>
+    </form>
+
+    <form name="italy">
+        <formFieldProperty name="codicefiscale"/>
+    </form>
+    <form name="foreign">
+        <formFieldProperty name="sesso"/>
+        <formFieldProperty name="dataDiNascita"/>
+        <formFieldProperty name="statoestero"/>
+    </form>
+
+    <form name="createUser">
+        <formFieldProperty name="firstName"/>
+        <formFieldProperty name="lastName"/>
+        <formFieldProperty name="email"/>
+        <formFieldProperty name="confirmEmail"/>
+        <formFieldProperty name="userName"/>
+        <formFieldProperty name="password"/>
+        <formFieldProperty name="confirmPassword"/>
+        <formFieldProperty name="nazionalita"/>
+    </form>
+
+    <columnSet name="displayUser">
+        <columnFieldProperty name="userName"
+                             label="cm.userName"/>
+        <columnFieldProperty name="firstName"/>
+        <columnFieldProperty name="lastName"/>
+        <columnFieldProperty name="email"/>
+        <columnFieldProperty name="codicefiscale"/>
+    </columnSet>
+
+    <form name="editUser">
+        <formFieldProperty name="hiddenUsername"/>
+        <formFieldProperty name="firstName"/>
+        <formFieldProperty name="lastName"/>
+        <formFieldProperty name="email"/>
+        <formFieldProperty name="nazionalita"/>
+    </form>
+    <form name="forgotPass">
+        <formFieldProperty name="emailForgotPass"/>
+    </form>
+
+</bulkInfo>

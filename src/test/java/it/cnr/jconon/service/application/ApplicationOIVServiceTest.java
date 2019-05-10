@@ -101,8 +101,15 @@ public class ApplicationOIVServiceTest {
     }
 
     public static void main(String[] args) {
-        createBandoOIV();
-    }
+        //createBandoOIV();
+		Session session = getRepositorySession("marco.spasiano", "0508jada");
+		Map<String, Object> properties = new HashMap<String, Object>();
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.systemDefault()));
+		calendar.set(2018,11,19,11,0,0);
+		properties.put("jconon_call_procedura_comparativa:ora_fine_proroga",null);
+		properties.put("jconon_call_procedura_comparativa:data_fine_proroga",null);
+		session.getObject("9026a0d3-ac38-4296-bfe0-80b9c1c4ee56").updateProperties(properties);
+	}
 
     private static void createBandoOIV() {
         Session session = getRepositorySession("admin", "admin");
@@ -508,7 +515,7 @@ public class ApplicationOIVServiceTest {
     {
 
         Map<String, String> sessionParameters = new HashMap<String, String>();
-        sessionParameters.put(SessionParameter.BROWSER_URL, "http://alfresco-community.test.si.cnr.it/alfresco/api/-default-/public/cmis/versions/1.1/browser");
+        sessionParameters.put(SessionParameter.BROWSER_URL, "http://alfresco.ecaasdfp.cloudspc.it/alfresco/api/-default-/public/cmis/versions/1.1/browser");
         sessionParameters.put("org.apache.chemistry.opencmis.binding.spi.type","browser");
         sessionParameters.put(SessionParameter.USER, userName);
         sessionParameters.put(SessionParameter.PASSWORD, password);
