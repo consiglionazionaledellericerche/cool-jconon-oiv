@@ -104,11 +104,8 @@ public class ApplicationOIVServiceTest {
         //createBandoOIV();
 		Session session = getRepositorySession("marco.spasiano", "0508jada");
 		Map<String, Object> properties = new HashMap<String, Object>();
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.systemDefault()));
-		calendar.set(2018,11,19,11,0,0);
-		properties.put("jconon_call_procedura_comparativa:ora_fine_proroga",null);
-		properties.put("jconon_call_procedura_comparativa:data_fine_proroga",null);
-		session.getObject("9026a0d3-ac38-4296-bfe0-80b9c1c4ee56").updateProperties(properties);
+		properties.put("jconon_application:cognome","Di Rella");
+		session.getObject("df5a9579-1361-41dd-bf96-8ff06f17b527").updateProperties(properties);
 	}
 
     private static void createBandoOIV() {
