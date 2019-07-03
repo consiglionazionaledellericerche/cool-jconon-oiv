@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+  ~ Copyright (C) 2019  Consiglio Nazionale delle Ricerche
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as
+  ~     published by the Free Software Foundation, either version 3 of the
+  ~     License, or (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <!-- Custom Model -->
 
 <!-- Note: This model is pre-configured to load at startup of the Repository.  So, all custom -->
@@ -7,147 +24,147 @@
 
 <model name="jconon_scheda_anonima:model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
-	<!-- Optional meta-data about the model -->   
-	<description>CNR CV Element Model</description>
-	<author>Marco Spasiano</author>
-	<version>1.0</version>
+    <!-- Optional meta-data about the model -->
+    <description>CNR CV Element Model</description>
+    <author>Marco Spasiano</author>
+    <version>1.0</version>
 
-	<imports>
-		<!-- Import Alfresco Dictionary Definitions -->
-		<import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
-		<!-- Import Alfresco Content Domain Model Definitions -->
-		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
-		<import uri="http://www.cnr.it/model/jconon_attachment/cmis"
-			prefix="jconon_attachment" />		
-	</imports>
+    <imports>
+        <!-- Import Alfresco Dictionary Definitions -->
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+        <!-- Import Alfresco Content Domain Model Definitions -->
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+        <import uri="http://www.cnr.it/model/jconon_attachment/cmis"
+                prefix="jconon_attachment"/>
+    </imports>
 
-	<!-- Introduction of new namespaces defined by this model -->
-	<!-- NOTE: The following namespace custom.model should be changed to reflect your own namespace -->
-	<namespaces>
-		<namespace uri="http://www.cnr.it/model/jconon_scheda_anonima/1.0" prefix="jconon_scheda_anonima"/>
-	</namespaces>
+    <!-- Introduction of new namespaces defined by this model -->
+    <!-- NOTE: The following namespace custom.model should be changed to reflect your own namespace -->
+    <namespaces>
+        <namespace uri="http://www.cnr.it/model/jconon_scheda_anonima/1.0" prefix="jconon_scheda_anonima"/>
+    </namespaces>
 
-	<!-- CONSTRAINS -->        
-	<constraints>
-		<constraint name="jconon_scheda_anonima:medioLenght" type="LENGTH">
-			<parameter name="minLength">
-				<value>0</value>
-			</parameter>
-			<parameter name="maxLength">
-				<value>1000</value>
-			</parameter>
-		</constraint>
-		<constraint name="jconon_scheda_anonima:elenco_oiv_numero_dipendenti_values" type="LIST">
-			<parameter name="allowedValues">
-				<list>
-					<value>&lt;250</value>
-					<value>&gt;=250</value>
-				</list>
-			</parameter>
-		</constraint>
-		<constraint name="jconon_scheda_anonima:elenco_oiv_ruolo_values" type="LIST">
-			<parameter name="allowedValues">
-				<list>
-					<value>Componente</value>
-					<value>Monocratico/Presidente</value>
-				</list>
-			</parameter>
-		</constraint>		
-	</constraints>
-	<!-- TYPES -->      
-	<types>
-	<!-- NEW TYPES -->
-		<type name="jconon_scheda_anonima:document">
-			<title>Scheda anonima</title>
-			<parent>jconon_attachment:document</parent>
-		</type>
-		<type name="jconon_scheda_anonima:esperienza_professionale">
-			<title>Esperienza professionale</title>
-			<description>Esperienza Professionale</description>
-			<parent>jconon_scheda_anonima:document</parent>
-			<properties>
-				<property name="jconon_attachment:esperienza_professionale_da">
-					<title>Da</title>
-					<description>a]</description>
-					<type>d:datetime</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_incorso">
-					<title>In corso</title>
-					<description>b] ui.radio</description>
-					<type>d:boolean</type>
-					<mandatory>true</mandatory>
-					<default>false</default>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_a">
-					<title>A</title>
-					<description>c] class:esperienza_professionale_incorso_false</description>
-					<type>d:datetime</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_area_specializzazione">
-					<title>Area di specializzazione</title>
-					<description>d]</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-					<constraints>
-						<constraint ref="jconon_attachment:elenco_area_specializzazione_values" />
-					</constraints>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_attivita_svolta">
-					<title>Attività svolta nell’area di specializzazione indicata</title>
-					<description>e] inputType:TEXTAREA</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:fl_amministrazione_pubblica">
-					<title>Amministrazione Pubblica</title>
-					<description>f] ui.radio</description>
-					<type>d:boolean</type>
-					<mandatory>true</mandatory>
-					<default>false</default>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_cod_amm_ipa">
-					<title>Codice IPA</title>
-					<description>g] inputType:ROTEXT class:fl_amministrazione_pubblica_true</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
+    <!-- CONSTRAINS -->
+    <constraints>
+        <constraint name="jconon_scheda_anonima:medioLenght" type="LENGTH">
+            <parameter name="minLength">
+                <value>0</value>
+            </parameter>
+            <parameter name="maxLength">
+                <value>1000</value>
+            </parameter>
+        </constraint>
+        <constraint name="jconon_scheda_anonima:elenco_oiv_numero_dipendenti_values" type="LIST">
+            <parameter name="allowedValues">
+                <list>
+                    <value>&lt;250</value>
+                    <value>&gt;=250</value>
+                </list>
+            </parameter>
+        </constraint>
+        <constraint name="jconon_scheda_anonima:elenco_oiv_ruolo_values" type="LIST">
+            <parameter name="allowedValues">
+                <list>
+                    <value>Componente</value>
+                    <value>Monocratico/Presidente</value>
+                </list>
+            </parameter>
+        </constraint>
+    </constraints>
+    <!-- TYPES -->
+    <types>
+        <!-- NEW TYPES -->
+        <type name="jconon_scheda_anonima:document">
+            <title>Scheda anonima</title>
+            <parent>jconon_attachment:document</parent>
+        </type>
+        <type name="jconon_scheda_anonima:esperienza_professionale">
+            <title>Esperienza professionale</title>
+            <description>Esperienza Professionale</description>
+            <parent>jconon_scheda_anonima:document</parent>
+            <properties>
+                <property name="jconon_attachment:esperienza_professionale_da">
+                    <title>Da</title>
+                    <description>a]</description>
+                    <type>d:datetime</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:esperienza_professionale_incorso">
+                    <title>In corso</title>
+                    <description>b] ui.radio</description>
+                    <type>d:boolean</type>
+                    <mandatory>true</mandatory>
+                    <default>false</default>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:esperienza_professionale_a">
+                    <title>A</title>
+                    <description>c] class:esperienza_professionale_incorso_false</description>
+                    <type>d:datetime</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:esperienza_professionale_area_specializzazione">
+                    <title>Area di specializzazione</title>
+                    <description>d]</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                    <constraints>
+                        <constraint ref="jconon_attachment:elenco_area_specializzazione_values"/>
+                    </constraints>
+                </property>
+                <property name="jconon_attachment:esperienza_professionale_attivita_svolta">
+                    <title>Attività svolta nell’area di specializzazione indicata</title>
+                    <description>e] inputType:TEXTAREA</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:fl_amministrazione_pubblica">
+                    <title>Amministrazione Pubblica</title>
+                    <description>f] ui.radio</description>
+                    <type>d:boolean</type>
+                    <mandatory>true</mandatory>
+                    <default>false</default>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:esperienza_professionale_cod_amm_ipa">
+                    <title>Codice IPA</title>
+                    <description>g] inputType:ROTEXT class:fl_amministrazione_pubblica_true</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
                 <property name="jconon_attachment:esperienza_professionale_amministrazione">
                     <title>Amministrazione</title>
                     <description>h] class:fl_amministrazione_pubblica_true widget:ui.amministrazioni-ipa</description>
@@ -160,229 +177,229 @@
                     </index>
                 </property>
 
-				<property name="jconon_attachment:esperienza_professionale_datore_lavoro">
-					<title>Datore di Lavoro/Committente</title>
-					<description>i] class:fl_amministrazione_pubblica_false</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_ruolo">
-					<title>Ruolo</title>
-					<description>l]</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_citta">
-					<title>Comune</title>
-					<description>m]</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:esperienza_professionale_stato_estero">
-					<title>Stato</title>
-					<description>n] class:fl_amministrazione_pubblica_false</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-			</properties>	
-		</type>
-		<type name="jconon_scheda_anonima:precedente_incarico_oiv">
-			<title>Incarichi OIV/Nuclei</title>
-			<parent>jconon_scheda_anonima:document</parent>
-			<properties>
-				<property name="jconon_attachment:precedente_incarico_oiv_da">
-					<title>Da</title>
-					<description>a]</description>
-					<type>d:datetime</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_incorso">
-					<title>In corso</title>
-					<description>b] ui.radio</description>
-					<type>d:boolean</type>
-					<mandatory>true</mandatory>
-					<default>false</default>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_a">
-					<title>A</title>
-					<description>c] class:precedente_incarico_oiv_incorso_false</description>
-					<type>d:datetime</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_cod_amm_ipa">
-					<title>Codice IPA</title>
-					<description>d] inputType:ROTEXT</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_amministrazione">
-					<title>Amministrazione pubblica</title>
-					<description>e] widget:ui.amministrazioni-ipa</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_sede">
-					<title>Sede</title>
-					<description>f] class:input-xxlarge</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_comune">
-					<title>Comune</title>
-					<description>g] class:input-xlarge</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_indirizzo">
-					<title>Indirizzo</title>
-					<description>h] class:input-xxlarge</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_cap">
-					<title>CAP</title>
-					<description>i] class:input-medium</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_telefono">
-					<title>Telefono</title>
-					<description>l] class:input-large</description>
-					<type>d:text</type>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_numero_dipendenti">
-					<title>N. dipendenti</title>
-					<description>m]</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-					<constraints>
-						<constraint ref="jconon_scheda_anonima:elenco_oiv_numero_dipendenti_values" />
-					</constraints>
-				</property>
-				<property name="jconon_attachment:precedente_incarico_oiv_ruolo">
-					<title>Ruolo</title>
-					<description>n]</description>
-					<type>d:text</type>
-					<mandatory>true</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-					<constraints>
-						<constraint ref="jconon_scheda_anonima:elenco_oiv_ruolo_values" />
-					</constraints>
-				</property>
-			</properties>
-		</type>
-	</types>
-	<aspects>
-		<aspect name="jconon_scheda_anonima:esperienza_non_coerente">
-			<title>Esperienza non coerente</title>
-			<properties>			
-				<property name="jconon_attachment:esperienza_non_coerente_motivazione">
-					<title>Motivazione</title>
-					<description>a] inputType:TEXTAREA</description>
-					<type>d:text</type>
-					<mandatory>false</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-			</properties>
-		</aspect>
-		<aspect name="jconon_scheda_anonima:esperienza_annotazioni">
-			<title>Annotazioni</title>
-			<properties>			
-				<property name="jconon_attachment:esperienza_annotazione_motivazione">
-					<title>Annotazione</title>
-					<description>a] inputType:TEXTAREA</description>
-					<type>d:text</type>
-					<mandatory>false</mandatory>
-					<index enabled="true">
-						<atomic>true</atomic>
-						<stored>false</stored>
-						<tokenised>both</tokenised>
-					</index>
-				</property>
-			</properties>
-		</aspect>
-	</aspects>
+                <property name="jconon_attachment:esperienza_professionale_datore_lavoro">
+                    <title>Datore di Lavoro/Committente</title>
+                    <description>i] class:fl_amministrazione_pubblica_false</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:esperienza_professionale_ruolo">
+                    <title>Ruolo</title>
+                    <description>l]</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:esperienza_professionale_citta">
+                    <title>Comune</title>
+                    <description>m]</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:esperienza_professionale_stato_estero">
+                    <title>Stato</title>
+                    <description>n] class:fl_amministrazione_pubblica_false</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+            </properties>
+        </type>
+        <type name="jconon_scheda_anonima:precedente_incarico_oiv">
+            <title>Incarichi OIV/Nuclei</title>
+            <parent>jconon_scheda_anonima:document</parent>
+            <properties>
+                <property name="jconon_attachment:precedente_incarico_oiv_da">
+                    <title>Da</title>
+                    <description>a]</description>
+                    <type>d:datetime</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_incorso">
+                    <title>In corso</title>
+                    <description>b] ui.radio</description>
+                    <type>d:boolean</type>
+                    <mandatory>true</mandatory>
+                    <default>false</default>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_a">
+                    <title>A</title>
+                    <description>c] class:precedente_incarico_oiv_incorso_false</description>
+                    <type>d:datetime</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_cod_amm_ipa">
+                    <title>Codice IPA</title>
+                    <description>d] inputType:ROTEXT</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_amministrazione">
+                    <title>Amministrazione pubblica</title>
+                    <description>e] widget:ui.amministrazioni-ipa</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_sede">
+                    <title>Sede</title>
+                    <description>f] class:input-xxlarge</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_comune">
+                    <title>Comune</title>
+                    <description>g] class:input-xlarge</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_indirizzo">
+                    <title>Indirizzo</title>
+                    <description>h] class:input-xxlarge</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_cap">
+                    <title>CAP</title>
+                    <description>i] class:input-medium</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_telefono">
+                    <title>Telefono</title>
+                    <description>l] class:input-large</description>
+                    <type>d:text</type>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_numero_dipendenti">
+                    <title>N. dipendenti</title>
+                    <description>m]</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                    <constraints>
+                        <constraint ref="jconon_scheda_anonima:elenco_oiv_numero_dipendenti_values"/>
+                    </constraints>
+                </property>
+                <property name="jconon_attachment:precedente_incarico_oiv_ruolo">
+                    <title>Ruolo</title>
+                    <description>n]</description>
+                    <type>d:text</type>
+                    <mandatory>true</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                    <constraints>
+                        <constraint ref="jconon_scheda_anonima:elenco_oiv_ruolo_values"/>
+                    </constraints>
+                </property>
+            </properties>
+        </type>
+    </types>
+    <aspects>
+        <aspect name="jconon_scheda_anonima:esperienza_non_coerente">
+            <title>Esperienza non coerente</title>
+            <properties>
+                <property name="jconon_attachment:esperienza_non_coerente_motivazione">
+                    <title>Motivazione</title>
+                    <description>a] inputType:TEXTAREA</description>
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+            </properties>
+        </aspect>
+        <aspect name="jconon_scheda_anonima:esperienza_annotazioni">
+            <title>Annotazioni</title>
+            <properties>
+                <property name="jconon_attachment:esperienza_annotazione_motivazione">
+                    <title>Annotazione</title>
+                    <description>a] inputType:TEXTAREA</description>
+                    <type>d:text</type>
+                    <mandatory>false</mandatory>
+                    <index enabled="true">
+                        <atomic>true</atomic>
+                        <stored>false</stored>
+                        <tokenised>both</tokenised>
+                    </index>
+                </property>
+            </properties>
+        </aspect>
+    </aspects>
 </model>

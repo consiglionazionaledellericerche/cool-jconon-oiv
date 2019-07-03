@@ -1,22 +1,24 @@
-[{
-	"sedeId": "-1000",
-	"direzione": "",
-	"indirizzo": "",
-	"codCitta": "",
-	"cap": "",
-	"prov": "",
-	"telex": "",
-	"fax": "",
-	"telefono": "",
-	"telefono2": "",
-	"telefono3": "",
-	"email": "",
-	"dataIst": "1901-01-01T00:00:00.000+01:00",
-	"dataDis": "3000-01-01T00:00:00.000+01:00",
-	"titCa": "000000",
-	"tipoOp": "C",
-	"dataOp": "2005-11-01T00:00:00.000+01:00",
-	"descrizione": "ELENCO NAZIONALE OIV",
-	"citta": "ROMA",
-	"sigla": "OIV"
-}]
+[
+  {
+    "sedeId": "-1000",
+    "direzione": "",
+    "indirizzo": "",
+    "codCitta": "",
+    "cap": "",
+    "prov": "",
+    "telex": "",
+    "fax": "",
+    "telefono": "",
+    "telefono2": "",
+    "telefono3": "",
+    "email": "",
+    "dataIst": "1901-01-01T00:00:00.000+01:00",
+    "dataDis": "3000-01-01T00:00:00.000+01:00",
+    "titCa": "000000",
+    "tipoOp": "C",
+    "dataOp": "2005-11-01T00:00:00.000+01:00",
+    "descrizione": "ELENCO NAZIONALE OIV",
+    "citta": "ROMA",
+    "sigla": "OIV"
+  }
+]

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019  Consiglio Nazionale delle Ricerche
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as
+ *     published by the Free Software Foundation, either version 3 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package it.cnr.si.cool.jconon.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -8,17 +25,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
-import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-public class FlowsConfiguration extends WebSecurityConfigurerAdapter{
+public class FlowsConfiguration extends WebSecurityConfigurerAdapter {
     @Value("${flows.resource}")
     private String baseUrl;
 
@@ -43,19 +58,6 @@ public class FlowsConfiguration extends WebSecurityConfigurerAdapter{
         http.csrf().disable();
     }
 
-    public class CustomOAuth2ClientContext extends DefaultOAuth2ClientContext {
-        @Override
-        public AccessTokenRequest getAccessTokenRequest() {
-            return super.getAccessTokenRequest();
-        }
-    }
-
-    public class CustomResourceOwnerPasswordResourceDetails extends ResourceOwnerPasswordResourceDetails {
-        @Override
-        public boolean isClientOnly() {
-            return true;
-        }
-    }
     @Bean
     protected OAuth2ProtectedResourceDetails resource() {
 
@@ -75,6 +77,20 @@ public class FlowsConfiguration extends WebSecurityConfigurerAdapter{
     @Bean
     public OAuth2RestOperations restTemplate() {
         return new OAuth2RestTemplate(resource());
+    }
+
+    public class CustomOAuth2ClientContext extends DefaultOAuth2ClientContext {
+        @Override
+        public AccessTokenRequest getAccessTokenRequest() {
+            return super.getAccessTokenRequest();
+        }
+    }
+
+    public class CustomResourceOwnerPasswordResourceDetails extends ResourceOwnerPasswordResourceDetails {
+        @Override
+        public boolean isClientOnly() {
+            return true;
+        }
     }
 
 }

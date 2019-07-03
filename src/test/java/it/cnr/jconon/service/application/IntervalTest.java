@@ -1,18 +1,30 @@
+/*
+ * Copyright (C) 2019  Consiglio Nazionale delle Ricerche
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as
+ *     published by the Free Software Foundation, either version 3 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package it.cnr.jconon.service.application;
 
+import it.cnr.si.cool.jconon.service.application.Interval;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.junit.Test;
 
-import it.cnr.si.cool.jconon.service.application.Interval;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -52,12 +64,9 @@ public class IntervalTest {
         Interval intervalAfter = new Interval(new GregorianCalendar(2009, 1, 1),
                 new GregorianCalendar(2011, 1, 1));
 
-        assertEquals(1, intervalAfter.compareTo(intervalBefore) );
-        assertEquals(-1, intervalBefore.compareTo(intervalAfter) );
+        assertEquals(1, intervalAfter.compareTo(intervalBefore));
+        assertEquals(-1, intervalBefore.compareTo(intervalAfter));
     }
-
-
-
 
     @Test
     public void equals() throws Exception {
@@ -70,32 +79,4 @@ public class IntervalTest {
 
         assertTrue(interval1.equals(sameInterval));
     }
-
-    public static Session getRepositorySession()
-    {
-
-        Map<String, String> sessionParameters = new HashMap<String, String>();
-        sessionParameters.put(SessionParameter.ATOMPUB_URL, "http://alfresco-community.test.si.cnr.it/alfresco/api/-default-/public/cmis/versions/1.1/atom");
-        sessionParameters.put("org.apache.chemistry.opencmis.binding.spi.type","atompub");
-        sessionParameters.put(SessionParameter.USER, "admin");
-        sessionParameters.put(SessionParameter.PASSWORD, "admin");
-        sessionParameters.put(SessionParameter.REPOSITORY_ID, "-default-");
-        Session session = SessionFactoryImpl.newInstance().createSession(sessionParameters);
-        return session;
-    }
-
-    public static void main(String[] args) {
-		Session session = getRepositorySession();
-		CmisObject utente = session.getObject("workspace://SpacesStore/a69b70c5-b283-47d1-acce-47f22d28ae1e");
-	
-		session.bulkUpdateProperties(Collections.singletonList(utente), 
-				Collections.singletonMap("fpperson:amministrazione", 
-						Arrays.asList(
-								"ASI - AGENZIA SPAZIALE ITALIANA"
-						)
-				), 
-				Collections.singletonList("P:fpperson:metadati"), Collections.emptyList()
-		);		
-		
-	}
 }

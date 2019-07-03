@@ -1,78 +1,94 @@
+/*
+ * Copyright (C) 2019  Consiglio Nazionale delle Ricerche
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as
+ *     published by the Free Software Foundation, either version 3 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package it.cnr.si.cool.jconon.service.application;
 
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.Optional;
 
-public class Interval implements Comparable<Interval>{
-	@Override
-	public int hashCode() {
-		int result = startDate.hashCode();
-		result = 31 * result + endDate.hashCode();
-		return result;
-	}
+public class Interval implements Comparable<Interval> {
+    private Instant startDate;
+    private Instant endDate;
 
-	private Instant startDate;
+    public Interval(Instant startDate, Instant endDate) {
+        super();
+        this.startDate = startDate;
+        final Instant now = Calendar.getInstance().toInstant();
+        this.endDate = Optional.ofNullable(endDate).map(data -> {
+            if (data.isAfter(now)) {
+                return now;
+            } else {
+                return data;
+            }
+        }).orElse(now);
+    }
 
-	private Instant endDate;
+    public Interval(Calendar startDate, Calendar endDate) {
+        super();
+        this.startDate = startDate.toInstant();
+        final Calendar now = Calendar.getInstance();
+        this.endDate = Optional.ofNullable(endDate).map(data -> {
+            if (data.after(now)) {
+                return now;
+            } else {
+                return data;
+            }
+        }).orElse(now).toInstant();
+    }
 
-	public Interval(Instant startDate, Instant endDate) {
-		super();
-		this.startDate = startDate;
-		final Instant now = Calendar.getInstance().toInstant();
-		this.endDate = Optional.ofNullable(endDate).map(data -> {
-			if (data.isAfter(now)) {
-				return now;
-			} else {
-				return data;
-			}
-		}).orElse(now);
-	}
+    @Override
+    public int hashCode() {
+        int result = startDate.hashCode();
+        result = 31 * result + endDate.hashCode();
+        return result;
+    }
 
-	public Interval(Calendar startDate, Calendar endDate) {
-		super();
-		this.startDate = startDate.toInstant();
-		final Calendar now = Calendar.getInstance();
-		this.endDate = Optional.ofNullable(endDate).map(data -> {
-			if (data.after(now)) {
-				return now;
-			} else {
-				return data;
-			}
-		}).orElse(now).toInstant();
-	}
+    @Override
+    public int compareTo(Interval o) {
+        if (o.startDate.isAfter(startDate))
+            return -1;
+        if (o.startDate.isBefore(startDate))
+            return 1;
+        return 0;
+    }
 
-	@Override
-	public int compareTo(Interval o) {
-		if (o.startDate.isAfter(startDate))
-			return -1;
-		if (o.startDate.isBefore(startDate))
-			return 1;
-		return 0;
-	}
+    public Instant getStartDate() {
+        return startDate;
+    }
 
-	public Instant getStartDate() {
-		return startDate;
-	}
+    public Instant getEndDate() {
+        return endDate;
+    }
 
-	public Instant getEndDate() {
-		return endDate;
-	}
-
-	@Override
+    @Override
     public String toString() {
         return startDate + ".." + endDate;
     }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-		Interval interval = (Interval) o;
+        Interval interval = (Interval) o;
 
-		if (!startDate.equals(interval.startDate)) return false;
-		return endDate.equals(interval.endDate);
+        if (!startDate.equals(interval.startDate)) return false;
+        return endDate.equals(interval.endDate);
 
-	}
+    }
 }

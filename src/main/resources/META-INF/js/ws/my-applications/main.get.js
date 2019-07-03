@@ -231,10 +231,10 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
       'Stato domanda': 'jconon_application:stato_domanda',
       'Numero di iscrizione in elenco':  'jconon_application:progressivo_iscrizione_elenco'
     },
-    orderBy: {
+    orderBy: [{
       field: 'jconon_application:cognome',
       asc: true
-    },
+    }],
     type: myType,
     maxItems: callId||callCodice ? undefined : 100,
     dataSource: function (page, settings, getUrlParams) {

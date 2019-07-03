@@ -1,31 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2019  Consiglio Nazionale delle Ricerche
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as
+  ~     published by the Free Software Foundation, either version 3 of the
+  ~     License, or (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <!DOCTYPE urlrewrite PUBLIC "-//tuckey.org//DTD UrlRewrite 3.0//EN" "urlrewrite3.0.dtd">
 <urlrewrite default-match-type="wildcard">
 
-	<rule>
-		<from>/</from>
-		<to>/rest/page/my-applications</to>
-	</rule>
-	<rule>
-		<from>/home</from>
-		<to>/rest/page/manage-application?callCodice=OIV</to>
-	</rule>
-	<rule>
-		<from>/res/**</from>
-		<to>/rest/static/$1</to>
-	</rule>
+    <rule>
+        <from>/</from>
+        <to>/rest/page/my-applications</to>
+    </rule>
+    <rule>
+        <from>/home</from>
+        <to>/rest/page/manage-application?callCodice=OIV</to>
+    </rule>
+    <rule>
+        <from>/res/**</from>
+        <to>/rest/static/$1</to>
+    </rule>
 
-	<rule>
-		<from>/search/content</from>
-		<to>/rest/content</to>
-	</rule>
+    <rule>
+        <from>/search/content</from>
+        <to>/rest/content</to>
+    </rule>
 
-	<rule match-type="regex">
-    <condition type="request-uri" operator="notequal">^/info$</condition>
-    <condition type="request-uri" operator="notequal">^/metrics$</condition>
-    <condition type="request-uri" operator="notequal">^/health$</condition>
-		<from>^/([a-zA-Z0-9\\-]+)$</from>
-		<to>/rest/page/$1</to>
-	</rule>
+    <rule match-type="regex">
+        <condition type="request-uri" operator="notequal">^/info$</condition>
+        <condition type="request-uri" operator="notequal">^/metrics$</condition>
+        <condition type="request-uri" operator="notequal">^/health$</condition>
+        <from>^/([a-zA-Z0-9\\-]+)$</from>
+        <to>/rest/page/$1</to>
+    </rule>
 
 </urlrewrite>
