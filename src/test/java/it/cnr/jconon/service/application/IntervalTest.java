@@ -36,11 +36,11 @@ public class IntervalTest {
     @Test
     public void hashCodeTest() throws Exception {
 
-        Interval interval = new Interval(new GregorianCalendar(2000, 1, 1),
-                new GregorianCalendar(2005, 1, 1));
-
+        Interval interval = new Interval(
+                new GregorianCalendar(2000, 1, 1),
+                new GregorianCalendar(2005, 1, 1)
+        );
         assertEquals(472588928, interval.hashCode());
-
     }
 
     @Test

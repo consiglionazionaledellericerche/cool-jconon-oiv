@@ -17,6 +17,7 @@
 
 package it.cnr.si.cool.jconon.service.application;
 
+import java.sql.Time;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -26,11 +27,12 @@ import java.util.TimeZone;
 public class Interval implements Comparable<Interval> {
     private Instant startDate;
     private Instant endDate;
+    private static TimeZone CURRENT_TIME_ZONE = TimeZone.getTimeZone(ZoneId.of("Europe/Rome"));
 
     public Interval(Instant startDate, Instant endDate) {
         super();
         this.startDate = startDate;
-        final Instant now = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Paris"))).toInstant();
+        final Instant now = Calendar.getInstance(CURRENT_TIME_ZONE).toInstant();
         this.endDate = Optional.ofNullable(endDate).map(data -> {
             if (data.isAfter(now)) {
                 return now;
@@ -42,8 +44,10 @@ public class Interval implements Comparable<Interval> {
 
     public Interval(Calendar startDate, Calendar endDate) {
         super();
+        startDate.setTimeZone(CURRENT_TIME_ZONE);
+        endDate.setTimeZone(CURRENT_TIME_ZONE);
         this.startDate = startDate.toInstant();
-        final Calendar now = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Paris")));
+        final Calendar now = Calendar.getInstance(CURRENT_TIME_ZONE);
         this.endDate = Optional.ofNullable(endDate).map(data -> {
             if (data.after(now)) {
                 return now;
