@@ -1,9 +1,7 @@
-jcononfunzionepubblica:
+jconon-oiv:
   image: docker.si.cnr.it/##{CONTAINER_ID}##
   mem_limit: 1g
   read_only: true
-  ports:
-  - 8980:8080
   environment:
   - FLOWS_ENABLE=true
   - LANG=it_IT.UTF-8

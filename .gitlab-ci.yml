@@ -53,7 +53,7 @@ maven-deploy-tag:
   script: "mvn clean deploy $MAVEN_CLI_OPTS -Pprod -DskipTests"
   artifacts:
     paths:
-      - cool-jconon-webapp/target/*.war
+      - target/*.war
   only:
     - tags
 
