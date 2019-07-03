@@ -18,8 +18,10 @@
 package it.cnr.si.cool.jconon.service.application;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Optional;
+import java.util.TimeZone;
 
 public class Interval implements Comparable<Interval> {
     private Instant startDate;
@@ -28,7 +30,7 @@ public class Interval implements Comparable<Interval> {
     public Interval(Instant startDate, Instant endDate) {
         super();
         this.startDate = startDate;
-        final Instant now = Calendar.getInstance().toInstant();
+        final Instant now = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Paris"))).toInstant();
         this.endDate = Optional.ofNullable(endDate).map(data -> {
             if (data.isAfter(now)) {
                 return now;
@@ -41,7 +43,7 @@ public class Interval implements Comparable<Interval> {
     public Interval(Calendar startDate, Calendar endDate) {
         super();
         this.startDate = startDate.toInstant();
-        final Calendar now = Calendar.getInstance();
+        final Calendar now = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("Europe/Paris")));
         this.endDate = Optional.ofNullable(endDate).map(data -> {
             if (data.after(now)) {
                 return now;
