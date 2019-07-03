@@ -10,8 +10,8 @@ stages:
 
 variables:
   MAVEN_OPTS: "-Djava.awt.headless=true -Dsonar.host.url=$SONAR_HOST_URL"
-  MAVEN_CLI_OPTS: "-s .m2/settings.xml -Dmaven.repo.local=./.m2/repository -Djava.io.tmpdir=/root -Dnexus.url=$NEXUS_URL -Dnexus.login=$NEXUS_USERNAME -Dnexus.pwd=$NEXUS_PASSWORD -Drepository.base.url=$CMIS_BASE_URL --batch-mode --errors --fail-at-end --show-version"
-  MAVEN_CLI_CENTRAL_OPTS: "-s .m2/settings.xml -Dmaven.repo.local=./.m2/repository -Djava.io.tmpdir=/root -Pprod,maven-central -Dnexus.url=$NEXUS_URL -Dsonatype.login=$SONATYPE_USERNAME -Dsonatype.pwd=$SONATYPE_PASSWORD -DskipTests --batch-mode --errors --fail-at-end --show-version"
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml -Dmaven.repo.local=./.m2/repository -Dnexus.url=$NEXUS_URL -Dnexus.login=$NEXUS_USERNAME -Dnexus.pwd=$NEXUS_PASSWORD -Drepository.base.url=$CMIS_BASE_URL --batch-mode --errors --fail-at-end --show-version"
+  MAVEN_CLI_CENTRAL_OPTS: "-s .m2/settings.xml -Dmaven.repo.local=./.m2/repository -Pprod,maven-central -Dnexus.url=$NEXUS_URL -Dsonatype.login=$SONATYPE_USERNAME -Dsonatype.pwd=$SONATYPE_PASSWORD -DskipTests --batch-mode --errors --fail-at-end --show-version"
   CONTAINER_TEST_IMAGE: $CI_PROJECT_PATH:$CI_COMMIT_REF_NAME
   CONTAINER_RELEASE_IMAGE: $CI_PROJECT_PATH:latest
 
@@ -26,7 +26,7 @@ maven-deploy:
   image: maven:alpine
   before_script:
     - apk add --update nodejs nodejs-npm && rm -rf /var/cache/apk/*
-  script: "mvn clean deploy $MAVEN_CLI_OPTS -Pprod"
+  script: mvn clean deploy $MAVEN_CLI_OPTS -Pprod -Darguments="-Djava.io.tmpdir=/root"
   artifacts:
     paths:
       - target/*.war
