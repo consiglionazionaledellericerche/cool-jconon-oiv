@@ -1,384 +1,402 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<bulkInfo xmlns="http://www.cnr.it/schema/BulkInfo_v2" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	cmisQueryName="jconon_call_procedura_comparativa:folder" 
-	cmisTypeName="F:jconon_call_procedura_comparativa:folder" 
-	longDescription="Procedura Comparativa" 
-	shortDescription="Procedura Comparativa" 
-	xsi:schemaLocation="http://www.cnr.it/schema/BulkInfo_v2 BulkInfo_v2">
+<!--
+  ~ Copyright (C) 2019  Consiglio Nazionale delle Ricerche
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as
+  ~     published by the Free Software Foundation, either version 3 of the
+  ~     License, or (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
 
-	<fieldProperty 
-		class="span12" 
-		inputType="TEXT" 
-		label="label.jconon_call_procedura_comparativa_amministrazione" 
-		name="amministrazione" 
-		property="jconon_call_procedura_comparativa:amministrazione" 
-		tooltip="tooltip.jconon_call_procedura_comparativa_amministrazione">
-		<jsonvalidator required="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="span12" 
-		inputType="TEXTAREA" 
-		rows="3"
-		label="label.jconon_call_procedura_comparativa_titolo" 
-		name="titolo" 
-		property="jconon_call_procedura_comparativa:titolo" 
-		tooltip="tooltip.jconon_call_procedura_comparativa_titolo">
-		<jsonvalidator required="true" minlengthAlfresco="50" maxlengthAlfresco="200"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="span12" 
-		inputType="TEXTAREA" 
-		rows="5"
-		label="label.jconon_call_procedura_comparativa_breve_descrizione" 
-		name="breve_descrizione" 
-		property="jconon_call_procedura_comparativa:breve_descrizione" 
-		tooltip="tooltip.jconon_call_procedura_comparativa_breve_descrizione">
-		<jsonvalidator required="true" minlengthAlfresco="100" maxlengthAlfresco="500"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="span12" 
-		inputType="TEXTAREA" 
-		label="label.jconon_call_procedura_comparativa_rdp" 
-		name="rdp" 
-		property="jconon_call_procedura_comparativa:rdp">
-		<jsonvalidator required="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="btn-medium" 
-		inputType="SELECT" 
-		label="label.jconon_call_procedura_comparativa_numero_dipendenti" 
-		name="numero_dipendenti" 
-		property="jconon_call_procedura_comparativa:numero_dipendenti"
-		widget="ui.radio">
-		<jsonvalidator requiredWidget="true"/>
-		<jsonlist>
-			<listElement defaultLabel="Maggiore o uguale a 250" key="Maggiore o uguale a 250" label="label.maggiore.250"/>
-			<listElement defaultLabel="Minore di 250" key="Minore di 250" label="label.minore.250"/>
-		</jsonlist>
-	</fieldProperty>
-	<fieldProperty
-		parentGroupClass="span5"		
-		class="input-medium"  
-		inputType="TEXT"
-		todayHighlight="false" 
-		todayBtn="false"
-		startDate="+1d"
-		label="label.jconon_call_procedura_comparativa_data_fine_invio_domande" 
-		name="data_fine_invio_domande" 
-		property="jconon_call:data_fine_invio_domande"
-		widget="ui.datepicker">
-		<jsonvalidator requiredWidget="true"/>
-	</fieldProperty>
-	<fieldProperty
-		parentGroupClass="span5"		
-		class="input-medium"  
-		inputType="TEXT"
-		todayHighlight="false" 
-		todayBtn="false"
-		startDate="+1d"
-		label="label.procedura_comparativa_data_fine_proroga" 
-		name="data_fine_proroga" 
-		property="jconon_call_procedura_comparativa:data_fine_proroga"
-		widget="ui.datepicker">
-		<jsonvalidator requiredWidget="true"/>
-	</fieldProperty>	
-	<fieldProperty 
-		class="input-small" 
-		inputType="TEXT" 
-		label="label.procedura_comparativa_ora_fine_proroga" 
-		name="ora_fine_proroga" 
-		property="jconon_call_procedura_comparativa:ora_fine_proroga"
-		widget="ui.timepicker"/>
-			
-	<fieldProperty 
-		parentGroupClass="offset5"
-		class="input-small" 
-		inputType="TEXT" 
-		label="label.jconon_call_procedura_comparativa_ora_fine_invio_domande" 
-		name="ora_fine_invio_domande" 
-		property="jconon_call_procedura_comparativa:ora_fine_invio_domande"
-		widget="ui.timepicker">
-	</fieldProperty>
-	<fieldProperty 
-		class="input-xlarge" 
-		inputType="TEXT" 
-		label="label.jconon_call_procedura_comparativa_telefono" 
-		name="telefono" 
-		property="jconon_call_procedura_comparativa:telefono">
-		<jsonvalidator telephone-number="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="span12" 
-		inputType="TEXT" 
-		label="label.jconon_call_procedura_comparativa_email" 
-		name="email" 
-		property="jconon_call_procedura_comparativa:email">
-		<jsonvalidator email="true" required="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="span12" 
-		inputType="TEXT" 
-		label="label.jconon_call_procedura_comparativa_pec" 
-		name="pec" 
-		property="jconon_call_procedura_comparativa:pec">
-		<jsonvalidator email="true" required="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="span12" 
-		inputType="TEXT" 
-		label="label.jconon_call_procedura_comparativa_sito_web" 
-		name="sito_web" 
-		property="jconon_call_procedura_comparativa:sito_web">
-	</fieldProperty>
-	<fieldProperty 
-		class="span12" 
-		inputType="SELECT" 
-		label="label.jconon_call_procedura_comparativa_tipologia_oiv" 
-		name="tipologia_oiv" 
-		property="jconon_call_procedura_comparativa:tipologia_oiv"
-		widget="ui.select">
-		<jsonvalidator requiredWidget="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		class="span12" 
-		inputType="SELECT" 
-		label="label.jconon_call_procedura_comparativa_tipologia_selezione" 
-		name="tipologia_selezione" 
-		property="jconon_call_procedura_comparativa:tipologia_selezione"
-		widget="ui.select">
-		<jsonvalidator requiredWidget="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		parentGroupClass="span5"
-		class="input-xlarge" 
-		inputType="SELECT"
-		label="label.jconon_call_procedura_comparativa_fascia_professionale" 
-		name="fascia_professionale" 
-		property="jconon_call_procedura_comparativa:fascia_professionale"
-		widget="ui.select">
-		<jsonlist>
-			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
-			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
-			<listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>
-		</jsonlist>		
-	</fieldProperty>
-	<fieldProperty 
-		parentGroupClass="offset5"
-		class="input-medium currency" 
-		inputType="CURRENCY" 
-		decimal="true"
-		name="compenso_annuo_presidente" 
-		property="jconon_call_procedura_comparativa:compenso_annuo_presidente">
-		<jsonvalidator currency="true"/>
-	</fieldProperty>
-	<fieldProperty 
-		parentGroupClass="span5"
-		class="input-xlarge" 
-		inputType="SELECT"
-		label="label.jconon_call_procedura_comparativa_fascia_professionale_comp2" 
-		name="fascia_professionale_comp2" 
-		property="jconon_call_procedura_comparativa:fascia_professionale_comp2"
-		widget="ui.select">
-		<jsonlist>
-			<listElement defaultLabel="Tutte le fasce" key="Tutte le fasce" label="label.fascia.tutte"/>			
-			<listElement defaultLabel="Fascia 1" key="Fascia 1" label="label.fascia.1"/>
-			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
-			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
-			<listElement defaultLabel="Fascia 1 o 2" key="Fascia 1 o 2" label="label.fascia.1.2"/>									
-			<listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>						
-		</jsonlist>		
-	</fieldProperty>
-	<fieldProperty 
-		parentGroupClass="offset5"
-		class="input-medium currency" 
-		inputType="CURRENCY" 
-		decimal="true"
-		name="compenso_annuo_componente" 
-		property="jconon_call_procedura_comparativa:compenso_annuo_componente">
-		<jsonvalidator currency="true"/>
-	</fieldProperty>
+<bulkInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="http://www.cnr.it/schema/BulkInfo_v2"
+          cmisQueryName="jconon_call_procedura_comparativa:folder"
+          cmisTypeName="F:jconon_call_procedura_comparativa:folder"
+          longDescription="Procedura Comparativa"
+          shortDescription="Procedura Comparativa"
+          xsi:schemaLocation="http://www.cnr.it/schema/BulkInfo_v2 BulkInfo_v2">
 
-	<fieldProperty 
-		parentGroupClass="span5"
-		class="input-xlarge" 
-		inputType="SELECT"
-		label="label.jconon_call_procedura_comparativa_fascia_professionale_comp3" 
-		name="fascia_professionale_comp3" 
-		property="jconon_call_procedura_comparativa:fascia_professionale_comp3"
-		widget="ui.select">
-		<jsonlist>
-			<listElement defaultLabel="Tutte le fasce" key="Tutte le fasce" label="label.fascia.tutte"/>			
-			<listElement defaultLabel="Fascia 1" key="Fascia 1" label="label.fascia.1"/>
-			<listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
-			<listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
-			<listElement defaultLabel="Fascia 1 o 2" key="Fascia 1 o 2" label="label.fascia.1.2"/>									
-			<listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>						
-		</jsonlist>		
-	</fieldProperty>
-	<fieldProperty 
-		parentGroupClass="offset5"
-		class="input-medium currency" 
-		inputType="CURRENCY" 
-		decimal="true"
-		name="compenso_annuo_altro_componente" 
-		property="jconon_call_procedura_comparativa:compenso_annuo_altro_componente">
-		<jsonvalidator currency="true"/>
-	</fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="TEXT"
+            label="label.jconon_call_procedura_comparativa_amministrazione"
+            name="amministrazione"
+            property="jconon_call_procedura_comparativa:amministrazione"
+            tooltip="tooltip.jconon_call_procedura_comparativa_amministrazione">
+        <jsonvalidator required="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="TEXTAREA"
+            rows="3"
+            label="label.jconon_call_procedura_comparativa_titolo"
+            name="titolo"
+            property="jconon_call_procedura_comparativa:titolo"
+            tooltip="tooltip.jconon_call_procedura_comparativa_titolo">
+        <jsonvalidator required="true" minlengthAlfresco="50" maxlengthAlfresco="200"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="TEXTAREA"
+            rows="5"
+            label="label.jconon_call_procedura_comparativa_breve_descrizione"
+            name="breve_descrizione"
+            property="jconon_call_procedura_comparativa:breve_descrizione"
+            tooltip="tooltip.jconon_call_procedura_comparativa_breve_descrizione">
+        <jsonvalidator required="true" minlengthAlfresco="100" maxlengthAlfresco="500"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="TEXTAREA"
+            label="label.jconon_call_procedura_comparativa_rdp"
+            name="rdp"
+            property="jconon_call_procedura_comparativa:rdp">
+        <jsonvalidator required="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="btn-medium"
+            inputType="SELECT"
+            label="label.jconon_call_procedura_comparativa_numero_dipendenti"
+            name="numero_dipendenti"
+            property="jconon_call_procedura_comparativa:numero_dipendenti"
+            widget="ui.radio">
+        <jsonvalidator requiredWidget="true"/>
+        <jsonlist>
+            <listElement defaultLabel="Maggiore o uguale a 250" key="Maggiore o uguale a 250"
+                         label="label.maggiore.250"/>
+            <listElement defaultLabel="Minore di 250" key="Minore di 250" label="label.minore.250"/>
+        </jsonlist>
+    </fieldProperty>
+    <fieldProperty
+            parentGroupClass="span5"
+            class="input-medium"
+            inputType="TEXT"
+            todayHighlight="false"
+            todayBtn="false"
+            startDate="+1d"
+            label="label.jconon_call_procedura_comparativa_data_fine_invio_domande"
+            name="data_fine_invio_domande"
+            property="jconon_call:data_fine_invio_domande"
+            widget="ui.datepicker">
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty
+            parentGroupClass="span5"
+            class="input-medium"
+            inputType="TEXT"
+            todayHighlight="false"
+            todayBtn="false"
+            startDate="+1d"
+            label="label.procedura_comparativa_data_fine_proroga"
+            name="data_fine_proroga"
+            property="jconon_call_procedura_comparativa:data_fine_proroga"
+            widget="ui.datepicker">
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="input-small"
+            inputType="TEXT"
+            label="label.procedura_comparativa_ora_fine_proroga"
+            name="ora_fine_proroga"
+            property="jconon_call_procedura_comparativa:ora_fine_proroga"
+            widget="ui.timepicker"/>
 
-	<fieldProperty 
-		class="span12" 
-		inputType="TEXTAREA" 
-		rows="5"
-		label="label.jconon_call_procedura_comparativa_descrizione_esito" 
-		name="descrizione_esito" 
-		property="jconon_call_procedura_comparativa:descrizione_esito">
-		<jsonvalidator required="true" minlengthAlfresco="100" maxlengthAlfresco="500"/>
-	</fieldProperty>
+    <fieldProperty
+            parentGroupClass="offset5"
+            class="input-small"
+            inputType="TEXT"
+            label="label.jconon_call_procedura_comparativa_ora_fine_invio_domande"
+            name="ora_fine_invio_domande"
+            property="jconon_call_procedura_comparativa:ora_fine_invio_domande"
+            widget="ui.timepicker">
+    </fieldProperty>
+    <fieldProperty
+            class="input-xlarge"
+            inputType="TEXT"
+            label="label.jconon_call_procedura_comparativa_telefono"
+            name="telefono"
+            property="jconon_call_procedura_comparativa:telefono">
+        <jsonvalidator telephone-number="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="TEXT"
+            label="label.jconon_call_procedura_comparativa_email"
+            name="email"
+            property="jconon_call_procedura_comparativa:email">
+        <jsonvalidator email="true" required="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="TEXT"
+            label="label.jconon_call_procedura_comparativa_pec"
+            name="pec"
+            property="jconon_call_procedura_comparativa:pec">
+        <jsonvalidator email="true" required="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="TEXT"
+            label="label.jconon_call_procedura_comparativa_sito_web"
+            name="sito_web"
+            property="jconon_call_procedura_comparativa:sito_web">
+    </fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="SELECT"
+            label="label.jconon_call_procedura_comparativa_tipologia_oiv"
+            name="tipologia_oiv"
+            property="jconon_call_procedura_comparativa:tipologia_oiv"
+            widget="ui.select">
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty
+            class="span12"
+            inputType="SELECT"
+            label="label.jconon_call_procedura_comparativa_tipologia_selezione"
+            name="tipologia_selezione"
+            property="jconon_call_procedura_comparativa:tipologia_selezione"
+            widget="ui.select">
+        <jsonvalidator requiredWidget="true"/>
+    </fieldProperty>
+    <fieldProperty
+            parentGroupClass="span5"
+            class="input-xlarge"
+            inputType="SELECT"
+            label="label.jconon_call_procedura_comparativa_fascia_professionale"
+            name="fascia_professionale"
+            property="jconon_call_procedura_comparativa:fascia_professionale"
+            widget="ui.select">
+        <jsonlist>
+            <listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
+            <listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+            <listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>
+        </jsonlist>
+    </fieldProperty>
+    <fieldProperty
+            parentGroupClass="offset5"
+            class="input-medium currency"
+            inputType="CURRENCY"
+            decimal="true"
+            name="compenso_annuo_presidente"
+            property="jconon_call_procedura_comparativa:compenso_annuo_presidente">
+        <jsonvalidator currency="true"/>
+    </fieldProperty>
+    <fieldProperty
+            parentGroupClass="span5"
+            class="input-xlarge"
+            inputType="SELECT"
+            label="label.jconon_call_procedura_comparativa_fascia_professionale_comp2"
+            name="fascia_professionale_comp2"
+            property="jconon_call_procedura_comparativa:fascia_professionale_comp2"
+            widget="ui.select">
+        <jsonlist>
+            <listElement defaultLabel="Tutte le fasce" key="Tutte le fasce" label="label.fascia.tutte"/>
+            <listElement defaultLabel="Fascia 1" key="Fascia 1" label="label.fascia.1"/>
+            <listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
+            <listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+            <listElement defaultLabel="Fascia 1 o 2" key="Fascia 1 o 2" label="label.fascia.1.2"/>
+            <listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>
+        </jsonlist>
+    </fieldProperty>
+    <fieldProperty
+            parentGroupClass="offset5"
+            class="input-medium currency"
+            inputType="CURRENCY"
+            decimal="true"
+            name="compenso_annuo_componente"
+            property="jconon_call_procedura_comparativa:compenso_annuo_componente">
+        <jsonvalidator currency="true"/>
+    </fieldProperty>
+
+    <fieldProperty
+            parentGroupClass="span5"
+            class="input-xlarge"
+            inputType="SELECT"
+            label="label.jconon_call_procedura_comparativa_fascia_professionale_comp3"
+            name="fascia_professionale_comp3"
+            property="jconon_call_procedura_comparativa:fascia_professionale_comp3"
+            widget="ui.select">
+        <jsonlist>
+            <listElement defaultLabel="Tutte le fasce" key="Tutte le fasce" label="label.fascia.tutte"/>
+            <listElement defaultLabel="Fascia 1" key="Fascia 1" label="label.fascia.1"/>
+            <listElement defaultLabel="Fascia 2" key="Fascia 2" label="label.fascia.2"/>
+            <listElement defaultLabel="Fascia 3" key="Fascia 3" label="label.fascia.3"/>
+            <listElement defaultLabel="Fascia 1 o 2" key="Fascia 1 o 2" label="label.fascia.1.2"/>
+            <listElement defaultLabel="Fascia 2 o 3" key="Fascia 2 o 3" label="label.fascia.2.3"/>
+        </jsonlist>
+    </fieldProperty>
+    <fieldProperty
+            parentGroupClass="offset5"
+            class="input-medium currency"
+            inputType="CURRENCY"
+            decimal="true"
+            name="compenso_annuo_altro_componente"
+            property="jconon_call_procedura_comparativa:compenso_annuo_altro_componente">
+        <jsonvalidator currency="true"/>
+    </fieldProperty>
+
+    <fieldProperty
+            class="span12"
+            inputType="TEXTAREA"
+            rows="5"
+            label="label.jconon_call_procedura_comparativa_descrizione_esito"
+            name="descrizione_esito"
+            property="jconon_call_procedura_comparativa:descrizione_esito">
+        <jsonvalidator required="true" minlengthAlfresco="100" maxlengthAlfresco="500"/>
+    </fieldProperty>
 
 
-	<form name="affix_sezione_6">
-		<formFieldProperty name="amministrazione"/>
-		<formFieldProperty name="titolo"/>
-		<formFieldProperty name="breve_descrizione"/>
-		<formFieldProperty name="rdp"/>
-		<formFieldProperty name="numero_dipendenti"/>
-		<formFieldProperty name="data_fine_invio_domande"/>
-		<formFieldProperty name="ora_fine_invio_domande"/>
-	</form>
-	<form name="affix_sezione_7">
-		<formFieldProperty name="tipologia_oiv"/>
-		<formFieldProperty name="tipologia_selezione"/>
-	</form>
-	<form name="affix_sezione_8">
-		<formFieldProperty name="fascia_professionale"/>
-		<formFieldProperty name="compenso_annuo_presidente"/>
-		<formFieldProperty name="fascia_professionale_comp2"/>
-		<formFieldProperty name="compenso_annuo_componente"/>
-		<formFieldProperty name="fascia_professionale_comp3"/>
-		<formFieldProperty name="compenso_annuo_altro_componente"/>
-	</form>
-	<form name="affix_sezione_9">
-		<formFieldProperty name="telefono"/>
-		<formFieldProperty name="email"/>
-		<formFieldProperty name="pec"/>
-		<formFieldProperty name="sito_web"/>
-	</form>
-	<form name="affix_sezione_allegati"/>
+    <form name="affix_sezione_6">
+        <formFieldProperty name="amministrazione"/>
+        <formFieldProperty name="titolo"/>
+        <formFieldProperty name="breve_descrizione"/>
+        <formFieldProperty name="rdp"/>
+        <formFieldProperty name="numero_dipendenti"/>
+        <formFieldProperty name="data_fine_invio_domande"/>
+        <formFieldProperty name="ora_fine_invio_domande"/>
+    </form>
+    <form name="affix_sezione_7">
+        <formFieldProperty name="tipologia_oiv"/>
+        <formFieldProperty name="tipologia_selezione"/>
+    </form>
+    <form name="affix_sezione_8">
+        <formFieldProperty name="fascia_professionale"/>
+        <formFieldProperty name="compenso_annuo_presidente"/>
+        <formFieldProperty name="fascia_professionale_comp2"/>
+        <formFieldProperty name="compenso_annuo_componente"/>
+        <formFieldProperty name="fascia_professionale_comp3"/>
+        <formFieldProperty name="compenso_annuo_altro_componente"/>
+    </form>
+    <form name="affix_sezione_9">
+        <formFieldProperty name="telefono"/>
+        <formFieldProperty name="email"/>
+        <formFieldProperty name="pec"/>
+        <formFieldProperty name="sito_web"/>
+    </form>
+    <form name="affix_sezione_allegati"/>
 
-	<form name="esito_sezione_1">
-		<formFieldProperty 
-			name="amministrazione_hidden"
-			inputType="HIDDEN"
-			property="jconon_call_procedura_comparativa:amministrazione" 
-			label=""/>		
-		<formFieldProperty name="descrizione_esito"/>
-	</form>	
-	<form name="esito_sezione_allegati"/>
+    <form name="esito_sezione_1">
+        <formFieldProperty
+                name="amministrazione_hidden"
+                inputType="HIDDEN"
+                property="jconon_call_procedura_comparativa:amministrazione"
+                label=""/>
+        <formFieldProperty name="descrizione_esito"/>
+    </form>
+    <form name="esito_sezione_allegati"/>
 
-	<form name="all-filters">
-		<formFieldProperty
-			parentGroupClass="btn-group-vertical" 
-			class="span12"
-			label="Selezioni" 
-			default="dapubblicare" 
-			name="filters-attivi_scaduti" 
-			property="filters-attivi_scaduti" 
-			widget="ui.radio">
-				<jsonlist>
-					<listElement defaultLabel="Aperte" key="attivi" label="label.aperte"/>
-					<listElement defaultLabel="Scadute" key="scaduti" label="label.concluse"/>
-					<listElement defaultLabel="Da Pubblicare" key="dapubblicare" label="label.dapubblicare"/>
-				</jsonlist>
-		</formFieldProperty>
-		<formFieldProperty 
-			class="criteria-contains span12" 
-			inputType="TEXT" 
-			label="label.jconon_call_procedura_comparativa_amministrazione" 
-			name="filters-amministrazione" 
-			placeholder="placeholder.filter.like" 
-			property="jconon_call_procedura_comparativa:amministrazione"/>
-			
-		<formFieldProperty 
-			class="criteria-gte input-medium" 
-			label="label.jconon_call_da_data" 
-			name="filters-da_data" 
-			placeholder="placeholder.jconon_call_da_data" 
-			property="root.jconon_call:data_fine_invio_domande" 
-			widget="ui.datepicker"/>
-		<formFieldProperty 
-			class="criteria-lte input-medium" 
-			name="filters-a_data" 
-			placeholder="placeholder.jconon_call_a_data" 
-			property="root.jconon_call:data_fine_invio_domande" 
-			widget="ui.datepicker"/>
-	</form>
+    <form name="all-filters">
+        <formFieldProperty
+                parentGroupClass="btn-group-vertical"
+                class="span12"
+                label="Selezioni"
+                default="dapubblicare"
+                name="filters-attivi_scaduti"
+                property="filters-attivi_scaduti"
+                widget="ui.radio">
+            <jsonlist>
+                <listElement defaultLabel="Aperte" key="attivi" label="label.aperte"/>
+                <listElement defaultLabel="Scadute" key="scaduti" label="label.concluse"/>
+                <listElement defaultLabel="Da Pubblicare" key="dapubblicare" label="label.dapubblicare"/>
+            </jsonlist>
+        </formFieldProperty>
+        <formFieldProperty
+                class="criteria-contains span12"
+                inputType="TEXT"
+                label="label.jconon_call_procedura_comparativa_amministrazione"
+                name="filters-amministrazione"
+                placeholder="placeholder.filter.like"
+                property="jconon_call_procedura_comparativa:amministrazione"/>
 
-	<columnSet name="display">
-		<columnFieldProperty name="amministrazione"/>
-		<columnFieldProperty name="titolo"/>
-		<columnFieldProperty name="breve_descrizione"/>
-		<columnFieldProperty name="rdp"/>
-		<columnFieldProperty name="numero_dipendenti"/>
-		<columnFieldProperty 
-			name="data_inizio_invio_domande"
-			property="jconon_call:data_inizio_invio_domande"
-			widget="ui.datepicker"/>
-		<columnFieldProperty 
-			name="data_fine_invio_domande"
-			widget="ui.datepicker"/>
-		<columnFieldProperty name="ora_fine_invio_domande"/>
-		<columnFieldProperty 
-			name="data_fine_proroga"
-			widget="ui.datepicker"/>
-		<columnFieldProperty name="ora_fine_proroga"/>
+        <formFieldProperty
+                class="criteria-gte input-medium"
+                label="label.jconon_call_da_data"
+                name="filters-da_data"
+                placeholder="placeholder.jconon_call_da_data"
+                property="root.jconon_call:data_fine_invio_domande"
+                widget="ui.datepicker"/>
+        <formFieldProperty
+                class="criteria-lte input-medium"
+                name="filters-a_data"
+                placeholder="placeholder.jconon_call_a_data"
+                property="root.jconon_call:data_fine_invio_domande"
+                widget="ui.datepicker"/>
+    </form>
 
-		<columnFieldProperty name="tipologia_oiv"/>
-		<columnFieldProperty name="tipologia_selezione"/>
-		<columnFieldProperty name="fascia_professionale"/>
-		<columnFieldProperty 
-			name="compenso_annuo_presidente"
-			label="label.jconon_call_procedura_comparativa_compenso_annuo_presidente"/>
-		<columnFieldProperty name="fascia_professionale_comp2"/>
-		<columnFieldProperty 
-			name="compenso_annuo_componente"
-			label="label.jconon_call_procedura_comparativa_compenso_annuo_componente"/>
-		<columnFieldProperty name="fascia_professionale_comp3"/>
-		<columnFieldProperty 
-			name="compenso_annuo_altro_componente"
-			label="label.jconon_call_procedura_comparativa_compenso_annuo_altro_componente"/>			
-		<columnFieldProperty name="telefono"/>
-		<columnFieldProperty name="email"/>
-		<columnFieldProperty name="pec"/>
-		<columnFieldProperty name="sito_web"/>
-		<columnFieldProperty name="descrizione_esito"
-			label="label.jconon_call_procedura_comparativa_descrizione_esito_column"/>
-	</columnSet>	
-	<columnFieldProperty 
-		property="cmis:objectId" 
-		name="objectId" 
-		inSelect="false"/>
-	<columnFieldProperty 
-		class="sort" 
-		label="label.column.jconon_call_data_inizio_invio_domande" 
-		property="jconon_call:data_inizio_invio_domande" 
-		name="data_inizio_invio_domande"/>
-	<columnFieldProperty 
-		class="sort" 
-		label="label.column.jconon_call_data_fine_invio_domande" 
-		property="jconon_call:data_fine_invio_domande" 
-		name="data_fine_invio_domande"/>
-	<columnFieldProperty 
-		class="sort" 
-		label="label.procedura_comparativa_data_fine_proroga" 
-		property="jconon_call_procedura_comparativa:data_fine_proroga" 
-		name="data_fine_proroga"/>
+    <columnSet name="display">
+        <columnFieldProperty name="amministrazione"/>
+        <columnFieldProperty name="titolo"/>
+        <columnFieldProperty name="breve_descrizione"/>
+        <columnFieldProperty name="rdp"/>
+        <columnFieldProperty name="numero_dipendenti"/>
+        <columnFieldProperty
+                name="data_inizio_invio_domande"
+                property="jconon_call:data_inizio_invio_domande"
+                widget="ui.datepicker"/>
+        <columnFieldProperty
+                name="data_fine_invio_domande"
+                widget="ui.datepicker"/>
+        <columnFieldProperty name="ora_fine_invio_domande"/>
+        <columnFieldProperty
+                name="data_fine_proroga"
+                widget="ui.datepicker"/>
+        <columnFieldProperty name="ora_fine_proroga"/>
 
-	<columnFieldProperty 
-		class="sort" 
-		name="amministrazione"/>
-	<columnFieldProperty 
-		name="titolo"/>
-	<columnFieldProperty 
-		name="breve_descrizione"/>
+        <columnFieldProperty name="tipologia_oiv"/>
+        <columnFieldProperty name="tipologia_selezione"/>
+        <columnFieldProperty name="fascia_professionale"/>
+        <columnFieldProperty
+                name="compenso_annuo_presidente"
+                label="label.jconon_call_procedura_comparativa_compenso_annuo_presidente"/>
+        <columnFieldProperty name="fascia_professionale_comp2"/>
+        <columnFieldProperty
+                name="compenso_annuo_componente"
+                label="label.jconon_call_procedura_comparativa_compenso_annuo_componente"/>
+        <columnFieldProperty name="fascia_professionale_comp3"/>
+        <columnFieldProperty
+                name="compenso_annuo_altro_componente"
+                label="label.jconon_call_procedura_comparativa_compenso_annuo_altro_componente"/>
+        <columnFieldProperty name="telefono"/>
+        <columnFieldProperty name="email"/>
+        <columnFieldProperty name="pec"/>
+        <columnFieldProperty name="sito_web"/>
+        <columnFieldProperty name="descrizione_esito"
+                             label="label.jconon_call_procedura_comparativa_descrizione_esito_column"/>
+    </columnSet>
+    <columnFieldProperty
+            property="cmis:objectId"
+            name="objectId"
+            inSelect="false"/>
+    <columnFieldProperty
+            class="sort"
+            label="label.column.jconon_call_data_inizio_invio_domande"
+            property="jconon_call:data_inizio_invio_domande"
+            name="data_inizio_invio_domande"/>
+    <columnFieldProperty
+            class="sort"
+            label="label.column.jconon_call_data_fine_invio_domande"
+            property="jconon_call:data_fine_invio_domande"
+            name="data_fine_invio_domande"/>
+    <columnFieldProperty
+            class="sort"
+            label="label.procedura_comparativa_data_fine_proroga"
+            property="jconon_call_procedura_comparativa:data_fine_proroga"
+            name="data_fine_proroga"/>
+
+    <columnFieldProperty
+            class="sort"
+            name="amministrazione"/>
+    <columnFieldProperty
+            name="titolo"/>
+    <columnFieldProperty
+            name="breve_descrizione"/>
 </bulkInfo>

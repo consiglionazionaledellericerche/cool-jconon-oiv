@@ -1,43 +1,52 @@
 {{#each bulkinfoMap}}
-	{{#with raw}}
-		<tr>
-			<td>
-				{{#if ../../settings.call_type}}
-				<strong>{{i18n objectTypeId}}</strong><br/>
-				{{/if}}
+    {{#with raw}}
+        <tr>
+            <td>
+                {{#if ../../settings.call_type}}
+                    <strong>{{i18n objectTypeId}}</strong><br/>
+                {{/if}}
 
-				{{{applicationStatus jconon_application_stato_domanda jconon_application_data_domanda cmis_lastModificationDate relationships.parent.[0].jconon_call_data_fine_invio_domande}}}
-				<br>
+                {{{applicationStatus jconon_application_stato_domanda jconon_application_data_domanda
+                                     cmis_lastModificationDate
+                                     relationships.parent.[0].jconon_call_data_fine_invio_domande}}}
+                <br>
 
-				<strong>
-					<a href="#" class="user" data-user="{{jconon_application_user}}">
-					{{jconon_application_nome}}
-					{{jconon_application_cognome}}
-					</a>
-				</strong>
-				<br>
-					CF: {{jconon_application_codice_fiscale}},
-					Data di nascita: {{date jconon_application_data_nascita "DD/MM/YYYY"}}
-				<br>
-				{{#if jconon_application_fascia_professionale_attribuita}}
-					Fascia professionale attribuita: {{jconon_application_fascia_professionale_attribuita}}
-					<br>
-				{{/if}}
-				{{#if jconon_application_progressivo_iscrizione_elenco}}
-					{{{iscrizioneElenco jconon_application_progressivo_iscrizione_elenco jconon_application_data_iscrizione_elenco jconon_application_fascia_professionale_validata jconon_application_fascia_professionale_attribuita}}}
-					<br>
-				{{/if}}
-				{{#ifIn 'P:jconon_scheda_anonima:esperienza_annotazioni' cmis_secondaryObjectTypeIds ../../settings.isRdP}}
-					{{{code 'Sono presenti annotazioni...' '' 'badge badge-warning annotazione' jconon_attachment_esperienza_annotazione_motivazione jconon_attachment_esperienza_annotazione_motivazione}}}
-					<br>
-				{{/ifIn}}
+                <strong>
+                    <a href="#" class="user" data-user="{{jconon_application_user}}">
+                        {{jconon_application_nome}}
+                        {{jconon_application_cognome}}
+                    </a>
+                </strong>
+                <br>
+                CF: {{jconon_application_codice_fiscale}},
+                Data di nascita: {{date jconon_application_data_nascita "DD/MM/YYYY"}}
+                <br>
+                {{#if jconon_application_fascia_professionale_attribuita}}
+                    Fascia professionale attribuita: {{jconon_application_fascia_professionale_attribuita}}
+                    <br>
+                {{/if}}
+                {{#if jconon_application_progressivo_iscrizione_elenco}}
+                    {{{iscrizioneElenco jconon_application_progressivo_iscrizione_elenco
+                                        jconon_application_data_iscrizione_elenco
+                                        jconon_application_fascia_professionale_validata
+                                        jconon_application_fascia_professionale_attribuita}}}
+                    <br>
+                {{/if}}
+                {{#ifIn 'P:jconon_scheda_anonima:esperienza_annotazioni' cmis_secondaryObjectTypeIds
+                        ../../settings.isRdP}}
+                    {{{code 'Sono presenti annotazioni...' '' 'badge badge-warning annotazione'
+                            jconon_attachment_esperienza_annotazione_motivazione
+                            jconon_attachment_esperienza_annotazione_motivazione}}}
+                    <br>
+                {{/ifIn}}
                 {{#if jconon_application_data_invio_comunicazione}}
                     {{{comunicazione jconon_application_data_invio_comunicazione}}}
                 {{/if}}
-				{{{esclusioneRinuncia jconon_application_esclusione_rinuncia jconon_application_stato_domanda jconon_application_fl_rimosso_elenco jconon_application_data_rimozione_elenco}}}
+                {{{esclusioneRinuncia jconon_application_esclusione_rinuncia jconon_application_stato_domanda
+                                      jconon_application_fl_rimosso_elenco jconon_application_data_rimozione_elenco}}}
 
-			</td>
-			<td></td>
-		</tr>
-	{{/with}}
+            </td>
+            <td></td>
+        </tr>
+    {{/with}}
 {{/each}}

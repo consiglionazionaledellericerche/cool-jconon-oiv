@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2019  Consiglio Nazionale delle Ricerche
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as
+ *     published by the Free Software Foundation, either version 3 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package it.cnr.si.cool.jconon.service;
 
 import it.cnr.cool.security.service.impl.alfresco.CMISUser;
@@ -48,12 +65,12 @@ public class OIVHelpdeskService extends HelpdeskService {
     private String sender;
 
     @Override
-    public String sendReopenMessage(HelpdeskBean hdBean) throws MailException, IOException {
-        return sendOIVReopenMessage(hdBean, null);
+    public void sendReopenMessage(HelpdeskBean hdBean) throws MailException {
+        sendOIVReopenMessage(hdBean, null);
     }
 
     @Override
-    public String post(HelpdeskBean hdBean, MultipartFile allegato, CMISUser user) throws IOException, MailException, CmisObjectNotFoundException {
+    public void post(HelpdeskBean hdBean, MultipartFile allegato, CMISUser user) throws MailException, CmisObjectNotFoundException {
         hdBean.setMatricola("0");
         if (user != null && !user.isGuest()
                 && user.getFirstName() != null
@@ -81,7 +98,7 @@ public class OIVHelpdeskService extends HelpdeskService {
             }
         } catch (HelpDeskNotConfiguredException _ex) {
         }
-        return sendOIVReopenMessage(hdBean, allegato);
+        sendOIVReopenMessage(hdBean, allegato);
     }
 
     private String testoSegnalazione(HelpdeskBean hdBean) {
@@ -107,7 +124,7 @@ public class OIVHelpdeskService extends HelpdeskService {
         return testo.toString();
     }
 
-    private String sendOIVReopenMessage(HelpdeskBean hdBean, MultipartFile allegato) throws MailException, IOException {
+    private String sendOIVReopenMessage(HelpdeskBean hdBean, MultipartFile allegato) throws MailException {
         JSONObject json = new JSONObject();
         json.put("titolo", hdBean.getCall() + " - " + hdBean.getSubject());
         json.put("categoria", hdBean.getCategory());

@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!--
+  ~ Copyright (C) 2019  Consiglio Nazionale delle Ricerche
+  ~
+  ~     This program is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Affero General Public License as
+  ~     published by the Free Software Foundation, either version 3 of the
+  ~     License, or (at your option) any later version.
+  ~
+  ~     This program is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Affero General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Affero General Public License
+  ~     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <artifactId>archetype</artifactId>
         <groupId>it.cnr.si</groupId>
-        <version>1.0.5</version>
+        <version>1.0.13</version>
     </parent>
 
     <properties>
-        <cool-shared.version>3.1.32</cool-shared.version>
-        <cool-jconon.version>4.1.59</cool-jconon.version>
+        <cool-jconon.version>4.2.47</cool-jconon.version>
         <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
         <cool.mode>development</cool.mode>
         <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
@@ -21,9 +38,9 @@
 
     <packaging>war</packaging>
 
-    <artifactId>cool-jconon-funzione-pubblica</artifactId>
+    <artifactId>cool-jconon-oiv</artifactId>
     <version>2.0.47-SNAPSHOT</version>
-    <name>Concorsi On-Line Funzione Pubblica</name>
+    <name>Concorsi On-Line - OIV</name>
 
     <dependencies>
         <dependency>
@@ -36,11 +53,6 @@
                     <artifactId>mail</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.si.sprint</groupId>
-            <artifactId>sprint-logging</artifactId>
-            <version>2.0.12</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
@@ -62,29 +74,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>it.cnr.si.cool</groupId>
-            <artifactId>cool-common-web</artifactId>
-            <version>${cool-shared.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.si.cool</groupId>
-            <artifactId>cool-common-web-js</artifactId>
-            <version>${cool-shared.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.mail</groupId>
-                    <artifactId>mail</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>javax.mail</artifactId>
@@ -93,7 +82,6 @@
     </dependencies>
 
     <profiles>
-
         <profile>
             <id>prod</id>
             <properties>
@@ -178,23 +166,6 @@
                                             </outputDirectory>
                                             <includes>**/*.js</includes>
                                         </artifactItem>
-                                        <artifactItem>
-                                            <groupId>it.cnr.si.cool</groupId>
-                                            <artifactId>cool-common-web-js</artifactId>
-                                            <version>${cool-shared.version}</version>
-                                            <outputDirectory>${project.build.directory}/javascript-exploded
-                                            </outputDirectory>
-                                            <includes>**/*.js</includes>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>it.cnr.si.cool</groupId>
-                                            <artifactId>cool-common-web</artifactId>
-                                            <version>${cool-shared.version}</version>
-                                            <outputDirectory>${project.build.directory}/javascript-exploded
-                                            </outputDirectory>
-                                            <includes>**/*.js</includes>
-                                            <excludes>**/remote/**,**/surf/**</excludes>
-                                        </artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
@@ -203,12 +174,11 @@
                 </plugins>
             </build>
         </profile>
-
     </profiles>
 
 
     <build>
-        <finalName>selezioni-fp</finalName>
+        <finalName>selezioni-oiv</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -247,7 +217,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <warName>selezioni-fp</warName>
+                    <warName>selezioni-oiv</warName>
                     <!-- exclude direct copy of resources from src when using yuicompressor, see parent POM configuration -->
                     <warSourceExcludes>**/js/ws/**/*.js,**/js/cnr/**/*.js,**/js/thirdparty/**/*.js,**/*.css
                     </warSourceExcludes>
@@ -256,12 +226,9 @@
                             <addClasspath>true</addClasspath>
                         </manifest>
                         <manifestEntries>
-                            <Dependencies>org.dom4j,javax.mail.api</Dependencies>
-                                  
+                            <Dependencies>org.dom4j,javax.mail.api</Dependencies>      
                             <Specification-Title>${project.name}</Specification-Title>
-                                          
                             <Specification-Version>${project.version}</Specification-Version>
-                                          
                             <Implementation-Version>${project.version}</Implementation-Version>
                             <mode>${cool.mode}</mode>
                         </manifestEntries>
@@ -294,8 +261,8 @@
     </build>
 
     <scm>
-        <connection>scm:git:ssh://git@git.si.cnr.it/documentale/cool-jconon-funzione-pubblica.git</connection>
-        <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/cool-jconon-funzione-pubblica.git
+        <connection>scm:git:ssh://git@git.si.cnr.it/documentale/cool-jconon-oiv.git</connection>
+        <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/cool-jconon-oiv.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
@@ -313,6 +280,39 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <licenses>
+        <license>
+            <name>GNU AFFERO GENERAL PUBLIC LICENSE</name>
+            <url>https://www.gnu.org/licenses/agpl-3.0.html</url>
+            <comments>
+                Copyright (C) 2019 Consiglio Nazionale delle Ricerche
+
+                This program is free software: you can redistribute it and/or modify
+                it under the terms of the GNU Affero General Public License as
+                published by the Free Software Foundation, either version 3 of the
+                License, or (at your option) any later version.
+
+                This program is distributed in the hope that it will be useful,
+                but WITHOUT ANY WARRANTY; without even the implied warranty of
+                MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+                GNU Affero General Public License for more details.
+
+                You should have received a copy of the GNU Affero General Public License
+                along with this program. If not, see https://www.gnu.org/licenses/
+            </comments>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>marco.spasiano</id>
+            <name>Marco Spasiano</name>
+            <email>marco.spasiano at cnr.it</email>
+            <roles>
+                <role>Project lead</role>
+            </roles>
+        </developer>
+    </developers>
 
 
 </project>
