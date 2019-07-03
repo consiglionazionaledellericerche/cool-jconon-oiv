@@ -166,6 +166,21 @@
                                             </outputDirectory>
                                             <includes>**/*.js</includes>
                                         </artifactItem>
+                                        <artifactItem>
+                                            <groupId>it.cnr.si.cool</groupId>
+                                            <artifactId>cool-common-web-js</artifactId>
+                                            <outputDirectory>${project.build.directory}/javascript-exploded
+                                            </outputDirectory>
+                                            <includes>**/*.js</includes>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>it.cnr.si.cool</groupId>
+                                            <artifactId>cool-common-web</artifactId>
+                                            <outputDirectory>${project.build.directory}/javascript-exploded
+                                            </outputDirectory>
+                                            <includes>**/*.js</includes>
+                                            <excludes>**/remote/**,**/surf/**</excludes>
+                                        </artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
@@ -267,7 +282,6 @@
         <tag>HEAD</tag>
     </scm>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -313,6 +327,4 @@
             </roles>
         </developer>
     </developers>
-
-
 </project>
