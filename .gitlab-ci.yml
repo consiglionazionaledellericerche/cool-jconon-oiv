@@ -23,10 +23,10 @@ cache:
   
 maven-deploy:
   stage: deploy
-  image: maven:alpine
+  image: maven:3.3-jdk-8
   before_script:
     - apk add --update nodejs nodejs-npm && rm -rf /var/cache/apk/*
-  script: mvn clean deploy $MAVEN_CLI_OPTS -Pprod -Darguments="-Djava.io.tmpdir=/root"
+  script: "mvn clean deploy $MAVEN_CLI_OPTS -Pprod"
   artifacts:
     paths:
       - target/*.war
