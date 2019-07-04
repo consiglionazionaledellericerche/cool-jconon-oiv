@@ -1,0 +1,62 @@
+{
+  "text.jconon_application_possesso_cittadinanza_italiana": {
+    "oldLabel": "di possedere la cittadinanza italiana",
+    "newLabel": "di essere cittadino italiano o di uno degli Stati membri dell'Unione Europea"
+  },
+  "text.jconon_application_condanne_penali": {
+    "oldLabel": "di non aver riportato condanne penali, né avere procedimenti penali in corso, anche all'estero",
+    "newLabel": "di non aver riportato condanne penali e non essere destinatario di provvedimenti giudiziari iscritti nel casellario giudiziale. \nLe cause di esclusione di cui alla presente lettera operano anche nel caso in cui la sentenza definitiva disponga l'applicazione della pena su richiesta, ai sensi dell'articolo 444 del codice di procedura penale.\n"
+  },
+  "text.jconon_application_laurea": {
+    "oldLabel": "di aver conseguito il seguente titolo di studio (o titolo estero equivalente)",
+    "newLabel": "di essere in possesso del diploma di laurea (vecchio ordinamento) o laurea specialistica o laurea magistrale"
+  },
+  "affix_tabCurriculum": {
+    "oldLabel": "A) Curriculum",
+    "newLabel": "Altri Dati Facoltativi"
+  },
+  "affix_tabSchedaAnonima": {
+    "oldLabel": "Scheda Anonima Sintetica",
+    "newLabel": "Dettaglio delle Esperienze Professionali e degli Incarichi negli OIV o nei Nuclei di Valutazione con Funzioni Analoghe"
+  },
+  "affix_tabUlterioriDati": {
+    "oldLabel": "Ulteriori Dati",
+    "newLabel": "Fascia Professionale"
+  },
+  "label.jconon_application.fl_esperienza_professionale": {
+    "oldLabel": "di essere in possesso di comprovata esperienza professionale di almeno 5 anni, maturata sul campo,  presso pubbliche amministrazioni o aziende private, nella misurazione e valutazione della performance organizzativa e individuale, nella pianificazione, nel controllo di gestione, nella programmazione finanziaria e di bilancio e nel risk management.",
+    "newLabel": "di essere in possesso di comprovata esperienza professionale di almeno 5 anni, maturata presso pubbliche amministrazioni o aziende private, nella misurazione e valutazione della performance organizzativa e individuale, nella pianificazione, nel controllo di gestione, nella programmazione finanziaria e di bilancio e nel risk management"
+  },
+  "label.jconon_application.fl_sentenza_giudicato": {
+    "oldLabel": "di non essere stato condannato, anche con sentenza non passata in giudicato, per uno dei reati previsti dal capo I del titolo II del libro secondo del codice penale",
+    "newLabel": "di non essere stato condannato, anche con sentenza non passata in giudicato, per uno dei reati previsti dal libro secondo, titolo II, capo I del codice penale"
+  },
+  "label.jconon_application.fl_condanne_contabili": {
+    "oldLabel": "di non avere riportato condanne nei giudizi di responsabilità contabile e amministrativa",
+    "newLabel": "di non aver riportato condanna nei giudizi di responsabilità contabile e amministrativa per danno erariale"
+  },
+  "label.jconon_application.fl_incarichi_pubblici_apicali": {
+    "oldLabel": "di non rivestire incarichi pubblici elettivi, incarichi apicali presso uffici di diretta collaborazione, cariche in partiti politici o in organizzazioni sindacali e di non aver rivestito tali incarichi e cariche nei tre anni precedenti all'iscrizione all'Elenco nazionale ovvero al rinnovo dell'iscrizione.",
+    "newLabel": "di non essere stato destinatario, quale dipendente pubblico, di una sanzione disciplinare superiore alla censura"
+  },
+  "label.jconon_application.fl_precedente_incarico_oiv": {
+    "oldLabel": "di aver ricoperto l'incarico di organismo indipendente di valutazione o nucleo di valutazione per almeno 3 anni",
+    "newLabel": "di aver ricoperto l'incarico di Organismo indipendente di valutazione della performance o Nucleo di valutazione con funzioni analoghe per almeno 3 anni"
+  },
+  "label.jconon_application.fl_magistrato_contabile": {
+    "oldLabel": "di non essere soggetto deputato allo svolgimento di funzioni di controllo esterno alle amministrazioni e di non essere magistrato contabile",
+    "newLabel": "di non rivestire incarichi pubblici elettivi o cariche in partiti politici o in organizzazioni sindacali, ovvero non avere rapporti continuativi di collaborazione o di consulenza con le predette organizzazioni, ovvero non avere rivestito simili incarichi o cariche, ovvero non avere avuto simili rapporti nei tre anni precedenti la designazione"
+  },
+  "label.jconon_application_data_laurea": {
+    "oldLabel": "Data Conseguimento",
+    "newLabel": "Data conseguimento"
+  },
+  "affix_tabTitoli": {
+    "oldLabel": "Allegati Vari",
+    "newLabel": "Allegati alla Domanda"
+  },
+  "affix_tabDatiCNR": {
+    "oldLabel": "Dati CNR",
+    "newLabel": "Dati posizione lavorativa attuale"
+  }
+}

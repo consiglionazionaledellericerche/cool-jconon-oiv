@@ -66,7 +66,7 @@ public class FlowsService {
             numeroEsperienza++;
             result.add(
                     new Esperienza()
-                            .setIdEsperienza(resultEsperienza.<String>getPropertyValueById(PropertyIds.OBJECT_ID))
+                            .setIdEsperienza(resultEsperienza.getPropertyValueById(PropertyIds.OBJECT_ID))
                             .setNumeroEsperienza(numeroEsperienza)
                             .setDataInizio(
                                     DateTimeFormatter.ofPattern(DD_MM_YYYY).format(
@@ -83,20 +83,20 @@ public class FlowsService {
                                             .orElse(null)
                             )
                             .setTipologiaEsperienza("Esperienza professionale")
-                            .setCodIpa(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_cod_amm_ipa"))
+                            .setCodIpa(resultEsperienza.getPropertyValueById("jconon_attachment:esperienza_professionale_cod_amm_ipa"))
                             .setDescrizioneIpa(
                                     Optional.ofNullable(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_amministrazione"))
-                                            .orElseGet(() -> resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_datore_lavoro"))
+                                            .orElseGet(() -> resultEsperienza.getPropertyValueById("jconon_attachment:esperienza_professionale_datore_lavoro"))
                             )
-                            .setAmbitoEsperienza(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_area_specializzazione"))
-                            .setAttivitaSvolta(resultEsperienza.<String>getPropertyValueById("jconon_attachment:esperienza_professionale_attivita_svolta"))
+                            .setAmbitoEsperienza(resultEsperienza.getPropertyValueById("jconon_attachment:esperienza_professionale_area_specializzazione"))
+                            .setAttivitaSvolta(resultEsperienza.getPropertyValueById("jconon_attachment:esperienza_professionale_attivita_svolta"))
             );
         }
         for (QueryResult oiv : queryResultOivs) {
             numeroEsperienza++;
             result.add(
                     new Esperienza()
-                            .setIdEsperienza(oiv.<String>getPropertyValueById(PropertyIds.OBJECT_ID))
+                            .setIdEsperienza(oiv.getPropertyValueById(PropertyIds.OBJECT_ID))
                             .setNumeroEsperienza(numeroEsperienza)
                             .setDataInizio(
                                     DateTimeFormatter.ofPattern(DD_MM_YYYY).format(
@@ -113,15 +113,15 @@ public class FlowsService {
                                             .orElse(null)
                             )
                             .setTipologiaEsperienza("Incarichi OIV/Nuclei")
-                            .setCodIpa(oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_cod_amm_ipa"))
+                            .setCodIpa(oiv.getPropertyValueById("jconon_attachment:precedente_incarico_oiv_cod_amm_ipa"))
                             .setDescrizioneIpa(
-                                    oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_amministrazione")
+                                    oiv.getPropertyValueById("jconon_attachment:precedente_incarico_oiv_amministrazione")
                             )
                             .setNrDipendenti(Optional.ofNullable(oiv.<String>getPropertyValueById(ApplicationOIVService.JCONON_ATTACHMENT_PRECEDENTE_INCARICO_OIV_NUMERO_DIPENDENTI))
                                     .filter(s -> s.equalsIgnoreCase(ApplicationOIVService.SUP250))
                                     .map(s -> "maggioreUguale250")
                                     .orElse("minoreDi250"))
-                            .setAttivitaSvolta(oiv.<String>getPropertyValueById("jconon_attachment:precedente_incarico_oiv_ruolo"))
+                            .setAttivitaSvolta(oiv.getPropertyValueById("jconon_attachment:precedente_incarico_oiv_ruolo"))
             );
         }
         return result;

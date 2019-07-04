@@ -573,7 +573,7 @@ public class PrintOIVService extends PrintService {
                         doc.setContentStream(contentStream, true, true);
                         doc = doc.getObjectOfLatestVersion(false);
                         LOGGER.info("Start checkin application:{} with name {}", doc.getId(), nameRicevutaReportModel);
-                        docId = checkInPrint(cmisService.getAdminSession(), doc.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), is, nameRicevutaReportModel);
+                        docId = checkInPrint(cmisService.getAdminSession(), doc.getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), is, nameRicevutaReportModel);
                         LOGGER.info("End checkin application:{} with name {}", doc.getId(), nameRicevutaReportModel);
                     } else {
                         doc = cmisSession.getLatestDocumentVersion(doc.updateProperties(properties, true));
@@ -647,7 +647,7 @@ public class PrintOIVService extends PrintService {
             row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:telefono_comunicazioni"));
         }
         Calendar data = Optional.ofNullable(applicationObject.<Calendar>getPropertyValue("jconon_application:data_domanda")).orElse(
-                applicationObject.<Calendar>getPropertyValue("jconon_application:data_ultimo_invio"));
+                applicationObject.getPropertyValue("jconon_application:data_ultimo_invio"));
         row.createCell(column++).setCellValue(Optional.ofNullable(data).map(map ->
                 dateTimeFormat.format((data).getTime())).orElse(""));
         if (!all) {
@@ -736,7 +736,7 @@ public class PrintOIVService extends PrintService {
         row.createCell(column++).setCellValue(applicationObject.<String>getPropertyValue("jconon_application:telefono_comunicazioni"));
 
         Calendar data = Optional.ofNullable(applicationObject.<Calendar>getPropertyValue("jconon_application:data_domanda")).orElse(
-                applicationObject.<Calendar>getPropertyValue("jconon_application:data_ultimo_invio"));
+                applicationObject.getPropertyValue("jconon_application:data_ultimo_invio"));
         row.createCell(column++).setCellValue(Optional.ofNullable(data).map(map ->
                 dateTimeFormat.format((data).getTime())).orElse(""));
 

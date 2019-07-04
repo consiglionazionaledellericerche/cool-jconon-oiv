@@ -93,6 +93,9 @@ public class CallOIVService extends CallService {
     private static final String JCONON_ATTACHMENT_CALL_FP = "jconon_attachment:call_fp";
     private static final Logger LOGGER = LoggerFactory.getLogger(CallOIVService.class);
     private static final String F_JCONON_CALL_PROCEDURA_COMPARATIVA_FOLDER = "F:jconon_call_procedura_comparativa:folder";
+    public static final String OIV_CALL_DATA_INIZIO_INVIO_DOMANDE = "jconon_call:data_inizio_invio_domande";
+    public static final String OIV_CALL_DATA_FINE_INVIO_DOMANDE = "jconon_call:data_fine_invio_domande";
+
     @Autowired
     private I18nService i18NService;
     @Autowired
@@ -133,6 +136,18 @@ public class CallOIVService extends CallService {
                 || status == HttpStatus.SC_INTERNAL_SERVER_ERROR)
             throw new CoolException("Publish failed for procedura-comparativa: "
                     + resp.getErrorContent());
+    }
+
+    public boolean isBandoInCorso(Folder call) {
+        Calendar dtPubblBando = call.getPropertyValue(OIV_CALL_DATA_INIZIO_INVIO_DOMANDE);
+        Calendar dtScadenzaBando = call.getPropertyValue(OIV_CALL_DATA_FINE_INVIO_DOMANDE);
+        Calendar currDate = new GregorianCalendar();
+        Boolean isBandoInCorso = Boolean.FALSE;
+        if (dtScadenzaBando == null && dtPubblBando != null && dtPubblBando.before(currDate))
+            isBandoInCorso = Boolean.TRUE;
+        if (dtScadenzaBando != null && dtPubblBando != null && dtPubblBando.before(currDate) && dtScadenzaBando.after(currDate))
+            isBandoInCorso = Boolean.TRUE;
+        return isBandoInCorso;
     }
 
     public Folder publishEsito(Session cmisSession,
@@ -370,12 +385,12 @@ public class CallOIVService extends CallService {
         ContentStream contentStream = new ContentStreamImpl(file.getOriginalFilename(), BigInteger.valueOf(file.getSize()),
                 file.getContentType(), file.getInputStream());
         Document proroga = call.createDocument(properties, contentStream, VersioningState.MAJOR);
-        aclService.setInheritedPermission(cmisService.getAdminSession(), proroga.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), false);
-        aclService.changeOwnership(cmisService.getAdminSession(), proroga.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
+        aclService.setInheritedPermission(cmisService.getAdminSession(), proroga.getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), false);
+        aclService.changeOwnership(cmisService.getAdminSession(), proroga.getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
                 adminUserName, false, Collections.emptyList());
         Map<String, ACLType> aces = new HashMap<String, ACLType>();
         aces.put(GROUP_EVERYONE, ACLType.Consumer);
-        aclService.addAcl(cmisService.getAdminSession(), proroga.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), aces);
+        aclService.addAcl(cmisService.getAdminSession(), proroga.getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), aces);
 
         Map<String, Object> propertiesCall = new HashMap<String, Object>();
         propertiesCall.put(JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA, calcolaDataProroga);

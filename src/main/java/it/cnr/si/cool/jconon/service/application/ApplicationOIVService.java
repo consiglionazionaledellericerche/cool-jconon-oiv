@@ -407,7 +407,7 @@ public class ApplicationOIVService extends ApplicationService {
                 .map(Document.class::cast)
                 .collect(Collectors.toList());
 
-        TaskResponse currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
+        TaskResponse currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
                 .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
                 .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody()).orElseThrow(() -> new RuntimeException("Task corrente non trovato!"));
 
@@ -444,7 +444,7 @@ public class ApplicationOIVService extends ApplicationService {
                 .map(Document.class::cast)
                 .collect(Collectors.toList());
 
-        TaskResponse currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
+        TaskResponse currentTask = Optional.ofNullable(flowsService.getCurrentTask(application.getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
                 .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
                 .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody()).orElseThrow(() -> new RuntimeException("Task corrente non trovato!"));
 
@@ -655,7 +655,7 @@ public class ApplicationOIVService extends ApplicationService {
             Optional.ofNullable(latestDocumentVersion.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)).ifPresent(fascia -> {
                 if (eseguiControlloFascia &&
                         fascia.equals(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA)) &&
-                        ((flowsEnable && Optional.ofNullable(application.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).isPresent()) || !flowsEnable)) {
+                        (!flowsEnable || Optional.ofNullable(application.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO)).isPresent())) {
                     throw new ClientMessageException(
                             i18nService.getLabel("message.error.domanda.fascia.equals", Locale.ITALIAN, fascia));
                 }
@@ -742,7 +742,7 @@ public class ApplicationOIVService extends ApplicationService {
         Folder application = loadApplicationById(session, nodeRef, null);
         Folder call = loadCallById(currentCMISSession, application.getProperty(PropertyIds.PARENT_ID).getValueAsString());
         try {
-            final Optional<BigInteger> progressivoIscrizione = Optional.ofNullable(application.<BigInteger>getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO));
+            final Optional<BigInteger> progressivoIscrizione = Optional.ofNullable(application.getPropertyValue(JCONON_APPLICATION_PROGRESSIVO_ISCRIZIONE_ELENCO));
             Integer numProgressivo =
                     progressivoIscrizione
                             .map(BigInteger::intValue)
@@ -816,7 +816,7 @@ public class ApplicationOIVService extends ApplicationService {
             EmailMessage message = new EmailMessage();
             message.setRecipients(emailList);
             message.setBccRecipients(Arrays.asList(mailFromDefault));
-            message.setSubject(doc.<String>getPropertyValue(JCONON_APPLICATION_OGGETTO_NOTIFICA_EMAIL));
+            message.setSubject(doc.getPropertyValue(JCONON_APPLICATION_OGGETTO_NOTIFICA_EMAIL));
             message.setBody(doc.<String>getPropertyValue(JCONON_APPLICATION_TESTO_NOTIFICA_EMAIL));
             if (Optional.ofNullable(doc.getContentStream()).isPresent())
                 message.setAttachments(Arrays.asList(new AttachmentBean(doc.getName(), IOUtils.toByteArray(doc.getContentStream().getStream()))));
@@ -1032,8 +1032,8 @@ public class ApplicationOIVService extends ApplicationService {
         ItemIterable<QueryResult> iterable = criteria.executeQuery(session, false, session.getDefaultContext());
         result.add("NOME,COGNOME,CODICE_FISCALE,NUMERO ELENCO,FASCIA ATTRIBUITA,FASCIA CALCOLATA");
         for (QueryResult queryResult : iterable.getPage(Integer.MAX_VALUE)) {
-            Folder application = loadApplicationById(session, queryResult.<String>getPropertyValueById(PropertyIds.OBJECT_ID), null);
-            Optional<String> fasciaAttribuita = Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
+            Folder application = loadApplicationById(session, queryResult.getPropertyValueById(PropertyIds.OBJECT_ID), null);
+            Optional<String> fasciaAttribuita = Optional.ofNullable(application.getPropertyValue(JCONON_APPLICATION_FASCIA_PROFESSIONALE_ATTRIBUITA));
             Optional<String> fasciaCalcolata = Optional.ofNullable(eseguiCalcolo(application.getId()));
             result.add(
                     application.<String>getPropertyValue(JCONONPropertyIds.APPLICATION_NOME.value()).toUpperCase()
@@ -1082,7 +1082,7 @@ public class ApplicationOIVService extends ApplicationService {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("jconon_attachment:esperienza_non_coerente_motivazione", motivazione);
         object.updateProperties(properties, Collections.singletonList(aspect), Collections.emptyList());
-        aclService.changeOwnership(cmisService.getAdminSession(), object.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
+        aclService.changeOwnership(cmisService.getAdminSession(), object.getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
                 adminUserName, false, Collections.emptyList());
     }
 
@@ -1138,7 +1138,7 @@ public class ApplicationOIVService extends ApplicationService {
         }
         CmisObject object = session.getObject(objectId);
         object.updateProperties(Collections.emptyMap(), Collections.emptyList(), Collections.singletonList(aspect));
-        aclService.changeOwnership(cmisService.getAdminSession(), object.<String>getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
+        aclService.changeOwnership(cmisService.getAdminSession(), object.getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
                 userName, false, Collections.emptyList());
     }
 
@@ -1218,7 +1218,7 @@ public class ApplicationOIVService extends ApplicationService {
 
     public boolean isStatoFlussoSoccorsoIstruttorio(Session currentCMISSession, final String applicationSourceId) {
         final Folder newApplication = loadApplicationById(currentCMISSession, applicationSourceId, null);
-        final String currentTaskName = Optional.ofNullable(flowsService.getCurrentTask(newApplication.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
+        final String currentTaskName = Optional.ofNullable(flowsService.getCurrentTask(newApplication.getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
                 .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
                 .map(taskResponseResponseEntity -> taskResponseResponseEntity.getBody())
                 .map(TaskResponse::getName)

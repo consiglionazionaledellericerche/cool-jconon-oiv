@@ -19,14 +19,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>archetype</artifactId>
-        <groupId>it.cnr.si</groupId>
-        <version>1.0.13</version>
+        <groupId>it.cnr.si.cool.jconon</groupId>
+        <artifactId>cool-jconon-parent</artifactId>
+        <version>4.2.47</version>
     </parent>
 
     <properties>
-        <cool-jconon.version>4.2.47</cool-jconon.version>
-        <cool.shared.version>3.1.59</cool.shared.version>
+        <cool.jconon.version>4.2.47</cool.jconon.version>
         <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
         <cool.mode>development</cool.mode>
         <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
@@ -45,7 +44,7 @@
         <dependency>
             <groupId>it.cnr.si.cool.jconon</groupId>
             <artifactId>cool-jconon-webapp-resources</artifactId>
-            <version>${cool-jconon.version}</version>
+            <version>${cool.jconon.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.mail</groupId>
@@ -160,7 +159,7 @@
                                         <artifactItem>
                                             <groupId>it.cnr.si.cool.jconon</groupId>
                                             <artifactId>cool-jconon-webapp-resources</artifactId>
-                                            <version>${cool-jconon.version}</version>
+                                            <version>${cool.jconon.version}</version>
                                             <outputDirectory>${project.build.directory}/javascript-exploded
                                             </outputDirectory>
                                             <includes>**/*.js</includes>

@@ -17,7 +17,6 @@
 
 package it.cnr.si.cool.jconon.service.application;
 
-import java.sql.Time;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -25,9 +24,9 @@ import java.util.Optional;
 import java.util.TimeZone;
 
 public class Interval implements Comparable<Interval> {
+    private static TimeZone CURRENT_TIME_ZONE = TimeZone.getTimeZone(ZoneId.of("Europe/Rome"));
     private Instant startDate;
     private Instant endDate;
-    private static TimeZone CURRENT_TIME_ZONE = TimeZone.getTimeZone(ZoneId.of("Europe/Rome"));
 
     public Interval(Instant startDate, Instant endDate) {
         super();
