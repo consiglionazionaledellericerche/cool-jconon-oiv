@@ -53,6 +53,10 @@
                     <groupId>com.hazelcast</groupId>
                     <artifactId>hazelcast-spring</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>it.uliana.hazelcastshell</groupId>
+                    <artifactId>hazelcast-shell</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
