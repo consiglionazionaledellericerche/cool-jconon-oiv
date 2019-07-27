@@ -26,6 +26,7 @@ import it.cnr.si.cool.jconon.cmis.model.JCONONFolderType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.service.call.CallOIVService;
 import it.cnr.si.cool.jconon.service.call.CallService;
+import it.cnr.si.cool.jconon.util.JcononGroups;
 import it.cnr.si.opencmis.criteria.Criteria;
 import it.cnr.si.opencmis.criteria.CriteriaFactory;
 import it.cnr.si.opencmis.criteria.restrictions.Restrictions;
@@ -175,8 +176,8 @@ public class OIVConfiguration {
             aclService.addAcl(cmisService.getAdminSession(),
                     callOIV.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(),
                     Stream.of(
-                            new AbstractMap.SimpleEntry<String, ACLType>(CallService.GROUP_CONCORSI, ACLType.Coordinator),
-                            new AbstractMap.SimpleEntry<String, ACLType>(CallService.GROUP_EVERYONE, ACLType.Consumer))
+                            new AbstractMap.SimpleEntry<String, ACLType>(JcononGroups.CONCORSI.group(), ACLType.Coordinator),
+                            new AbstractMap.SimpleEntry<String, ACLType>(JcononGroups.EVERYONE.group(), ACLType.Consumer))
                             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
             );
             callOIV.createDocument(

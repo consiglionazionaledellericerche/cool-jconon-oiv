@@ -3,7 +3,7 @@ repository.base.url: http://alfresco-community.test.si.cnr.it/alfresco/
 org.apache.chemistry.opencmis.binding.spi.type: browser
 
 user.admin.password: admin
-server.context-path: /
+server.servlet.context-path: /
 siper.sedi.url: http://localhost:8080/rest/static/json/sedi.json
 helpdesk.url: https://helpdesk-coll.ecaasdfp.cloudspc.it/rest
 helpdesk.ucat.url:

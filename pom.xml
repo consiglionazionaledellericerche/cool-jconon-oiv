@@ -21,17 +21,16 @@
     <parent>
         <groupId>it.cnr.si.cool.jconon</groupId>
         <artifactId>cool-jconon-parent</artifactId>
-        <version>4.2.47</version>
+        <version>4.2.59</version>
     </parent>
 
     <properties>
-        <cool.jconon.version>4.2.47</cool.jconon.version>
-        <spring-boot.version>1.4.1.RELEASE</spring-boot.version>
+        <cool.jconon.version>4.2.59</cool.jconon.version>
         <cool.mode>development</cool.mode>
         <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
         <junit.version>4.12</junit.version>
-        <spring.version>4.3.3.RELEASE</spring.version>
         <mail.version>1.6.2</mail.version>
+        <hazelcast.version>3.7.2</hazelcast.version>
     </properties>
 
     <packaging>war</packaging>
@@ -50,11 +49,26 @@
                     <groupId>javax.mail</groupId>
                     <artifactId>mail</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.hazelcast</groupId>
+                    <artifactId>hazelcast-spring</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
             <artifactId>spring-security-oauth2</artifactId>
+            <version>2.3.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-spring</artifactId>
+            <version>${hazelcast.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+            <version>${hazelcast.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -227,6 +241,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

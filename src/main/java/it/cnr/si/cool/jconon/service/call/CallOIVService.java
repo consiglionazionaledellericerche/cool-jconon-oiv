@@ -34,6 +34,7 @@ import it.cnr.si.cool.jconon.cmis.model.JCONONPolicyType;
 import it.cnr.si.cool.jconon.cmis.model.JCONONPropertyIds;
 import it.cnr.si.cool.jconon.repository.CacheRepository;
 import it.cnr.si.cool.jconon.service.cache.CompetitionFolderService;
+import it.cnr.si.cool.jconon.util.JcononGroups;
 import it.cnr.si.opencmis.criteria.Criteria;
 import it.cnr.si.opencmis.criteria.CriteriaFactory;
 import it.cnr.si.opencmis.criteria.restrictions.Restrictions;
@@ -342,7 +343,7 @@ public class CallOIVService extends CallService {
                 aclService.setInheritedPermission(bindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), false);
                 creaGruppoRdP(call, userId);
                 Map<String, ACLType> aces = new HashMap<String, ACLType>();
-                aces.put(GROUP_CONCORSI, ACLType.Coordinator);
+                aces.put(JcononGroups.CONCORSI.group(), ACLType.Coordinator);
                 aclService.addAcl(bindingSession, call.getProperty(CoolPropertyIds.ALFCMIS_NODEREF.value()).getValueAsString(), aces);
             } else {
                 call = (Folder) cmisSession.getObject((String) properties.get(PropertyIds.OBJECT_ID));
@@ -389,7 +390,7 @@ public class CallOIVService extends CallService {
         aclService.changeOwnership(cmisService.getAdminSession(), proroga.getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()),
                 adminUserName, false, Collections.emptyList());
         Map<String, ACLType> aces = new HashMap<String, ACLType>();
-        aces.put(GROUP_EVERYONE, ACLType.Consumer);
+        aces.put(JcononGroups.EVERYONE.group(), ACLType.Consumer);
         aclService.addAcl(cmisService.getAdminSession(), proroga.getPropertyValue(CoolPropertyIds.ALFCMIS_NODEREF.value()), aces);
 
         Map<String, Object> propertiesCall = new HashMap<String, Object>();
