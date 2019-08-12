@@ -44,13 +44,13 @@ public class Interval implements Comparable<Interval> {
     public Interval(Calendar startDate, Calendar endDate) {
         super();
         startDate.setTimeZone(CURRENT_TIME_ZONE);
-        endDate.setTimeZone(CURRENT_TIME_ZONE);
         this.startDate = startDate.toInstant();
         final Calendar now = Calendar.getInstance(CURRENT_TIME_ZONE);
         this.endDate = Optional.ofNullable(endDate).map(data -> {
             if (data.after(now)) {
                 return now;
             } else {
+                data.setTimeZone(CURRENT_TIME_ZONE);
                 return data;
             }
         }).orElse(now).toInstant();
