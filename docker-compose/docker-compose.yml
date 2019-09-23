@@ -91,6 +91,3 @@ services:
       - ./conf.d/:/etc/nginx/conf.d/
       - /var/cache/nginx/
       - /var/run/
-volumes:
-  pgdata:
-    external: true

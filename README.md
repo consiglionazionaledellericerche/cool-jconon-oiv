@@ -13,10 +13,10 @@
 |Artifact| Version |
 |---|---|
 |[Apache Chemistry](https://chemistry.apache.org/java/opencmis.html)| ![Maven Central](https://img.shields.io/maven-central/v/org.apache.chemistry.opencmis/chemistry-opencmis-client-impl.svg)|
-|[Spring Boot](https://spring.io/projects/spring-boot)| ![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/org.springframework.boot/spring-boot/1.4.1.RELEASE.svg) |
-|[Spring.io](https://spring.io/)| ![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/org.springframework/spring-context/4.3.3.RELEASE.svg) |
-|[Cool](https://github.com/consiglionazionaledellericerche/cool) | ![Maven Central](https://img.shields.io/maven-central/v/it.cnr.si.cool/cool-parent.svg)|
-|[Jconon](https://github.com/consiglionazionaledellericerche/cool-jconon) | ![Maven Central](https://img.shields.io/maven-central/v/it.cnr.si.cool.jconon/cool-jconon-parent.svg)|
+|[Spring Boot](https://spring.io/projects/spring-boot)| ![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/org.springframework.boot/spring-boot/2.1.6.RELEASE.svg) |
+|[Spring.io](https://spring.io/)| ![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/org.springframework/spring-context/5.1.8.RELEASE.svg) |
+|[Cool](https://github.com/consiglionazionaledellericerche/cool) | ![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/it.cnr.si.cool/cool-parent/3.1.65.svg)|
+|[Jconon](https://github.com/consiglionazionaledellericerche/cool-jconon) | ![Maven Central with version prefix filter](https://img.shields.io/maven-central/v/it.cnr.si.cool.jconon/cool-jconon-parent/4.2.65.svg)|
 |[OpenCMIS Criteria](https://mvnrepository.com/artifact/it.cnr.si/opencmis-criteria) | ![Maven Central](https://img.shields.io/maven-central/v/it.cnr.si/opencmis-criteria.svg)|
 
 
@@ -25,7 +25,7 @@
 #### Prerequisites Docker and docker-compose
 ```
 git clone https://github.com/consiglionazionaledellericerche/cool-jconon-oiv.git
-cd docker-compose
+cd cool-jconon-oiv/docker-compose
 docker-compose up -d;docker-compose logs -f
 ```
 ### Normally after 120 seconds the application responds
