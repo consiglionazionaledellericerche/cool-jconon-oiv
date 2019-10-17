@@ -77,6 +77,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -86,6 +87,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.RedirectionException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -93,6 +95,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.URI;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -175,6 +178,9 @@ public class ApplicationOIVService extends ApplicationService {
     private FlowsService flowsService;
     @Autowired
     private CompetitionFolderService competitionFolderService;
+
+    @Autowired
+    Environment env;
 
     @Value("${mail.from.default}")
     private String mailFromDefault;
@@ -713,7 +719,8 @@ public class ApplicationOIVService extends ApplicationService {
         mailModel.put("email_comunicazione", user.getEmail());
         EmailMessage message = new EmailMessage();
         message.setRecipients(emailList);
-        message.setBccRecipients(Arrays.asList(mailFromDefault));
+        if (Arrays.asList(env.getActiveProfiles()).stream().anyMatch(s -> s.equals("prod")))
+            message.setBccRecipients(Arrays.asList(mailFromDefault));
         String body = Util.processTemplate(mailModel, "/pages/application/application.registration.html.ftl");
         message.setSubject(i18nService.getLabel("subject-info", Locale.ITALIAN) + i18nService.getLabel("subject-confirm-domanda", Locale.ITALIAN,
                 call.getProperty(JCONONPropertyIds.CALL_CODICE.value()).getValueAsString()));
@@ -773,7 +780,8 @@ public class ApplicationOIVService extends ApplicationService {
                     mailModel.put("email_comunicazione", email);
                     EmailMessage message = new EmailMessage();
                     message.setRecipients(emailList);
-                    message.setBccRecipients(Arrays.asList(mailFromDefault));
+                    if (Arrays.asList(env.getActiveProfiles()).stream().anyMatch(s -> s.equals("prod")))
+                        message.setBccRecipients(Arrays.asList(mailFromDefault));
                     String body = Util.processTemplate(mailModel, "/pages/application/application.iscrizione.html.ftl");
                     message.setSubject(i18nService.getLabel("app.name", Locale.ITALIAN) + " - " + i18nService.getLabel("mail.subject.iscrizione", Locale.ITALIAN, numProgressivo));
                     message.setBody(body);
@@ -1217,6 +1225,14 @@ public class ApplicationOIVService extends ApplicationService {
     }
 
     public boolean isStatoFlussoSoccorsoIstruttorio(Session currentCMISSession, final String applicationSourceId) {
+        return getCurrentTaskName(currentCMISSession, applicationSourceId).equalsIgnoreCase(TaskResponse.SOCCORSO_ISTRUTTORIO);
+    }
+
+    public boolean isPreavvisoDiRigetto(Session currentCMISSession, final String applicationSourceId) {
+        return getCurrentTaskName(currentCMISSession, applicationSourceId).equalsIgnoreCase(TaskResponse.PREAVVISO_RIGETTO);
+    }
+
+    public String getCurrentTaskName(Session currentCMISSession, final String applicationSourceId) {
         final Folder newApplication = loadApplicationById(currentCMISSession, applicationSourceId, null);
         final String currentTaskName = Optional.ofNullable(flowsService.getCurrentTask(newApplication.getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID)))
                 .filter(processInstanceResponseResponseEntity -> processInstanceResponseResponseEntity.getStatusCode() == HttpStatus.OK)
@@ -1224,7 +1240,7 @@ public class ApplicationOIVService extends ApplicationService {
                 .map(TaskResponse::getName)
                 .orElse("");
         LOGGER.info("Current Task Name {}", currentTaskName);
-        return currentTaskName.equalsIgnoreCase(TaskResponse.SOCCORSO_ISTRUTTORIO);
+        return currentTaskName;
     }
 
     public Map<String, String> scaricaSoccorsoIstruttorio(Session currentCMISSession, final String applicationSourceId) {
@@ -1258,10 +1274,14 @@ public class ApplicationOIVService extends ApplicationService {
     @Override
     public Folder load(Session currentCMISSession, String callId, String applicationId, String userId, boolean preview, String contextURL, Locale locale) {
         final Folder application = super.load(currentCMISSession, callId, applicationId, userId, preview, contextURL, locale);
-        if (flowsEnable && Optional.ofNullable(application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID))
-                .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent())
+        final String activityId = application.<String>getPropertyValue(JCONON_APPLICATION_ACTIVITY_ID);
+        if (flowsEnable && Optional.ofNullable(activityId)
+                .filter(processInstanceId -> !flowsService.isProcessTerminated(processInstanceId)).isPresent()) {
+            final String currentTaskName = getCurrentTaskName(currentCMISSession, application.getId());
+            if (currentTaskName.equals(TaskResponse.SOCCORSO_ISTRUTTORIO) || currentTaskName.equals(TaskResponse.PREAVVISO_RIGETTO))
+                throw new RedirectionException(javax.ws.rs.core.Response.Status.SEE_OTHER, URI.create("/my-applications"));
             throw new ClientMessageException("La domanda è in fase di valutazione, non è possibile modificarla!");
-
+        }
         return application;
     }
 

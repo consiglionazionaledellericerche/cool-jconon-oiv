@@ -5,13 +5,17 @@ org.apache.chemistry.opencmis.binding.spi.type: browser
 user.admin.password: admin
 server.servlet.context-path: /
 siper.sedi.url: http://localhost:8080/rest/static/json/sedi.json
-helpdesk.url: https://helpdesk-coll.ecaasdfp.cloudspc.it/rest
-helpdesk.ucat.url:
-helpdesk.istanza: /HDTrasparenza
-helpdesk.password: PdtAdmin
+helpdesk:
+  url: https://helpdesk-coll.ecaasdfp.cloudspc.it/rest
+  ucat:
+    url:
+  istanza: /HDTrasparenza
+  password: PdtAdmin
 
 mail.smtp.socketFactory.fallback: false
-
+hazelcast:
+  port:
+    autoincrement: false
 rrd:
   path: remote-shared,remote-fp
   skipmd5: true

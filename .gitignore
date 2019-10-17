@@ -12,3 +12,4 @@ activemq-data
 /docker-compose/alfresco_logs
 /docker-compose/pgdata
 /node_modules/
+/work/

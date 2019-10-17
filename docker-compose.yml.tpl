@@ -18,4 +18,4 @@ jconon-oiv:
   - ./webapp_logs:/logs
   - /tmp
   - /work/
-  command: java -Dspring.profiles.active=fp,prod -Xmx256m -Xss512k -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787 -Duser.language=it -Djava.security.egd=file:/dev/./urandom -jar /opt/jconon.war
+  command: java -Dspring.profiles.active=fp -Xmx256m -Xss512k -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787 -Duser.language=it -Djava.security.egd=file:/dev/./urandom -jar /opt/jconon.war
