@@ -90,6 +90,8 @@
     'cnr/cnr.ui.sedi': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.sedi',
     'cnr/cnr.ui.gestorisedi': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.gestorisedi',
     'cnr/cnr.ui.protocollo': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.protocollo',
+    'cnr/cnr.ui.user-titles': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.user-titles',
+    'cnr/cnr.ui.user-grades': '${common.cnr.javascript.path}' + 'cnr/cnr.ui.user-grades',
     'cnr/cnr.jconon': '${common.cnr.javascript.path}' + 'cnr/cnr.jconon',
     'cnr/cnr.application': '${common.cnr.javascript.path}' + 'cnr/cnr.application',
     'cnr/cnr.call': '${common.cnr.javascript.path}' + 'cnr/cnr.call',
@@ -99,6 +101,7 @@
     'cnr/cnr.url': '${common.cnr.javascript.path}' + 'cnr/cnr.url',
     'cnr/cnr.user': '${common.cnr.javascript.path}' + 'cnr/cnr.user',
     'cnr/cnr.validator': '${common.cnr.javascript.path}' + 'cnr/cnr.validator',
+
     'datepicker-i18n': 'empty:',
     'datetimepicker-i18n': 'empty:',
     'fileupload': '${common.javascript.path}' + 'thirdparty/jquery.fileupload',

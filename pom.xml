@@ -21,11 +21,10 @@
     <parent>
         <groupId>it.cnr.si.cool.jconon</groupId>
         <artifactId>cool-jconon-parent</artifactId>
-        <version>4.2.87</version>
+        <version>4.3.1</version>
     </parent>
 
     <properties>
-        <cool.jconon.version>4.3.1</cool.jconon.version>
         <cool.mode>development</cool.mode>
         <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
         <junit.version>4.12</junit.version>
@@ -43,7 +42,7 @@
         <dependency>
             <groupId>it.cnr.si.cool.jconon</groupId>
             <artifactId>cool-jconon-webapp-resources</artifactId>
-            <version>${cool.jconon.version}</version>
+            <version>${project.parent.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.mail</groupId>
@@ -177,7 +176,7 @@
                                         <artifactItem>
                                             <groupId>it.cnr.si.cool.jconon</groupId>
                                             <artifactId>cool-jconon-webapp-resources</artifactId>
-                                            <version>${cool.jconon.version}</version>
+                                            <version>${project.parent.version}</version>
                                             <outputDirectory>${project.build.directory}/javascript-exploded
                                             </outputDirectory>
                                             <includes>**/*.js</includes>
