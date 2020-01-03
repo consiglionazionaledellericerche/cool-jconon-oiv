@@ -2,6 +2,7 @@
 FROM anapsix/alpine-java:8u162b12_server-jre
 
 WORKDIR /app/
+RUN chown -R nobody:nobody /app
 ENV OIV_SLEEP 0
 ENV JAVA_OPTS="-Xmx1024m -Djava.security.egd=file:/dev/./urandom -Dlogback.configurationFile=logback-fp.xml"
 
