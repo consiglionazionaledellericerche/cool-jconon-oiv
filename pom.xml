@@ -35,7 +35,7 @@
     <packaging>war</packaging>
 
     <artifactId>cool-jconon-oiv</artifactId>
-    <version>2.0.55-SNAPSHOT</version>
+    <version>2.0.55</version>
     <name>Concorsi On-Line - OIV</name>
 
     <dependencies>
@@ -297,7 +297,7 @@
         <connection>scm:git:ssh://git@git.si.cnr.it/documentale/cool-jconon-oiv.git</connection>
         <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/cool-jconon-oiv.git
         </developerConnection>
-        <tag>HEAD</tag>
+        <tag>2.0.55</tag>
     </scm>
 
     <dependencyManagement>
