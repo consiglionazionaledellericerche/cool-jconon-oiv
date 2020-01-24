@@ -162,7 +162,7 @@ public class OIVHelpdeskService extends HelpdeskService {
                     UrlBuilder urlAllegato = new UrlBuilder(helpdeskPestURL.concat("/").concat(id));
                     PostMethod methodAllegato = new PostMethod(urlAllegato.toString());
                     try {
-                        FilePart filePart = new FilePart("allegato", new ByteArrayPartSource(allegato.getName(), allegato.getBytes()));
+                        FilePart filePart = new FilePart(allegato.getName(), new ByteArrayPartSource(allegato.getName(), allegato.getBytes()));
                         Part[] parts = {filePart};
                         methodAllegato.setRequestEntity(new MultipartRequestEntity(parts, methodAllegato.getParams()));
                         int statusCodeAllegato = httpClient.executeMethod(methodAllegato);
