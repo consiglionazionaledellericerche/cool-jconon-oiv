@@ -27,7 +27,7 @@ maven-deploy:
   before_script:
     - apk add --update nodejs nodejs-npm && rm -rf /var/cache/apk/*
     - apk add --update fontconfig ttf-dejavu && rm -rf /var/cache/apk/*
-  script: "mvn clean deploy $MAVEN_CLI_OPTS -Pprod"
+  script: "mvn clean deploy -DskipTests $MAVEN_CLI_OPTS -Pprod"
   artifacts:
     paths:
       - target/*.war
