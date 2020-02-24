@@ -62,7 +62,7 @@ services:
     volumes:
     - ./jconon_logs:/logs
     - /tmp
-    command: java -Xmx512m -Xss512k -Dspring.profiles.active=fp -Djava.security.egd=file:/dev/./urandom -jar /app/cool-jconon.war
+    command: java -Xmx512m -Xss512k -Dspring.profiles.active=fp -Djava.security.egd=file:/dev/./urandom -jar /app/elenco-oiv.war
     labels:
     - SERVICE_NAME=cool-jconon
     depends_on:
