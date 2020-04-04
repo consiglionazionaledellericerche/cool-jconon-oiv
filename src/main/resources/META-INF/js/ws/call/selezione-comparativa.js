@@ -165,7 +165,7 @@ define(['jquery', 'i18n', 'header', 'cnr/cnr.actionbutton', 'cnr/cnr.search',
         customButtons.attachments = function () {
           ApplicationFp.displayAttachments(el.id);
         };
-        if ((isActive || el.data_inizio_invio_domande === '') && (!el['jconon_call:pubblicato'] || common.User.admin)) {
+        if ((isActive || el.data_inizio_invio_domande === null) && (!el['jconon_call:pubblicato'] || common.User.admin)) {
           customButtons.edit = function () {
             window.location = jconon.URL.call.manage + '?call-type=' + el.objectTypeId + '&cmis:objectId=' + el.id;
           };
