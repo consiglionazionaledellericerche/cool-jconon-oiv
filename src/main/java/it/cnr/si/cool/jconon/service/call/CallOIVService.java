@@ -335,7 +335,7 @@ public class CallOIVService extends CallService {
                 properties.put(JCONONPropertyIds.CALL_ELENCO_ASSOCIATIONS.value(), Arrays.asList(""));
                 properties.put(JCONONPropertyIds.CALL_HAS_MACRO_CALL.value(), Boolean.FALSE);
                 properties.put(JCONONPropertyIds.CALL_ELENCO_SEZIONI_DOMANDA.value(), Arrays.asList(""));
-                properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), null);
+                properties.put(OIV_CALL_DATA_INIZIO_INVIO_DOMANDE, null);
                 properties.put(JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA, null);
 
                 call = (Folder) cmisSession.getObject(
