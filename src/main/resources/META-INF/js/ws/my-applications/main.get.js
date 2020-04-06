@@ -78,7 +78,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
         callStatus = callId ? 'tutti' : bulkInfo.getDataValueById('filters-attivi_scaduti'),
         call = el.relationships.parent ? el.relationships.parent[0] : {},
         now = new Date(common.now),
-        isActive = call['jconon_call:data_fine_invio_domande'] === "" ||
+        isActive = call['jconon_call:data_fine_invio_domande'] === null ||
           (new Date(call['jconon_call:data_inizio_invio_domande']) < now && new Date(call['jconon_call:data_fine_invio_domande']) > now);
 
       if (callCode) {
@@ -374,7 +374,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
               callData = el.relationships.parent[0],
               callAllowableActions = callData.allowableActions,
               dropdowns = {},
-              bandoInCorso = (callData['jconon_call:data_fine_invio_domande'] === "" ||
+              bandoInCorso = (callData['jconon_call:data_fine_invio_domande'] === null ||
                 new Date(callData['jconon_call:data_fine_invio_domande']) > new Date(common.now)),
               displayActionButton = true,
               defaultChoice,
@@ -779,7 +779,7 @@ define(['jquery', 'header', 'json!common', 'cnr/cnr.bulkinfo', 'cnr/cnr.search',
                         }
                       );
                     };
-                    if (el['jconon_application:progressivo_iscrizione_elenco'] == '') {
+                    if (el['jconon_application:progressivo_iscrizione_elenco'] === null) {
                       customButtons.inserisci = function () {
                         UI.confirm(i18n.prop('message.confirm.iscrizione.elenco', el['jconon_application:nome'], el['jconon_application:cognome']), function () {
                           var close = UI.progress();

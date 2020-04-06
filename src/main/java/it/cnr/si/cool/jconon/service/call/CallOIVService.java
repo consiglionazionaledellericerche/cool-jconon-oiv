@@ -211,12 +211,12 @@ public class CallOIVService extends CallService {
                 criteriaProcedureComparative.add(Restrictions.eq(JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE, call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_AMMINISTRAZIONE)));
                 criteriaProcedureComparative.add(Restrictions.ne(PropertyIds.OBJECT_ID, call.getId()));
                 criteriaProcedureComparative.add(Restrictions.eq(JCONONPropertyIds.CALL_PUBBLICATO.value(), true));
-                criteriaProcedureComparative.add(Restrictions.ge(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), Calendar.getInstance(TimeZone.getTimeZone(EUROPE_ROME), Locale.ITALY).getTime()));
+                criteriaProcedureComparative.add(Restrictions.ge(OIV_CALL_DATA_FINE_INVIO_DOMANDE, Calendar.getInstance(TimeZone.getTimeZone(EUROPE_ROME), Locale.ITALY).getTime()));
                 if (criteriaProcedureComparative.executeQuery(cmisSession, false, cmisSession.getDefaultContext()).getTotalNumItems() > 0)
                     throw new ClientMessageException("message.error.publish.call.alredy.active");
-                properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), today);
+                properties.put(OIV_CALL_DATA_INIZIO_INVIO_DOMANDE, today);
             } else {
-                properties.put(JCONONPropertyIds.CALL_DATA_INIZIO_INVIO_DOMANDE.value(), null);
+                properties.put(OIV_CALL_DATA_INIZIO_INVIO_DOMANDE, null);
             }
             call.updateProperties(properties, true);
             publish(cmisService.getAdminSession(),
@@ -259,7 +259,7 @@ public class CallOIVService extends CallService {
     }
 
     private void dataFineInvioDomande(Map<String, Object> properties) {
-        Optional<Calendar> dataFineInvioDomandeOpt = Optional.ofNullable((Calendar) properties.get(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value()));
+        Optional<Calendar> dataFineInvioDomandeOpt = Optional.ofNullable((Calendar) properties.get(OIV_CALL_DATA_FINE_INVIO_DOMANDE));
         Optional<String> oraFineInvioDomande = Optional.ofNullable((String) properties.get(JCONON_CALL_PROCEDURA_COMPARATIVA_ORA_FINE_INVIO_DOMANDE));
         if (dataFineInvioDomandeOpt.isPresent()) {
             Calendar dataFineInvioDomande = Calendar.getInstance(TimeZone.getTimeZone(ZoneId.of("CET")), Locale.ITALY);
@@ -274,7 +274,7 @@ public class CallOIVService extends CallService {
                 dataFineInvioDomande.set(Calendar.HOUR_OF_DAY, 23);
                 dataFineInvioDomande.set(Calendar.MINUTE, 59);
             }
-            properties.put(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value(), dataFineInvioDomande);
+            properties.put(OIV_CALL_DATA_FINE_INVIO_DOMANDE, dataFineInvioDomande);
         }
     }
 
@@ -372,7 +372,7 @@ public class CallOIVService extends CallService {
         Calendar calcolaDataProroga = calcolaDataProroga(dataProroga, oraProroga);
         //controllo sulle date
         if (calcolaDataProroga.before(Optional.ofNullable(call.getPropertyValue(JCONON_CALL_PROCEDURA_COMPARATIVA_DATA_FINE_PROROGA))
-                .orElse(call.getPropertyValue(JCONONPropertyIds.CALL_DATA_FINE_INVIO_DOMANDE.value())))) {
+                .orElse(call.getPropertyValue(OIV_CALL_DATA_FINE_INVIO_DOMANDE)))) {
             throw new ClientMessageException("La data di proroga deve essere successiva alla data presente sulla procedura comparativa!");
         }
         Map<String, Object> properties = new HashMap<String, Object>();

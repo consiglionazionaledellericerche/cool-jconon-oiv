@@ -262,10 +262,28 @@ define(['jquery', 'header', 'i18n', 'cnr/cnr', 'cnr/cnr.ui', 'cnr/cnr.bulkinfo',
 
           $('body').scrollspy({ target: '.cnr-sidenav' });
           content.prepend($('<div class="well jumbotron"><h1>' + i18n.prop(params['call-type']) + '</h1></div>'));
+        },
+        beforeCreateElement: function (item) {
+          if (item.name === 'compenso_annuo_altro_componente' ||
+              item.name === 'compenso_annuo_presidente' ||
+              item.name === 'compenso_annuo_componente') {
+            if (item.val) {
+              item.val = currencyFormat(item.val);
+            }
+          }
         }
       }
     });
     bulkinfo.render();
+  }
+
+  function currencyFormat(num) {
+    return (
+        Number(num)
+          .toFixed(2) // always two decimal digits
+          .replace('.', ',') // replace decimal point character with ,
+          .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+      ) // use . as a separator
   }
 
   function render() {
