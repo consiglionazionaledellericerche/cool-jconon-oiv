@@ -27,7 +27,7 @@
     <properties>
         <cool.mode>development</cool.mode>
         <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <mail.version>1.6.2</mail.version>
         <hazelcast.version>3.7.2</hazelcast.version>
     </properties>
