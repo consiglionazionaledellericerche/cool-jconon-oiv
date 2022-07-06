@@ -29,7 +29,7 @@
         <start-class>it.cnr.si.cool.jconon.CoolJcononApplication</start-class>
         <junit.version>4.12</junit.version>
         <mail.version>1.6.2</mail.version>
-        <hazelcast.version>3.7.2</hazelcast.version>
+        <hazelcast.version>3.11</hazelcast.version>
     </properties>
 
     <packaging>war</packaging>
